@@ -1,0 +1,36 @@
+{
+  "name": "agent-replay",
+  "version": "0.1.0",
+  "description": "Capture Python agent trajectories, inspect failures, and compare recorded, fixture, and live model replays.",
+  "author": {
+    "name": "Joe Ji",
+    "url": "https://github.com/j112929"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agent Replay",
+    "shortDescription": "Capture, inspect, and replay agent failures.",
+    "longDescription": "A local-first agent debugging workflow with bundled Python capture SDK, trajectory inspection, structural diffs, and replay runner.",
+    "developerName": "Joe Ji",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Inspect this agent trajectory and explain the failure.",
+      "Add trajectory capture to my Python agent.",
+      "Replay the failed tool with a JSON fixture and compare."
+    ],
+    "brandColor": "#D7FA75"
+  },
+  "repository": "https://github.com/j112929/agent-replay-mvp",
+  "homepage": "https://agent-replay-debugger.vercel.app",
+  "license": "MIT",
+  "keywords": [
+    "agents",
+    "debugging",
+    "trajectory",
+    "replay"
+  ]
+}
