@@ -17,3 +17,5 @@ jobs:
       - run: /tmp/replay-smoke/bin/pip install /tmp/replay-wheel/*.whl
       - run: cd /tmp && /tmp/replay-smoke/bin/agent-replay demo --directory /tmp/wheel-story
       - run: python plugins/agent-replay/scripts/replay.py demo --directory /tmp/plugin-story
+      - run: cd /tmp && /tmp/replay-smoke/bin/agent-replay rollout demo --actors 2 --rounds 2 --batch-size 16 --directory /tmp/wheel-rollout
+      - run: python plugins/agent-replay/scripts/replay.py rollout demo --actors 2 --rounds 2 --batch-size 16 --directory /tmp/plugin-rollout

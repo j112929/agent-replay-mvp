@@ -55,7 +55,7 @@ class ServerTests(unittest.TestCase):
         root=self.root/'restart';save(root/'jobs'/'one.json',{'id':'one','state':'running','idempotency_key':'key','request_digest':'digest'})
         store=Store(root,self.project);self.assertEqual(store.jobs['one']['state'],'interrupted');self.assertIn('key',store.idempotency)
     def test_new_assets_served(self):
-        for name in ('dashboard.js','v2.js','dashboard.css','regression-demo.json'):
+        for name in ('dashboard.js','v2.js','dashboard.css','regression-demo.json','debugger.html','rollout.js','rollout.css','rollout-demo.json'):
             with urlopen(self.url+'/'+name) as r:self.assertEqual(r.status,200)
     def test_native_provider_transport(self):
         from http.server import BaseHTTPRequestHandler

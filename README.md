@@ -1,3 +1,16 @@
+# Distributed RL Rollout & Replay Infrastructure
+
+Network Actor workers → versioned trajectories → independent rewards → replay/debug → real policy updates. Includes a CPU-only REINFORCE demo and preserves the Agent Regression Debugger.
+
+```sh
+pip install -e .
+agent-replay rollout demo --actors 3 --rounds 8
+```
+
+See [rollout architecture, API, workers and scope](docs/rollout-infrastructure.md). The Vercel site displays recorded/imported evidence; the controller and workers run on your infrastructure. This release uses one SQLite controller, not an HA scheduler or GPU trainer.
+
+---
+
 # Replay — Agent Regression Debugger
 
 [Live workspace](https://agent-replay-debugger.vercel.app) · [Implementation guide](docs/implementation.md) · [Original implementation plan](docs/agent-regression-debugger-plan.md)

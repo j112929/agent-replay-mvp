@@ -1,0 +1,4406 @@
+{
+  "counts": [
+    {
+      "count": 512,
+      "kind": "actor",
+      "state": "done"
+    },
+    {
+      "count": 8,
+      "kind": "learner",
+      "state": "done"
+    },
+    {
+      "count": 512,
+      "kind": "verifier",
+      "state": "done"
+    }
+  ],
+  "demo": {
+    "actors": 3,
+    "algorithm": "REINFORCE",
+    "batch_size": 64,
+    "environment": "two-arm-bandit.v1",
+    "history": [
+      {
+        "optimal_action_probability": 0.5,
+        "version": 0
+      },
+      {
+        "optimal_action_probability": 0.5698526514141571,
+        "version": 1
+      },
+      {
+        "optimal_action_probability": 0.6215949928614608,
+        "version": 2
+      },
+      {
+        "optimal_action_probability": 0.6793016968356304,
+        "version": 3
+      },
+      {
+        "optimal_action_probability": 0.7213164382109117,
+        "version": 4
+      },
+      {
+        "optimal_action_probability": 0.7573566292737867,
+        "version": 5
+      },
+      {
+        "optimal_action_probability": 0.789218975873899,
+        "version": 6
+      },
+      {
+        "optimal_action_probability": 0.814317149048727,
+        "version": 7
+      },
+      {
+        "optimal_action_probability": 0.8340588333685903,
+        "version": 8
+      }
+    ],
+    "rounds": 8,
+    "transport": "HTTP; separate worker processes"
+  },
+  "jobs": [
+    {
+      "attempts": 1,
+      "deadline": 1789424204.213115,
+      "id": "learn:42c71af61629:7",
+      "kind": "learner",
+      "owner": "learner-0",
+      "result": {
+        "metrics": {
+          "gradient_norm": 0.19284335449099116,
+          "mean_reward": 0.734375,
+          "optimal_action_probability": 0.8340588333685903,
+          "samples": 64
+        },
+        "policy_digest": "df917f64dbc11a69a1f325539e0ad403848cbcbaf8ca38a04fb842733238b537",
+        "policy_version": 8
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.14237,
+      "id": "verify:bb4519f2c3ca68a2167ed116fe653ccc75647d279195952978f049712b5a9c44",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "bb4519f2c3ca68a2167ed116fe653ccc75647d279195952978f049712b5a9c44",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1400619,
+      "id": "verify:2ae4d793cc13032626994c41ce9e8e8bf0be23bc87b84cb5c834d1890c9f594a",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "2ae4d793cc13032626994c41ce9e8e8bf0be23bc87b84cb5c834d1890c9f594a",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.138009,
+      "id": "verify:954ed80638147c981592fc9f439bd029a33dc8b65927a3eb32c73d4c1cae6caa",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "954ed80638147c981592fc9f439bd029a33dc8b65927a3eb32c73d4c1cae6caa",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1372921,
+      "id": "verify:091499d937f14c337b6322e7bd1db5ab343b1b0a243460128b41ed59cbde3dcb",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "091499d937f14c337b6322e7bd1db5ab343b1b0a243460128b41ed59cbde3dcb",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.13504,
+      "id": "verify:a61a9a2830dcc3c83c9d8319df1365238622a259476215db9c67e65ab38ad4e8",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "a61a9a2830dcc3c83c9d8319df1365238622a259476215db9c67e65ab38ad4e8",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.133331,
+      "id": "verify:96bf10f785f767eb143e6096ed776803d8af968f0422a6d72d4b953255d9cfa9",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "96bf10f785f767eb143e6096ed776803d8af968f0422a6d72d4b953255d9cfa9",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.132062,
+      "id": "verify:3e6e002034306ae3b678e68af5537892d60acb55846fde36bb1a4496d534e2e7",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "3e6e002034306ae3b678e68af5537892d60acb55846fde36bb1a4496d534e2e7",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.129341,
+      "id": "verify:f49d183a0707b5b5290469f3812d7e577b507b101b543a512657dc9513fafbe1",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "f49d183a0707b5b5290469f3812d7e577b507b101b543a512657dc9513fafbe1",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.12797,
+      "id": "verify:d4ea1946fe677b632dc36ee8827bea79794aa5ed61b37d611745e2eb6e7d91dc",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "d4ea1946fe677b632dc36ee8827bea79794aa5ed61b37d611745e2eb6e7d91dc",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.126357,
+      "id": "verify:120eaffe0d4d6de1ebc6c8f1aff3a9f6db886f2788fca18a86f3841bd65a5e6f",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "120eaffe0d4d6de1ebc6c8f1aff3a9f6db886f2788fca18a86f3841bd65a5e6f",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.124685,
+      "id": "verify:46d36b673a3ad21d5cde3895ecfd1bbd0214704f7b9bae6d8da7fbf81935736b",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "46d36b673a3ad21d5cde3895ecfd1bbd0214704f7b9bae6d8da7fbf81935736b",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1232,
+      "id": "verify:31f7af0b4300c535f68009f5cebe61da9f890e517bdad16876b690ea24050054",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "31f7af0b4300c535f68009f5cebe61da9f890e517bdad16876b690ea24050054",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1214411,
+      "id": "verify:6b24fdcddeacf57df9b595ddc2330a9c2a8281765ac87bbb95e453769483baed",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "6b24fdcddeacf57df9b595ddc2330a9c2a8281765ac87bbb95e453769483baed",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.119422,
+      "id": "verify:c63e51d1879b73b929e07aecf79126e3f25da1368978b2d4fdf4b9f9b01926ef",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "c63e51d1879b73b929e07aecf79126e3f25da1368978b2d4fdf4b9f9b01926ef",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.117478,
+      "id": "verify:ffdb39f36fb1cc97886984fa4da68343dfe1816cb614a287762b51c841eefb01",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "ffdb39f36fb1cc97886984fa4da68343dfe1816cb614a287762b51c841eefb01",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.116725,
+      "id": "verify:8111f34725260d5ebd1a77a0acfdb978885ae9dacc1128b16f87deb4642b78c1",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "8111f34725260d5ebd1a77a0acfdb978885ae9dacc1128b16f87deb4642b78c1",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1141791,
+      "id": "verify:3295fa762c341ef11e04378f8258140e65952d98b1e47a1285270261d75e8461",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "3295fa762c341ef11e04378f8258140e65952d98b1e47a1285270261d75e8461",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1116312,
+      "id": "verify:2712f5ff420831cc36314e85d1c3c0eb8ec15227a7d90e59ec30ddbf2385ee5c",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "2712f5ff420831cc36314e85d1c3c0eb8ec15227a7d90e59ec30ddbf2385ee5c",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.110084,
+      "id": "verify:5c4d77b16096b731dc5de70412d4b9e21701f039738e622aaf8e90dd0eb65d2b",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "5c4d77b16096b731dc5de70412d4b9e21701f039738e622aaf8e90dd0eb65d2b",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1082869,
+      "id": "verify:a24ff16df4e31262e89af37b692f40e7fac28694b5bd404e67b9e29a4a669295",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "a24ff16df4e31262e89af37b692f40e7fac28694b5bd404e67b9e29a4a669295",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1071281,
+      "id": "verify:c85b2be33bda349738e6a4a912f85a8522f94f456b5d0533bd1f649a26e2342f",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "c85b2be33bda349738e6a4a912f85a8522f94f456b5d0533bd1f649a26e2342f",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.1047208,
+      "id": "verify:59f4a36376515a1c5955ffb6b03ae953d1a71d98b11d5d85a0d04f16e09c7fca",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "59f4a36376515a1c5955ffb6b03ae953d1a71d98b11d5d85a0d04f16e09c7fca",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.102405,
+      "id": "verify:73038eb7dd915e77bc9bbe5401dca17d82b05bebcf019ceab94a04f0e4975687",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "73038eb7dd915e77bc9bbe5401dca17d82b05bebcf019ceab94a04f0e4975687",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.099848,
+      "id": "verify:e1e5ba86102a37eb9045d22351f8c790710ca29b93ec78b1097d6818428cd746",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "e1e5ba86102a37eb9045d22351f8c790710ca29b93ec78b1097d6818428cd746",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.097018,
+      "id": "verify:7b1d05863d41d599dc63d7da311148435624881095ee8470e9c5758eab5bcff7",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "7b1d05863d41d599dc63d7da311148435624881095ee8470e9c5758eab5bcff7",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0947158,
+      "id": "verify:adf83cb8a192f41991bd7bb2c3e93b1a7cc4b04c05976c6631fec09ad93e49e9",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "adf83cb8a192f41991bd7bb2c3e93b1a7cc4b04c05976c6631fec09ad93e49e9",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0920389,
+      "id": "verify:7517f9cea609089c52702f9234bebe1432b4c56db682c3cd1d20a3b1016ef45a",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "7517f9cea609089c52702f9234bebe1432b4c56db682c3cd1d20a3b1016ef45a",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.08949,
+      "id": "verify:af18d00a5a4a83c23698429cfa991169c9447fe294f00a0cba8ef97bfd0747ec",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "af18d00a5a4a83c23698429cfa991169c9447fe294f00a0cba8ef97bfd0747ec",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0861282,
+      "id": "verify:b70761e4a0f59fa52c0e272377d4a1fbcbee4ea4cb1faeefef6fa0e6a8cf31ca",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "b70761e4a0f59fa52c0e272377d4a1fbcbee4ea4cb1faeefef6fa0e6a8cf31ca",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0845902,
+      "id": "verify:faa21f92e59283f87a0094dbc421b799fa6a115b08dfa3ad35f4ad8477472cc8",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "faa21f92e59283f87a0094dbc421b799fa6a115b08dfa3ad35f4ad8477472cc8",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.083179,
+      "id": "verify:fa67783b73e8892d1f8bc88991196f8165bb3c4fd92dd9a37079b69f2c3d8d09",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "fa67783b73e8892d1f8bc88991196f8165bb3c4fd92dd9a37079b69f2c3d8d09",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.081671,
+      "id": "verify:c4c6b204717fa2c5b2dd158b4ecee2e067b506e67b4a03f7d7807a4e036cb99c",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "c4c6b204717fa2c5b2dd158b4ecee2e067b506e67b4a03f7d7807a4e036cb99c",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.080114,
+      "id": "verify:9d21033cec6dc80141b82a90afec3c3fd205927759d6679cc93eda23630361d5",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "9d21033cec6dc80141b82a90afec3c3fd205927759d6679cc93eda23630361d5",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0785,
+      "id": "verify:d7407f2f11f99953ddc2e70ccc2ad05f68ef58077070ab982b95c8e93a8a2f15",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "d7407f2f11f99953ddc2e70ccc2ad05f68ef58077070ab982b95c8e93a8a2f15",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0768168,
+      "id": "verify:895eaf1993a7a92f02f91e1816f327560f0df831494aacf7df1ab7676798ecf8",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "895eaf1993a7a92f02f91e1816f327560f0df831494aacf7df1ab7676798ecf8",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.075309,
+      "id": "verify:3bde2670f69f9906a82423ded3b38b1bc928a481acc8248a9a24e2442859c310",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "3bde2670f69f9906a82423ded3b38b1bc928a481acc8248a9a24e2442859c310",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0730681,
+      "id": "verify:4d61d9899746da766aa4930a104594dbcc0b8b39e92567bb89b7566a10a47737",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "4d61d9899746da766aa4930a104594dbcc0b8b39e92567bb89b7566a10a47737",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.070945,
+      "id": "verify:532183397ec010906c30c73363500c001a96d4c7e577fe84ecc8297d06d7e133",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "532183397ec010906c30c73363500c001a96d4c7e577fe84ecc8297d06d7e133",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.070615,
+      "id": "verify:e948f35be20e077665ada305997d5bc12ac52afea9e6e0b00bb3faf419663150",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "e948f35be20e077665ada305997d5bc12ac52afea9e6e0b00bb3faf419663150",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.069272,
+      "id": "verify:c3df6a2d2164d625de8a2cb1e5bd908e9952d7ff774f97e089704dd0f7bb7e00",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "c3df6a2d2164d625de8a2cb1e5bd908e9952d7ff774f97e089704dd0f7bb7e00",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.067755,
+      "id": "verify:3cc46abeaea02e1ec7e8dc3a70a4068747f77812362c27653b9f536bd8966b99",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "3cc46abeaea02e1ec7e8dc3a70a4068747f77812362c27653b9f536bd8966b99",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0647511,
+      "id": "verify:5bb91c69e96853924fe60f3560b626dd2aab8491e455464c08ffe4e46bcb68fc",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "5bb91c69e96853924fe60f3560b626dd2aab8491e455464c08ffe4e46bcb68fc",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.062031,
+      "id": "verify:2a21c3cb351dbf45252cba586d72356334a2851ed44470a57600709278f8917b",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "2a21c3cb351dbf45252cba586d72356334a2851ed44470a57600709278f8917b",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.060603,
+      "id": "verify:428b596f6d7f777657c1852a2c44ad7ef073635ed36d8c6e457cca4550aac603",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "428b596f6d7f777657c1852a2c44ad7ef073635ed36d8c6e457cca4550aac603",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.058995,
+      "id": "verify:2c12344b46a9b8b76a54f6d09cbaba2b637b391b5f2fb3595e19f43caf1b3c47",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "2c12344b46a9b8b76a54f6d09cbaba2b637b391b5f2fb3595e19f43caf1b3c47",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0570612,
+      "id": "verify:cd6c19fd78b4f1a1c8cfb245c73ff9bc8fd6de4cae9c01cae541303e7222b78a",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "cd6c19fd78b4f1a1c8cfb245c73ff9bc8fd6de4cae9c01cae541303e7222b78a",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0552928,
+      "id": "verify:cac693d721d6250f591d562ec5fbe0a8631b0e702590f900becc15c7b73c80b5",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "cac693d721d6250f591d562ec5fbe0a8631b0e702590f900becc15c7b73c80b5",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.053828,
+      "id": "verify:ca93268e771276ea7725189cd38a971d42ec45767a57678819bab39d3144ba66",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "ca93268e771276ea7725189cd38a971d42ec45767a57678819bab39d3144ba66",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.051907,
+      "id": "verify:6b17655a34c0eb6f770f55d1bddc64661b1f967cb166ec82de6d295e9d9384ab",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "6b17655a34c0eb6f770f55d1bddc64661b1f967cb166ec82de6d295e9d9384ab",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0504,
+      "id": "verify:f064e19c1d58a84458dac52adc3e736f1934b7b8306e3822b249c40ee4d60984",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "f064e19c1d58a84458dac52adc3e736f1934b7b8306e3822b249c40ee4d60984",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.047678,
+      "id": "verify:6182edba1771df85e03ebe14068531a44ba3f3ab29572b25ae7511940439f5ed",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "6182edba1771df85e03ebe14068531a44ba3f3ab29572b25ae7511940439f5ed",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0451431,
+      "id": "verify:ecd0474a33336c07a5c7cb213b40084fcef365c3f50c9806c4b7020da5bbff62",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "ecd0474a33336c07a5c7cb213b40084fcef365c3f50c9806c4b7020da5bbff62",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.0424168,
+      "id": "verify:4fbc6342df9d7b912a7a3d77e80236efc0bff968c0d97be4a7dcdca5b5bd0a1e",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "4fbc6342df9d7b912a7a3d77e80236efc0bff968c0d97be4a7dcdca5b5bd0a1e",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.040596,
+      "id": "verify:b495daa8ba135920c33d03af7665540b17a8d83d6030d93fdba0a667eef8903a",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "b495daa8ba135920c33d03af7665540b17a8d83d6030d93fdba0a667eef8903a",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.038174,
+      "id": "verify:728beefd20fb041fd08b732658928167452a9f68ad9cc8785de046e5cc7c90db",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "728beefd20fb041fd08b732658928167452a9f68ad9cc8785de046e5cc7c90db",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.035233,
+      "id": "verify:c7952c359d63040f268f23ef9fbea077ee7bcd022b017d3480e368477850ac06",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "c7952c359d63040f268f23ef9fbea077ee7bcd022b017d3480e368477850ac06",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.033542,
+      "id": "verify:e722c4554bd70a59a26f36d4f17e06b8f263300277fca5deb91b2a1e5f652f4e",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "e722c4554bd70a59a26f36d4f17e06b8f263300277fca5deb91b2a1e5f652f4e",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.03167,
+      "id": "verify:e7b195b7d7502bea55a5610fc3718f19a584ba6b09803d4a1563e38aad798e16",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "e7b195b7d7502bea55a5610fc3718f19a584ba6b09803d4a1563e38aad798e16",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.029727,
+      "id": "verify:c37df1a4945d58065044eb4c0a61f9be3a44acf303426565ed9153f72bdf2c1d",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "c37df1a4945d58065044eb4c0a61f9be3a44acf303426565ed9153f72bdf2c1d",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.027797,
+      "id": "verify:e16ae68c82eea7ea409df09164d468c0112d4a8e526eb98d22aaa261974a07c5",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "e16ae68c82eea7ea409df09164d468c0112d4a8e526eb98d22aaa261974a07c5",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.025739,
+      "id": "verify:46ad6dd0d3934040199d5637a22a5568377ac0311cf1f182b752e6633bfd0be9",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "46ad6dd0d3934040199d5637a22a5568377ac0311cf1f182b752e6633bfd0be9",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.025138,
+      "id": "verify:dbc94fbc75d1a8606bf948738401150060bbd74a83024b2bab1d0aef84c78242",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "dbc94fbc75d1a8606bf948738401150060bbd74a83024b2bab1d0aef84c78242",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.020884,
+      "id": "verify:1165c6fc72a9515ad305e103831f1ea3eb9d1462dbc63b9df9e4e1732df414d8",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "1165c6fc72a9515ad305e103831f1ea3eb9d1462dbc63b9df9e4e1732df414d8",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424204.019611,
+      "id": "verify:9a8d7f220653f9a92e83c231f5ddc68d527cca1d5caf868bdef05d47ddce0efe",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "9a8d7f220653f9a92e83c231f5ddc68d527cca1d5caf868bdef05d47ddce0efe",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.945062,
+      "id": "rollout:42c71af61629:7:63",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "bb4519f2c3ca68a2167ed116fe653ccc75647d279195952978f049712b5a9c44"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.94291,
+      "id": "rollout:42c71af61629:7:62",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "091499d937f14c337b6322e7bd1db5ab343b1b0a243460128b41ed59cbde3dcb"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.941838,
+      "id": "rollout:42c71af61629:7:61",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "954ed80638147c981592fc9f439bd029a33dc8b65927a3eb32c73d4c1cae6caa"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.9408379,
+      "id": "rollout:42c71af61629:7:60",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "a61a9a2830dcc3c83c9d8319df1365238622a259476215db9c67e65ab38ad4e8"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.938978,
+      "id": "rollout:42c71af61629:7:59",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "96bf10f785f767eb143e6096ed776803d8af968f0422a6d72d4b953255d9cfa9"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.938538,
+      "id": "rollout:42c71af61629:7:58",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "2ae4d793cc13032626994c41ce9e8e8bf0be23bc87b84cb5c834d1890c9f594a"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.936952,
+      "id": "rollout:42c71af61629:7:57",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "d4ea1946fe677b632dc36ee8827bea79794aa5ed61b37d611745e2eb6e7d91dc"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.935903,
+      "id": "rollout:42c71af61629:7:56",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "f49d183a0707b5b5290469f3812d7e577b507b101b543a512657dc9513fafbe1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.934997,
+      "id": "rollout:42c71af61629:7:55",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "120eaffe0d4d6de1ebc6c8f1aff3a9f6db886f2788fca18a86f3841bd65a5e6f"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.9342778,
+      "id": "rollout:42c71af61629:7:54",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "46d36b673a3ad21d5cde3895ecfd1bbd0214704f7b9bae6d8da7fbf81935736b"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.9322119,
+      "id": "rollout:42c71af61629:7:53",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "6b24fdcddeacf57df9b595ddc2330a9c2a8281765ac87bbb95e453769483baed"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.931387,
+      "id": "rollout:42c71af61629:7:52",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "31f7af0b4300c535f68009f5cebe61da9f890e517bdad16876b690ea24050054"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.929448,
+      "id": "rollout:42c71af61629:7:51",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "c63e51d1879b73b929e07aecf79126e3f25da1368978b2d4fdf4b9f9b01926ef"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.929069,
+      "id": "rollout:42c71af61629:7:50",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "ffdb39f36fb1cc97886984fa4da68343dfe1816cb614a287762b51c841eefb01"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.927493,
+      "id": "rollout:42c71af61629:7:49",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "3295fa762c341ef11e04378f8258140e65952d98b1e47a1285270261d75e8461"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.926399,
+      "id": "rollout:42c71af61629:7:48",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "8111f34725260d5ebd1a77a0acfdb978885ae9dacc1128b16f87deb4642b78c1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.924764,
+      "id": "rollout:42c71af61629:7:47",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "5c4d77b16096b731dc5de70412d4b9e21701f039738e622aaf8e90dd0eb65d2b"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.9230442,
+      "id": "rollout:42c71af61629:7:46",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "a24ff16df4e31262e89af37b692f40e7fac28694b5bd404e67b9e29a4a669295"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.921736,
+      "id": "rollout:42c71af61629:7:45",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "2712f5ff420831cc36314e85d1c3c0eb8ec15227a7d90e59ec30ddbf2385ee5c"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.9198852,
+      "id": "rollout:42c71af61629:7:44",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "59f4a36376515a1c5955ffb6b03ae953d1a71d98b11d5d85a0d04f16e09c7fca"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.9186509,
+      "id": "rollout:42c71af61629:7:43",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "c85b2be33bda349738e6a4a912f85a8522f94f456b5d0533bd1f649a26e2342f"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.916956,
+      "id": "rollout:42c71af61629:7:42",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "73038eb7dd915e77bc9bbe5401dca17d82b05bebcf019ceab94a04f0e4975687"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.915343,
+      "id": "rollout:42c71af61629:7:41",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "7b1d05863d41d599dc63d7da311148435624881095ee8470e9c5758eab5bcff7"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.91348,
+      "id": "rollout:42c71af61629:7:40",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "adf83cb8a192f41991bd7bb2c3e93b1a7cc4b04c05976c6631fec09ad93e49e9"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.911551,
+      "id": "rollout:42c71af61629:7:39",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "7517f9cea609089c52702f9234bebe1432b4c56db682c3cd1d20a3b1016ef45a"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.9077399,
+      "id": "rollout:42c71af61629:7:38",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "af18d00a5a4a83c23698429cfa991169c9447fe294f00a0cba8ef97bfd0747ec"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.90659,
+      "id": "rollout:42c71af61629:7:37",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "e1e5ba86102a37eb9045d22351f8c790710ca29b93ec78b1097d6818428cd746"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.905559,
+      "id": "rollout:42c71af61629:7:36",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "b70761e4a0f59fa52c0e272377d4a1fbcbee4ea4cb1faeefef6fa0e6a8cf31ca"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.904494,
+      "id": "rollout:42c71af61629:7:35",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "faa21f92e59283f87a0094dbc421b799fa6a115b08dfa3ad35f4ad8477472cc8"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.903426,
+      "id": "rollout:42c71af61629:7:34",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "fa67783b73e8892d1f8bc88991196f8165bb3c4fd92dd9a37079b69f2c3d8d09"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.902695,
+      "id": "rollout:42c71af61629:7:33",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "c4c6b204717fa2c5b2dd158b4ecee2e067b506e67b4a03f7d7807a4e036cb99c"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.900894,
+      "id": "rollout:42c71af61629:7:32",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "9d21033cec6dc80141b82a90afec3c3fd205927759d6679cc93eda23630361d5"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.899792,
+      "id": "rollout:42c71af61629:7:31",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "3e6e002034306ae3b678e68af5537892d60acb55846fde36bb1a4496d534e2e7"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8974469,
+      "id": "rollout:42c71af61629:7:30",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "895eaf1993a7a92f02f91e1816f327560f0df831494aacf7df1ab7676798ecf8"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8960571,
+      "id": "rollout:42c71af61629:7:29",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "d7407f2f11f99953ddc2e70ccc2ad05f68ef58077070ab982b95c8e93a8a2f15"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.893528,
+      "id": "rollout:42c71af61629:7:28",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "4d61d9899746da766aa4930a104594dbcc0b8b39e92567bb89b7566a10a47737"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.891386,
+      "id": "rollout:42c71af61629:7:27",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "3bde2670f69f9906a82423ded3b38b1bc928a481acc8248a9a24e2442859c310"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.890899,
+      "id": "rollout:42c71af61629:7:26",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "532183397ec010906c30c73363500c001a96d4c7e577fe84ecc8297d06d7e133"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8894138,
+      "id": "rollout:42c71af61629:7:25",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "e948f35be20e077665ada305997d5bc12ac52afea9e6e0b00bb3faf419663150"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.886055,
+      "id": "rollout:42c71af61629:7:24",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "c3df6a2d2164d625de8a2cb1e5bd908e9952d7ff774f97e089704dd0f7bb7e00"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8842828,
+      "id": "rollout:42c71af61629:7:23",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "3cc46abeaea02e1ec7e8dc3a70a4068747f77812362c27653b9f536bd8966b99"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.883873,
+      "id": "rollout:42c71af61629:7:22",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "2a21c3cb351dbf45252cba586d72356334a2851ed44470a57600709278f8917b"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.882336,
+      "id": "rollout:42c71af61629:7:21",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "428b596f6d7f777657c1852a2c44ad7ef073635ed36d8c6e457cca4550aac603"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.880859,
+      "id": "rollout:42c71af61629:7:20",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "2c12344b46a9b8b76a54f6d09cbaba2b637b391b5f2fb3595e19f43caf1b3c47"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.880488,
+      "id": "rollout:42c71af61629:7:19",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "cd6c19fd78b4f1a1c8cfb245c73ff9bc8fd6de4cae9c01cae541303e7222b78a"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.878952,
+      "id": "rollout:42c71af61629:7:18",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "cac693d721d6250f591d562ec5fbe0a8631b0e702590f900becc15c7b73c80b5"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.877145,
+      "id": "rollout:42c71af61629:7:17",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "6b17655a34c0eb6f770f55d1bddc64661b1f967cb166ec82de6d295e9d9384ab"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.875668,
+      "id": "rollout:42c71af61629:7:16",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "ca93268e771276ea7725189cd38a971d42ec45767a57678819bab39d3144ba66"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8749251,
+      "id": "rollout:42c71af61629:7:15",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "5bb91c69e96853924fe60f3560b626dd2aab8491e455464c08ffe4e46bcb68fc"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.873724,
+      "id": "rollout:42c71af61629:7:14",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "f064e19c1d58a84458dac52adc3e736f1934b7b8306e3822b249c40ee4d60984"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8726451,
+      "id": "rollout:42c71af61629:7:13",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "6182edba1771df85e03ebe14068531a44ba3f3ab29572b25ae7511940439f5ed"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.871776,
+      "id": "rollout:42c71af61629:7:12",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "ecd0474a33336c07a5c7cb213b40084fcef365c3f50c9806c4b7020da5bbff62"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8701901,
+      "id": "rollout:42c71af61629:7:11",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "4fbc6342df9d7b912a7a3d77e80236efc0bff968c0d97be4a7dcdca5b5bd0a1e"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8686872,
+      "id": "rollout:42c71af61629:7:10",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "b495daa8ba135920c33d03af7665540b17a8d83d6030d93fdba0a667eef8903a"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.867182,
+      "id": "rollout:42c71af61629:7:9",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "728beefd20fb041fd08b732658928167452a9f68ad9cc8785de046e5cc7c90db"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8652842,
+      "id": "rollout:42c71af61629:7:8",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "e722c4554bd70a59a26f36d4f17e06b8f263300277fca5deb91b2a1e5f652f4e"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.864013,
+      "id": "rollout:42c71af61629:7:7",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "c7952c359d63040f268f23ef9fbea077ee7bcd022b017d3480e368477850ac06"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8619142,
+      "id": "rollout:42c71af61629:7:6",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "e7b195b7d7502bea55a5610fc3718f19a584ba6b09803d4a1563e38aad798e16"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.860127,
+      "id": "rollout:42c71af61629:7:5",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "c37df1a4945d58065044eb4c0a61f9be3a44acf303426565ed9153f72bdf2c1d"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8598442,
+      "id": "rollout:42c71af61629:7:4",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "e16ae68c82eea7ea409df09164d468c0112d4a8e526eb98d22aaa261974a07c5"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.857714,
+      "id": "rollout:42c71af61629:7:3",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "46ad6dd0d3934040199d5637a22a5568377ac0311cf1f182b752e6633bfd0be9"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.8557272,
+      "id": "rollout:42c71af61629:7:2",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "dbc94fbc75d1a8606bf948738401150060bbd74a83024b2bab1d0aef84c78242"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.853666,
+      "id": "rollout:42c71af61629:7:1",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "1165c6fc72a9515ad305e103831f1ea3eb9d1462dbc63b9df9e4e1732df414d8"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.850092,
+      "id": "rollout:42c71af61629:7:0",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "9a8d7f220653f9a92e83c231f5ddc68d527cca1d5caf868bdef05d47ddce0efe"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.7335591,
+      "id": "learn:42c71af61629:6",
+      "kind": "learner",
+      "owner": "learner-0",
+      "result": {
+        "metrics": {
+          "gradient_norm": 0.22356703725751698,
+          "mean_reward": 0.75,
+          "optimal_action_probability": 0.814317149048727,
+          "samples": 64
+        },
+        "policy_digest": "10ab964d06213f4bfb4246f335dca9c14851875a5fc096d199f4cdab05d375ac",
+        "policy_version": 7
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.65956,
+      "id": "verify:4bbf5ec7efa0c1c327d97390c867b09abbcd1ba908d50d7512fb75d05adf8c70",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "4bbf5ec7efa0c1c327d97390c867b09abbcd1ba908d50d7512fb75d05adf8c70",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.657096,
+      "id": "verify:0bf1a9b623eda812e3f086e56135229bb315ac697386131972344f0852b2a2fb",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "0bf1a9b623eda812e3f086e56135229bb315ac697386131972344f0852b2a2fb",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.654542,
+      "id": "verify:8847ff0903f762a0371b1d5a916d19d0b4158efa89475b00388386469a6ee3f9",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "8847ff0903f762a0371b1d5a916d19d0b4158efa89475b00388386469a6ee3f9",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.652735,
+      "id": "verify:cdabefbfbcbc0170cb0e8bf7e8147d9cc1c03e736eabe7fd0f56d4956c91103f",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "cdabefbfbcbc0170cb0e8bf7e8147d9cc1c03e736eabe7fd0f56d4956c91103f",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.651317,
+      "id": "verify:0db7126fea8efe57d4f66b63f68072fad235e0174f87a181a6e3ace9d5833428",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "0db7126fea8efe57d4f66b63f68072fad235e0174f87a181a6e3ace9d5833428",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.649586,
+      "id": "verify:32efe22377a33aa539643f446abed11fb78d1a6e2f01b5520e21a4d039b06699",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "32efe22377a33aa539643f446abed11fb78d1a6e2f01b5520e21a4d039b06699",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.6474938,
+      "id": "verify:f00ab7aa3b2a026f36a2ddaab96490ee9ae355610f6022a1dcc548fa99b62786",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "f00ab7aa3b2a026f36a2ddaab96490ee9ae355610f6022a1dcc548fa99b62786",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.646864,
+      "id": "verify:197c7066841d06f4f99cd77b49b32bbb7fb186ed0c8563293a70405b2db9fe96",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "197c7066841d06f4f99cd77b49b32bbb7fb186ed0c8563293a70405b2db9fe96",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.6447659,
+      "id": "verify:363f1a3b878237309d4214ea131157aacab92f3c456095ed160c03773db57752",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "363f1a3b878237309d4214ea131157aacab92f3c456095ed160c03773db57752",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.643341,
+      "id": "verify:62816f4606786bb52c7a575dd9a8225f1115459cb891bc6e86f842f2ec8df95c",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "62816f4606786bb52c7a575dd9a8225f1115459cb891bc6e86f842f2ec8df95c",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.641846,
+      "id": "verify:7ac416d819687f65c69b3aeb2b6005d77882ab6001cca9aa104ec6ba9738d754",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "7ac416d819687f65c69b3aeb2b6005d77882ab6001cca9aa104ec6ba9738d754",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.640314,
+      "id": "verify:9cfa24d4f4d7746b75c07fa99f8c0e866c161271af1be42eeb48ec32c10a4ca7",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "9cfa24d4f4d7746b75c07fa99f8c0e866c161271af1be42eeb48ec32c10a4ca7",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.638749,
+      "id": "verify:0704f04bb7cd52ad107fc8d04b82e303f1a270bbe5916ccfa8400f17cc79ebd9",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "0704f04bb7cd52ad107fc8d04b82e303f1a270bbe5916ccfa8400f17cc79ebd9",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.637366,
+      "id": "verify:c91ae699cbbde81616a10507bbb296d0573d00cdf22678d321a90a88defd85a6",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "c91ae699cbbde81616a10507bbb296d0573d00cdf22678d321a90a88defd85a6",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.635914,
+      "id": "verify:eed8eadc2276f427782bf871f63d23096c27a00fd1be7d8631b2833f86519171",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "eed8eadc2276f427782bf871f63d23096c27a00fd1be7d8631b2833f86519171",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.634134,
+      "id": "verify:3c42f1e9020a88e06f6084f188da231ff3c9901ab4c098f3adbcd673a38b45fb",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "3c42f1e9020a88e06f6084f188da231ff3c9901ab4c098f3adbcd673a38b45fb",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.633339,
+      "id": "verify:63b99c769598ab7e4f9b79ae8e0c1117c159fb330101133f39ad07f1bcc417d8",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "63b99c769598ab7e4f9b79ae8e0c1117c159fb330101133f39ad07f1bcc417d8",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.63104,
+      "id": "verify:7ca7e9f08c4fb4c99c66434c1ec2324bb9f7682f179bb2fa2e897bd39c1e0f48",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "7ca7e9f08c4fb4c99c66434c1ec2324bb9f7682f179bb2fa2e897bd39c1e0f48",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.6291142,
+      "id": "verify:0ca38c452d1f082aba579358f8dabfe0546f028bc4ebb279127119c68b9aad5b",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "0ca38c452d1f082aba579358f8dabfe0546f028bc4ebb279127119c68b9aad5b",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.628327,
+      "id": "verify:1dd02c8d512a890ee9d47bcd084daa240e02c96e09b02ea55f335fcc1ec4194d",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "1dd02c8d512a890ee9d47bcd084daa240e02c96e09b02ea55f335fcc1ec4194d",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.625802,
+      "id": "verify:67ef68a34b632fea27ec1a7fa0727e463df1d241c3321bdd4e5882e16047dc24",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "67ef68a34b632fea27ec1a7fa0727e463df1d241c3321bdd4e5882e16047dc24",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.623073,
+      "id": "verify:f592f9eb747aaa3ce42f2c54acb2ea9c1f45af7542d866a82dd82347498875b5",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "f592f9eb747aaa3ce42f2c54acb2ea9c1f45af7542d866a82dd82347498875b5",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.621182,
+      "id": "verify:ffa03c3be991ea97142f3077d2e2d098c0dfb53268e282b612efaeb5a1f02038",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "ffa03c3be991ea97142f3077d2e2d098c0dfb53268e282b612efaeb5a1f02038",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.619767,
+      "id": "verify:88844dc87790ae82cdce3e0d3c23d23e917748b537cb4addf0fea289ad2b16df",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "88844dc87790ae82cdce3e0d3c23d23e917748b537cb4addf0fea289ad2b16df",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.6183228,
+      "id": "verify:7dd1294084b46a2a72a867b627adb092f44b1907e70a73c77453c5e89b4332fe",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "7dd1294084b46a2a72a867b627adb092f44b1907e70a73c77453c5e89b4332fe",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.6164749,
+      "id": "verify:e7f6508e11efa78b3db92a3e18921da831807f3c445d70b35ef66ca8e54ee40f",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "e7f6508e11efa78b3db92a3e18921da831807f3c445d70b35ef66ca8e54ee40f",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.615128,
+      "id": "verify:701025a435430bb74b8ed7cb56cc83679e5c9520bbdc201a74f437ae81531a6d",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "701025a435430bb74b8ed7cb56cc83679e5c9520bbdc201a74f437ae81531a6d",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.613308,
+      "id": "verify:01b9a74b85790f83cf3d3a64f39b3bf4d2c74f8e26066631d12d6c33659f82dc",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "01b9a74b85790f83cf3d3a64f39b3bf4d2c74f8e26066631d12d6c33659f82dc",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.611512,
+      "id": "verify:ef4b897505c93afb09dd96d3e7f0788e49188ad4a965a6f6b3fc8a18def70451",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "ef4b897505c93afb09dd96d3e7f0788e49188ad4a965a6f6b3fc8a18def70451",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.609819,
+      "id": "verify:e18e91b532cd02ea018a4a89b37284794d14d1a943e9d043df5c21ed17e885bd",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "e18e91b532cd02ea018a4a89b37284794d14d1a943e9d043df5c21ed17e885bd",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.608326,
+      "id": "verify:0986d85a10ad52613014ab1bc98a1cc62a3719ca80910074b391f9d62c41a1a9",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "0986d85a10ad52613014ab1bc98a1cc62a3719ca80910074b391f9d62c41a1a9",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.60658,
+      "id": "verify:21e8d6b0bc31f07f3183b2d94b30f3762a9e419d3620e3923f0e11e6b427fe9a",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "21e8d6b0bc31f07f3183b2d94b30f3762a9e419d3620e3923f0e11e6b427fe9a",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.604081,
+      "id": "verify:5e22dd051ed933a7d0344ef86924a47fa93b2138a14f5e1adc79faa7136970f6",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "5e22dd051ed933a7d0344ef86924a47fa93b2138a14f5e1adc79faa7136970f6",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.602787,
+      "id": "verify:4af7b15c67c8b40e7b86497ce9289be15c82e45f08f391e0386446ab72d5ae17",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "4af7b15c67c8b40e7b86497ce9289be15c82e45f08f391e0386446ab72d5ae17",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.602043,
+      "id": "verify:27d35a2bffd3757c916f736a3f6c6996dd086bb8383310005a2160326644247d",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "27d35a2bffd3757c916f736a3f6c6996dd086bb8383310005a2160326644247d",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.599872,
+      "id": "verify:140751586a02c913d0891cd79dba8c9265df7b371d086489417de792a922369a",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "140751586a02c913d0891cd79dba8c9265df7b371d086489417de792a922369a",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5980392,
+      "id": "verify:3bcd45e8b298c1c3c9d475e1a6ef8c24937cd19eb6e69ce38c6f029cb40e3c0f",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "3bcd45e8b298c1c3c9d475e1a6ef8c24937cd19eb6e69ce38c6f029cb40e3c0f",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.597471,
+      "id": "verify:2b0f8cadaf08c6f7dcbd2135eec388adb3e4eefaa6dbda71f20a58f61665c35b",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "2b0f8cadaf08c6f7dcbd2135eec388adb3e4eefaa6dbda71f20a58f61665c35b",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5945,
+      "id": "verify:922932cb2d898f80d73239430c33e19b3d96413dfd0b91a5abafed578f663a78",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "922932cb2d898f80d73239430c33e19b3d96413dfd0b91a5abafed578f663a78",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.593238,
+      "id": "verify:97d95335461f4568b0b6e5c937e2fbedab92242e422d4d538f1c6b2d267385ca",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "97d95335461f4568b0b6e5c937e2fbedab92242e422d4d538f1c6b2d267385ca",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.591468,
+      "id": "verify:a60cd07f1822ca7842f33626e656edf164860702ba3ccac89c2c56f3de4d6553",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "a60cd07f1822ca7842f33626e656edf164860702ba3ccac89c2c56f3de4d6553",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5894668,
+      "id": "verify:362b9ca50294a954edfb6063af2d79cb0bd5fe7dabc3cf724975360043e45159",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "362b9ca50294a954edfb6063af2d79cb0bd5fe7dabc3cf724975360043e45159",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.588107,
+      "id": "verify:f6d3f0ac47153a2f647077e5234e97fe8d4f913b693174e0d71c672233fe6f04",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "f6d3f0ac47153a2f647077e5234e97fe8d4f913b693174e0d71c672233fe6f04",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.586339,
+      "id": "verify:4c42f6c5443fb48dc4311fc145ff9a05c80731098bce241c93f632c178d5c2f5",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "4c42f6c5443fb48dc4311fc145ff9a05c80731098bce241c93f632c178d5c2f5",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.584383,
+      "id": "verify:ca58f1d89c154118bb0607b83eec0c9d0e25fb5ed298df5382fa2e134a7b1048",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "ca58f1d89c154118bb0607b83eec0c9d0e25fb5ed298df5382fa2e134a7b1048",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5829399,
+      "id": "verify:3c98287d38934d74dfd237b739278db20d84ba5d0ff4e66d7487644eb38c7edc",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "3c98287d38934d74dfd237b739278db20d84ba5d0ff4e66d7487644eb38c7edc",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.581291,
+      "id": "verify:f1625a546eccbc85221fda3d4291dbeeace1b275f81a37efb2e32d24b3fccea4",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "f1625a546eccbc85221fda3d4291dbeeace1b275f81a37efb2e32d24b3fccea4",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.579187,
+      "id": "verify:0888545766dd08de50c9715911291fbb6536496d81bf8a50ea85850a92a9e4a5",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "0888545766dd08de50c9715911291fbb6536496d81bf8a50ea85850a92a9e4a5",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.578492,
+      "id": "verify:7e4d2ee418749fcc00046c80b59e50b1e81abf9b07c798d2b2c2f4ac823ea9c1",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "7e4d2ee418749fcc00046c80b59e50b1e81abf9b07c798d2b2c2f4ac823ea9c1",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.575277,
+      "id": "verify:a06f07d328b8d6c772ab81e4ef46fe47a1267904e35118cf610663a0c97c35aa",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "a06f07d328b8d6c772ab81e4ef46fe47a1267904e35118cf610663a0c97c35aa",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.574903,
+      "id": "verify:ed66e40ac874033f497a1546318a074788308571e794cc1106225ff4ec7689cc",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "ed66e40ac874033f497a1546318a074788308571e794cc1106225ff4ec7689cc",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5722282,
+      "id": "verify:dd7fb8bb469eb3e975f65d0c36471d83deb7ba4f94e1337c23c2a54407c349e8",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "dd7fb8bb469eb3e975f65d0c36471d83deb7ba4f94e1337c23c2a54407c349e8",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5706592,
+      "id": "verify:e59826c47469c4a57a4af2cbb70efcb015241d88971d2cde6adc65a2caa39eda",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "e59826c47469c4a57a4af2cbb70efcb015241d88971d2cde6adc65a2caa39eda",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.56905,
+      "id": "verify:b5a0c4eff18c81a5b7d8352252850d1a15a26a5c045dd3248bc5f9c58a496a1d",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "b5a0c4eff18c81a5b7d8352252850d1a15a26a5c045dd3248bc5f9c58a496a1d",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.567263,
+      "id": "verify:42f1a67b75b2378ed80178bcace4c6b4bac61fba0e8c1a0542758ccbf41643a4",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "42f1a67b75b2378ed80178bcace4c6b4bac61fba0e8c1a0542758ccbf41643a4",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5653708,
+      "id": "verify:bf444ae7a5ec7e9776fd646a395028349c9db861e9d2fe56a713981bd178a48f",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "bf444ae7a5ec7e9776fd646a395028349c9db861e9d2fe56a713981bd178a48f",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.563332,
+      "id": "verify:9dd409840ba0653a8f06fb0785a333b3194faecec7089870f5d6fc006636b1cf",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "9dd409840ba0653a8f06fb0785a333b3194faecec7089870f5d6fc006636b1cf",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.561922,
+      "id": "verify:f4762046dae069219478e8f52880e6f74f44e254968b05687b803c23727f430f",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "f4762046dae069219478e8f52880e6f74f44e254968b05687b803c23727f430f",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5601091,
+      "id": "verify:f2271af64e60ba9eb7f88e113199241f7372286d98726c943da6a7be82116c4d",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "f2271af64e60ba9eb7f88e113199241f7372286d98726c943da6a7be82116c4d",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.558018,
+      "id": "verify:35d65872ec9d2f780a02a27d08c5a2eba1db2ed8854533a38dbad9bd97cc1878",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "35d65872ec9d2f780a02a27d08c5a2eba1db2ed8854533a38dbad9bd97cc1878",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.555881,
+      "id": "verify:218b0dfe55bb81f16c96e99e0321258ece4f4c7caf6c4ff714e6db66db428df3",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "218b0dfe55bb81f16c96e99e0321258ece4f4c7caf6c4ff714e6db66db428df3",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.555181,
+      "id": "verify:040d5117ead29a23a7def59af670ee0d29ad287f141f27ecd03eb107778b6c7c",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "040d5117ead29a23a7def59af670ee0d29ad287f141f27ecd03eb107778b6c7c",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5521002,
+      "id": "verify:0104d31dfda8e7a4387eaea7fac1562fbdab8b2cd7c14feddb1df98d64c926fd",
+      "kind": "verifier",
+      "owner": "verifier-0",
+      "result": {
+        "reward": 1,
+        "trajectory_id": "0104d31dfda8e7a4387eaea7fac1562fbdab8b2cd7c14feddb1df98d64c926fd",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.5508611,
+      "id": "verify:37960698db9758124657b8e3a29930cb72e7527116a6396004f75be5fbc3cc8a",
+      "kind": "verifier",
+      "owner": "verifier-1",
+      "result": {
+        "reward": 0,
+        "trajectory_id": "37960698db9758124657b8e3a29930cb72e7527116a6396004f75be5fbc3cc8a",
+        "verifier": "bandit-reward.v1"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.4776351,
+      "id": "rollout:42c71af61629:6:63",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "4bbf5ec7efa0c1c327d97390c867b09abbcd1ba908d50d7512fb75d05adf8c70"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.475913,
+      "id": "rollout:42c71af61629:6:62",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "0bf1a9b623eda812e3f086e56135229bb315ac697386131972344f0852b2a2fb"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.475477,
+      "id": "rollout:42c71af61629:6:61",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "cdabefbfbcbc0170cb0e8bf7e8147d9cc1c03e736eabe7fd0f56d4956c91103f"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.4744818,
+      "id": "rollout:42c71af61629:6:60",
+      "kind": "actor",
+      "owner": "actor-1",
+      "result": {
+        "trajectory_id": "8847ff0903f762a0371b1d5a916d19d0b4158efa89475b00388386469a6ee3f9"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.472915,
+      "id": "rollout:42c71af61629:6:59",
+      "kind": "actor",
+      "owner": "actor-0",
+      "result": {
+        "trajectory_id": "0db7126fea8efe57d4f66b63f68072fad235e0174f87a181a6e3ace9d5833428"
+      },
+      "state": "done"
+    },
+    {
+      "attempts": 1,
+      "deadline": 1789424203.47253,
+      "id": "rollout:42c71af61629:6:58",
+      "kind": "actor",
+      "owner": "actor-2",
+      "result": {
+        "trajectory_id": "32efe22377a33aa539643f446abed11fb78d1a6e2f01b5520e21a4d039b06699"
+      },
+      "state": "done"
+    }
+  ],
+  "policies": [
+    {
+      "batch": null,
+      "created": 1789424140.539514,
+      "digest": "6acdd1c94292ed515b9960629e3bdfb18c473c9a365bb9c81366c33349b0e17b",
+      "parent": null,
+      "version": 0
+    },
+    {
+      "batch": "learn:42c71af61629:0",
+      "created": 1789424140.993118,
+      "digest": "1c61050239c792a6b875bb6abfcc382531e45734be4ef3cfa85bafaa2efb0e3e",
+      "parent": 0,
+      "version": 1
+    },
+    {
+      "batch": "learn:42c71af61629:1",
+      "created": 1789424141.458435,
+      "digest": "57b90548c553f38cf4ea34f886ffc4774cf676bbc55300a497b206de89c17b5c",
+      "parent": 1,
+      "version": 2
+    },
+    {
+      "batch": "learn:42c71af61629:2",
+      "created": 1789424141.915877,
+      "digest": "20f791f4d8ef129e0c6b4c54b2dd59e6ac10f4480b06f8f18cef8f8d7cd51b19",
+      "parent": 2,
+      "version": 3
+    },
+    {
+      "batch": "learn:42c71af61629:3",
+      "created": 1789424142.369577,
+      "digest": "2ba6ee2faeddd038912635260fad8c0df320128ee3951df6fea376feed85e421",
+      "parent": 3,
+      "version": 4
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "created": 1789424142.857464,
+      "digest": "a3ffc722ffba70ec97bf4497aa54f04e1611df3f33c32bca53c745076a1162dc",
+      "parent": 4,
+      "version": 5
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "created": 1789424143.321532,
+      "digest": "70c4fbc1fc1a21da34a00c70d0cf27fa69b85b9c8f8fd6057d6071e3c25eefd4",
+      "parent": 5,
+      "version": 6
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "created": 1789424143.7785778,
+      "digest": "10ab964d06213f4bfb4246f335dca9c14851875a5fc096d199f4cdab05d375ac",
+      "parent": 6,
+      "version": 7
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "created": 1789424144.2563279,
+      "digest": "df917f64dbc11a69a1f325539e0ad403848cbcbaf8ca38a04fb842733238b537",
+      "parent": 7,
+      "version": 8
+    }
+  ],
+  "schema_version": "rollout-snapshot.v1",
+  "total_trajectories": 512,
+  "trajectories": [
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "bb4519f2c3ca68a2167ed116fe653ccc75647d279195952978f049712b5a9c44",
+      "policy": 7,
+      "reward": 1,
+      "seed": 611,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "2ae4d793cc13032626994c41ce9e8e8bf0be23bc87b84cb5c834d1890c9f594a",
+      "policy": 7,
+      "reward": 1,
+      "seed": 606,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "954ed80638147c981592fc9f439bd029a33dc8b65927a3eb32c73d4c1cae6caa",
+      "policy": 7,
+      "reward": 1,
+      "seed": 609,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "091499d937f14c337b6322e7bd1db5ab343b1b0a243460128b41ed59cbde3dcb",
+      "policy": 7,
+      "reward": 1,
+      "seed": 610,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "a61a9a2830dcc3c83c9d8319df1365238622a259476215db9c67e65ab38ad4e8",
+      "policy": 7,
+      "reward": 0,
+      "seed": 608,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "96bf10f785f767eb143e6096ed776803d8af968f0422a6d72d4b953255d9cfa9",
+      "policy": 7,
+      "reward": 1,
+      "seed": 607,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "3e6e002034306ae3b678e68af5537892d60acb55846fde36bb1a4496d534e2e7",
+      "policy": 7,
+      "reward": 1,
+      "seed": 579,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "f49d183a0707b5b5290469f3812d7e577b507b101b543a512657dc9513fafbe1",
+      "policy": 7,
+      "reward": 0,
+      "seed": 604,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "d4ea1946fe677b632dc36ee8827bea79794aa5ed61b37d611745e2eb6e7d91dc",
+      "policy": 7,
+      "reward": 0,
+      "seed": 605,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "120eaffe0d4d6de1ebc6c8f1aff3a9f6db886f2788fca18a86f3841bd65a5e6f",
+      "policy": 7,
+      "reward": 0,
+      "seed": 603,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "46d36b673a3ad21d5cde3895ecfd1bbd0214704f7b9bae6d8da7fbf81935736b",
+      "policy": 7,
+      "reward": 1,
+      "seed": 602,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "31f7af0b4300c535f68009f5cebe61da9f890e517bdad16876b690ea24050054",
+      "policy": 7,
+      "reward": 1,
+      "seed": 600,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "6b24fdcddeacf57df9b595ddc2330a9c2a8281765ac87bbb95e453769483baed",
+      "policy": 7,
+      "reward": 1,
+      "seed": 601,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "c63e51d1879b73b929e07aecf79126e3f25da1368978b2d4fdf4b9f9b01926ef",
+      "policy": 7,
+      "reward": 1,
+      "seed": 599,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "ffdb39f36fb1cc97886984fa4da68343dfe1816cb614a287762b51c841eefb01",
+      "policy": 7,
+      "reward": 1,
+      "seed": 598,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "8111f34725260d5ebd1a77a0acfdb978885ae9dacc1128b16f87deb4642b78c1",
+      "policy": 7,
+      "reward": 1,
+      "seed": 596,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "3295fa762c341ef11e04378f8258140e65952d98b1e47a1285270261d75e8461",
+      "policy": 7,
+      "reward": 0,
+      "seed": 597,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "2712f5ff420831cc36314e85d1c3c0eb8ec15227a7d90e59ec30ddbf2385ee5c",
+      "policy": 7,
+      "reward": 1,
+      "seed": 593,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "5c4d77b16096b731dc5de70412d4b9e21701f039738e622aaf8e90dd0eb65d2b",
+      "policy": 7,
+      "reward": 1,
+      "seed": 595,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "a24ff16df4e31262e89af37b692f40e7fac28694b5bd404e67b9e29a4a669295",
+      "policy": 7,
+      "reward": 0,
+      "seed": 594,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "c85b2be33bda349738e6a4a912f85a8522f94f456b5d0533bd1f649a26e2342f",
+      "policy": 7,
+      "reward": 1,
+      "seed": 591,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "59f4a36376515a1c5955ffb6b03ae953d1a71d98b11d5d85a0d04f16e09c7fca",
+      "policy": 7,
+      "reward": 0,
+      "seed": 592,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "73038eb7dd915e77bc9bbe5401dca17d82b05bebcf019ceab94a04f0e4975687",
+      "policy": 7,
+      "reward": 0,
+      "seed": 590,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "e1e5ba86102a37eb9045d22351f8c790710ca29b93ec78b1097d6818428cd746",
+      "policy": 7,
+      "reward": 0,
+      "seed": 585,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "7b1d05863d41d599dc63d7da311148435624881095ee8470e9c5758eab5bcff7",
+      "policy": 7,
+      "reward": 0,
+      "seed": 589,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "adf83cb8a192f41991bd7bb2c3e93b1a7cc4b04c05976c6631fec09ad93e49e9",
+      "policy": 7,
+      "reward": 1,
+      "seed": 588,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "7517f9cea609089c52702f9234bebe1432b4c56db682c3cd1d20a3b1016ef45a",
+      "policy": 7,
+      "reward": 1,
+      "seed": 587,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "af18d00a5a4a83c23698429cfa991169c9447fe294f00a0cba8ef97bfd0747ec",
+      "policy": 7,
+      "reward": 1,
+      "seed": 586,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "b70761e4a0f59fa52c0e272377d4a1fbcbee4ea4cb1faeefef6fa0e6a8cf31ca",
+      "policy": 7,
+      "reward": 1,
+      "seed": 584,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "faa21f92e59283f87a0094dbc421b799fa6a115b08dfa3ad35f4ad8477472cc8",
+      "policy": 7,
+      "reward": 1,
+      "seed": 583,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "fa67783b73e8892d1f8bc88991196f8165bb3c4fd92dd9a37079b69f2c3d8d09",
+      "policy": 7,
+      "reward": 1,
+      "seed": 582,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "c4c6b204717fa2c5b2dd158b4ecee2e067b506e67b4a03f7d7807a4e036cb99c",
+      "policy": 7,
+      "reward": 1,
+      "seed": 581,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "9d21033cec6dc80141b82a90afec3c3fd205927759d6679cc93eda23630361d5",
+      "policy": 7,
+      "reward": 1,
+      "seed": 580,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "d7407f2f11f99953ddc2e70ccc2ad05f68ef58077070ab982b95c8e93a8a2f15",
+      "policy": 7,
+      "reward": 1,
+      "seed": 577,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "895eaf1993a7a92f02f91e1816f327560f0df831494aacf7df1ab7676798ecf8",
+      "policy": 7,
+      "reward": 1,
+      "seed": 578,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "3bde2670f69f9906a82423ded3b38b1bc928a481acc8248a9a24e2442859c310",
+      "policy": 7,
+      "reward": 1,
+      "seed": 575,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "4d61d9899746da766aa4930a104594dbcc0b8b39e92567bb89b7566a10a47737",
+      "policy": 7,
+      "reward": 1,
+      "seed": 576,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "532183397ec010906c30c73363500c001a96d4c7e577fe84ecc8297d06d7e133",
+      "policy": 7,
+      "reward": 1,
+      "seed": 574,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "e948f35be20e077665ada305997d5bc12ac52afea9e6e0b00bb3faf419663150",
+      "policy": 7,
+      "reward": 1,
+      "seed": 573,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "c3df6a2d2164d625de8a2cb1e5bd908e9952d7ff774f97e089704dd0f7bb7e00",
+      "policy": 7,
+      "reward": 1,
+      "seed": 572,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "3cc46abeaea02e1ec7e8dc3a70a4068747f77812362c27653b9f536bd8966b99",
+      "policy": 7,
+      "reward": 0,
+      "seed": 571,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "5bb91c69e96853924fe60f3560b626dd2aab8491e455464c08ffe4e46bcb68fc",
+      "policy": 7,
+      "reward": 1,
+      "seed": 563,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "2a21c3cb351dbf45252cba586d72356334a2851ed44470a57600709278f8917b",
+      "policy": 7,
+      "reward": 0,
+      "seed": 570,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "428b596f6d7f777657c1852a2c44ad7ef073635ed36d8c6e457cca4550aac603",
+      "policy": 7,
+      "reward": 1,
+      "seed": 569,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "2c12344b46a9b8b76a54f6d09cbaba2b637b391b5f2fb3595e19f43caf1b3c47",
+      "policy": 7,
+      "reward": 0,
+      "seed": 568,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "cd6c19fd78b4f1a1c8cfb245c73ff9bc8fd6de4cae9c01cae541303e7222b78a",
+      "policy": 7,
+      "reward": 0,
+      "seed": 567,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "cac693d721d6250f591d562ec5fbe0a8631b0e702590f900becc15c7b73c80b5",
+      "policy": 7,
+      "reward": 1,
+      "seed": 566,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "ca93268e771276ea7725189cd38a971d42ec45767a57678819bab39d3144ba66",
+      "policy": 7,
+      "reward": 1,
+      "seed": 564,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "6b17655a34c0eb6f770f55d1bddc64661b1f967cb166ec82de6d295e9d9384ab",
+      "policy": 7,
+      "reward": 1,
+      "seed": 565,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "f064e19c1d58a84458dac52adc3e736f1934b7b8306e3822b249c40ee4d60984",
+      "policy": 7,
+      "reward": 1,
+      "seed": 562,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "6182edba1771df85e03ebe14068531a44ba3f3ab29572b25ae7511940439f5ed",
+      "policy": 7,
+      "reward": 1,
+      "seed": 561,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "ecd0474a33336c07a5c7cb213b40084fcef365c3f50c9806c4b7020da5bbff62",
+      "policy": 7,
+      "reward": 1,
+      "seed": 560,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "4fbc6342df9d7b912a7a3d77e80236efc0bff968c0d97be4a7dcdca5b5bd0a1e",
+      "policy": 7,
+      "reward": 0,
+      "seed": 559,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "b495daa8ba135920c33d03af7665540b17a8d83d6030d93fdba0a667eef8903a",
+      "policy": 7,
+      "reward": 1,
+      "seed": 558,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "728beefd20fb041fd08b732658928167452a9f68ad9cc8785de046e5cc7c90db",
+      "policy": 7,
+      "reward": 0,
+      "seed": 557,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "c7952c359d63040f268f23ef9fbea077ee7bcd022b017d3480e368477850ac06",
+      "policy": 7,
+      "reward": 1,
+      "seed": 555,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "e722c4554bd70a59a26f36d4f17e06b8f263300277fca5deb91b2a1e5f652f4e",
+      "policy": 7,
+      "reward": 1,
+      "seed": 556,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "e7b195b7d7502bea55a5610fc3718f19a584ba6b09803d4a1563e38aad798e16",
+      "policy": 7,
+      "reward": 1,
+      "seed": 554,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "c37df1a4945d58065044eb4c0a61f9be3a44acf303426565ed9153f72bdf2c1d",
+      "policy": 7,
+      "reward": 1,
+      "seed": 553,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "e16ae68c82eea7ea409df09164d468c0112d4a8e526eb98d22aaa261974a07c5",
+      "policy": 7,
+      "reward": 0,
+      "seed": 552,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "46ad6dd0d3934040199d5637a22a5568377ac0311cf1f182b752e6633bfd0be9",
+      "policy": 7,
+      "reward": 1,
+      "seed": 551,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "dbc94fbc75d1a8606bf948738401150060bbd74a83024b2bab1d0aef84c78242",
+      "policy": 7,
+      "reward": 1,
+      "seed": 550,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "1165c6fc72a9515ad305e103831f1ea3eb9d1462dbc63b9df9e4e1732df414d8",
+      "policy": 7,
+      "reward": 1,
+      "seed": 549,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:7",
+      "environment": "two-arm-bandit.v1",
+      "id": "9a8d7f220653f9a92e83c231f5ddc68d527cca1d5caf868bdef05d47ddce0efe",
+      "policy": 7,
+      "reward": 1,
+      "seed": 548,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "4bbf5ec7efa0c1c327d97390c867b09abbcd1ba908d50d7512fb75d05adf8c70",
+      "policy": 6,
+      "reward": 0,
+      "seed": 547,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "0bf1a9b623eda812e3f086e56135229bb315ac697386131972344f0852b2a2fb",
+      "policy": 6,
+      "reward": 0,
+      "seed": 546,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "8847ff0903f762a0371b1d5a916d19d0b4158efa89475b00388386469a6ee3f9",
+      "policy": 6,
+      "reward": 1,
+      "seed": 544,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "cdabefbfbcbc0170cb0e8bf7e8147d9cc1c03e736eabe7fd0f56d4956c91103f",
+      "policy": 6,
+      "reward": 1,
+      "seed": 545,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "0db7126fea8efe57d4f66b63f68072fad235e0174f87a181a6e3ace9d5833428",
+      "policy": 6,
+      "reward": 1,
+      "seed": 543,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "32efe22377a33aa539643f446abed11fb78d1a6e2f01b5520e21a4d039b06699",
+      "policy": 6,
+      "reward": 1,
+      "seed": 542,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "f00ab7aa3b2a026f36a2ddaab96490ee9ae355610f6022a1dcc548fa99b62786",
+      "policy": 6,
+      "reward": 1,
+      "seed": 541,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "197c7066841d06f4f99cd77b49b32bbb7fb186ed0c8563293a70405b2db9fe96",
+      "policy": 6,
+      "reward": 1,
+      "seed": 537,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "363f1a3b878237309d4214ea131157aacab92f3c456095ed160c03773db57752",
+      "policy": 6,
+      "reward": 1,
+      "seed": 540,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "62816f4606786bb52c7a575dd9a8225f1115459cb891bc6e86f842f2ec8df95c",
+      "policy": 6,
+      "reward": 1,
+      "seed": 539,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "7ac416d819687f65c69b3aeb2b6005d77882ab6001cca9aa104ec6ba9738d754",
+      "policy": 6,
+      "reward": 1,
+      "seed": 538,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "9cfa24d4f4d7746b75c07fa99f8c0e866c161271af1be42eeb48ec32c10a4ca7",
+      "policy": 6,
+      "reward": 1,
+      "seed": 536,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "0704f04bb7cd52ad107fc8d04b82e303f1a270bbe5916ccfa8400f17cc79ebd9",
+      "policy": 6,
+      "reward": 0,
+      "seed": 535,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "c91ae699cbbde81616a10507bbb296d0573d00cdf22678d321a90a88defd85a6",
+      "policy": 6,
+      "reward": 1,
+      "seed": 534,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "eed8eadc2276f427782bf871f63d23096c27a00fd1be7d8631b2833f86519171",
+      "policy": 6,
+      "reward": 0,
+      "seed": 532,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "3c42f1e9020a88e06f6084f188da231ff3c9901ab4c098f3adbcd673a38b45fb",
+      "policy": 6,
+      "reward": 1,
+      "seed": 533,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "63b99c769598ab7e4f9b79ae8e0c1117c159fb330101133f39ad07f1bcc417d8",
+      "policy": 6,
+      "reward": 1,
+      "seed": 529,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "7ca7e9f08c4fb4c99c66434c1ec2324bb9f7682f179bb2fa2e897bd39c1e0f48",
+      "policy": 6,
+      "reward": 1,
+      "seed": 531,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "0ca38c452d1f082aba579358f8dabfe0546f028bc4ebb279127119c68b9aad5b",
+      "policy": 6,
+      "reward": 1,
+      "seed": 530,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "1dd02c8d512a890ee9d47bcd084daa240e02c96e09b02ea55f335fcc1ec4194d",
+      "policy": 6,
+      "reward": 1,
+      "seed": 520,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "67ef68a34b632fea27ec1a7fa0727e463df1d241c3321bdd4e5882e16047dc24",
+      "policy": 6,
+      "reward": 1,
+      "seed": 527,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "f592f9eb747aaa3ce42f2c54acb2ea9c1f45af7542d866a82dd82347498875b5",
+      "policy": 6,
+      "reward": 1,
+      "seed": 528,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "ffa03c3be991ea97142f3077d2e2d098c0dfb53268e282b612efaeb5a1f02038",
+      "policy": 6,
+      "reward": 1,
+      "seed": 526,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "88844dc87790ae82cdce3e0d3c23d23e917748b537cb4addf0fea289ad2b16df",
+      "policy": 6,
+      "reward": 1,
+      "seed": 525,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "7dd1294084b46a2a72a867b627adb092f44b1907e70a73c77453c5e89b4332fe",
+      "policy": 6,
+      "reward": 1,
+      "seed": 524,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "e7f6508e11efa78b3db92a3e18921da831807f3c445d70b35ef66ca8e54ee40f",
+      "policy": 6,
+      "reward": 0,
+      "seed": 522,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "701025a435430bb74b8ed7cb56cc83679e5c9520bbdc201a74f437ae81531a6d",
+      "policy": 6,
+      "reward": 1,
+      "seed": 523,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "01b9a74b85790f83cf3d3a64f39b3bf4d2c74f8e26066631d12d6c33659f82dc",
+      "policy": 6,
+      "reward": 0,
+      "seed": 521,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "ef4b897505c93afb09dd96d3e7f0788e49188ad4a965a6f6b3fc8a18def70451",
+      "policy": 6,
+      "reward": 1,
+      "seed": 516,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "e18e91b532cd02ea018a4a89b37284794d14d1a943e9d043df5c21ed17e885bd",
+      "policy": 6,
+      "reward": 1,
+      "seed": 519,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "0986d85a10ad52613014ab1bc98a1cc62a3719ca80910074b391f9d62c41a1a9",
+      "policy": 6,
+      "reward": 1,
+      "seed": 518,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "21e8d6b0bc31f07f3183b2d94b30f3762a9e419d3620e3923f0e11e6b427fe9a",
+      "policy": 6,
+      "reward": 1,
+      "seed": 517,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "5e22dd051ed933a7d0344ef86924a47fa93b2138a14f5e1adc79faa7136970f6",
+      "policy": 6,
+      "reward": 0,
+      "seed": 515,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "4af7b15c67c8b40e7b86497ce9289be15c82e45f08f391e0386446ab72d5ae17",
+      "policy": 6,
+      "reward": 0,
+      "seed": 512,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "27d35a2bffd3757c916f736a3f6c6996dd086bb8383310005a2160326644247d",
+      "policy": 6,
+      "reward": 0,
+      "seed": 511,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "140751586a02c913d0891cd79dba8c9265df7b371d086489417de792a922369a",
+      "policy": 6,
+      "reward": 1,
+      "seed": 514,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "3bcd45e8b298c1c3c9d475e1a6ef8c24937cd19eb6e69ce38c6f029cb40e3c0f",
+      "policy": 6,
+      "reward": 0,
+      "seed": 513,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "2b0f8cadaf08c6f7dcbd2135eec388adb3e4eefaa6dbda71f20a58f61665c35b",
+      "policy": 6,
+      "reward": 1,
+      "seed": 507,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "922932cb2d898f80d73239430c33e19b3d96413dfd0b91a5abafed578f663a78",
+      "policy": 6,
+      "reward": 1,
+      "seed": 510,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "97d95335461f4568b0b6e5c937e2fbedab92242e422d4d538f1c6b2d267385ca",
+      "policy": 6,
+      "reward": 1,
+      "seed": 509,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "a60cd07f1822ca7842f33626e656edf164860702ba3ccac89c2c56f3de4d6553",
+      "policy": 6,
+      "reward": 1,
+      "seed": 508,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "362b9ca50294a954edfb6063af2d79cb0bd5fe7dabc3cf724975360043e45159",
+      "policy": 6,
+      "reward": 1,
+      "seed": 504,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "f6d3f0ac47153a2f647077e5234e97fe8d4f913b693174e0d71c672233fe6f04",
+      "policy": 6,
+      "reward": 0,
+      "seed": 505,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "4c42f6c5443fb48dc4311fc145ff9a05c80731098bce241c93f632c178d5c2f5",
+      "policy": 6,
+      "reward": 1,
+      "seed": 506,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "ca58f1d89c154118bb0607b83eec0c9d0e25fb5ed298df5382fa2e134a7b1048",
+      "policy": 6,
+      "reward": 0,
+      "seed": 503,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "3c98287d38934d74dfd237b739278db20d84ba5d0ff4e66d7487644eb38c7edc",
+      "policy": 6,
+      "reward": 1,
+      "seed": 502,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "f1625a546eccbc85221fda3d4291dbeeace1b275f81a37efb2e32d24b3fccea4",
+      "policy": 6,
+      "reward": 1,
+      "seed": 501,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "0888545766dd08de50c9715911291fbb6536496d81bf8a50ea85850a92a9e4a5",
+      "policy": 6,
+      "reward": 0,
+      "seed": 499,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "7e4d2ee418749fcc00046c80b59e50b1e81abf9b07c798d2b2c2f4ac823ea9c1",
+      "policy": 6,
+      "reward": 1,
+      "seed": 498,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "a06f07d328b8d6c772ab81e4ef46fe47a1267904e35118cf610663a0c97c35aa",
+      "policy": 6,
+      "reward": 1,
+      "seed": 500,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "ed66e40ac874033f497a1546318a074788308571e794cc1106225ff4ec7689cc",
+      "policy": 6,
+      "reward": 1,
+      "seed": 496,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "dd7fb8bb469eb3e975f65d0c36471d83deb7ba4f94e1337c23c2a54407c349e8",
+      "policy": 6,
+      "reward": 1,
+      "seed": 494,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "e59826c47469c4a57a4af2cbb70efcb015241d88971d2cde6adc65a2caa39eda",
+      "policy": 6,
+      "reward": 1,
+      "seed": 497,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "b5a0c4eff18c81a5b7d8352252850d1a15a26a5c045dd3248bc5f9c58a496a1d",
+      "policy": 6,
+      "reward": 1,
+      "seed": 493,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "42f1a67b75b2378ed80178bcace4c6b4bac61fba0e8c1a0542758ccbf41643a4",
+      "policy": 6,
+      "reward": 1,
+      "seed": 495,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "bf444ae7a5ec7e9776fd646a395028349c9db861e9d2fe56a713981bd178a48f",
+      "policy": 6,
+      "reward": 1,
+      "seed": 492,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "9dd409840ba0653a8f06fb0785a333b3194faecec7089870f5d6fc006636b1cf",
+      "policy": 6,
+      "reward": 1,
+      "seed": 491,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "f4762046dae069219478e8f52880e6f74f44e254968b05687b803c23727f430f",
+      "policy": 6,
+      "reward": 1,
+      "seed": 490,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "f2271af64e60ba9eb7f88e113199241f7372286d98726c943da6a7be82116c4d",
+      "policy": 6,
+      "reward": 1,
+      "seed": 489,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "35d65872ec9d2f780a02a27d08c5a2eba1db2ed8854533a38dbad9bd97cc1878",
+      "policy": 6,
+      "reward": 0,
+      "seed": 486,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "218b0dfe55bb81f16c96e99e0321258ece4f4c7caf6c4ff714e6db66db428df3",
+      "policy": 6,
+      "reward": 0,
+      "seed": 488,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "040d5117ead29a23a7def59af670ee0d29ad287f141f27ecd03eb107778b6c7c",
+      "policy": 6,
+      "reward": 1,
+      "seed": 487,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "0104d31dfda8e7a4387eaea7fac1562fbdab8b2cd7c14feddb1df98d64c926fd",
+      "policy": 6,
+      "reward": 1,
+      "seed": 484,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:6",
+      "environment": "two-arm-bandit.v1",
+      "id": "37960698db9758124657b8e3a29930cb72e7527116a6396004f75be5fbc3cc8a",
+      "policy": 6,
+      "reward": 0,
+      "seed": 485,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "a56a97a2c6d28228bc77a9bcfd52ca06918bb323b07ecbc5d025d53449fcf13b",
+      "policy": 5,
+      "reward": 1,
+      "seed": 424,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "f551aa7f8951854b6a6b1b12512b8ab0bcd49b40b0a2497f3723a2d25cfb0db0",
+      "policy": 5,
+      "reward": 1,
+      "seed": 483,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "5b643375741f141b7ac6e20c15265662556175ffba0412b28a27ca3fd77fb38f",
+      "policy": 5,
+      "reward": 1,
+      "seed": 482,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "69befbecc999cb3dac06854ab77e4450e43fb66420f7ab81b6ebbf8176c32639",
+      "policy": 5,
+      "reward": 1,
+      "seed": 480,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "3e9f02ac1d2c46111d581e40a1a8184f94cf9ec39947c3b32de2d54c4122cbdd",
+      "policy": 5,
+      "reward": 1,
+      "seed": 481,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "99a87be970af9a686151021b621ba43fb323655a51275d198659bac26502125d",
+      "policy": 5,
+      "reward": 1,
+      "seed": 477,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "ea7d8e7cbb1af66187740f57f595773a9e815377ddd634130fecd3c240feb7a0",
+      "policy": 5,
+      "reward": 1,
+      "seed": 479,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "223036399fde3e24e0142199965dd7bca869693d18b2ad82d06fc9b61789189d",
+      "policy": 5,
+      "reward": 1,
+      "seed": 478,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "72bd1718db74d7b852fe004597b901c2d321784ed222a4dc2837abcefc9bbb24",
+      "policy": 5,
+      "reward": 1,
+      "seed": 476,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "2bd8cc241939fcef5c3939da9bb220f4b398e2aa0467285f90166854fedcb61c",
+      "policy": 5,
+      "reward": 1,
+      "seed": 475,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "3d400fba9691d17a33241b5c1e338383252c06548c6ad92078cf966a6d0bfc90",
+      "policy": 5,
+      "reward": 0,
+      "seed": 474,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "53a9846b3e62f7c526b68d15a518e5af179f4e571fd3ebbe62d9ff1d6ce700b6",
+      "policy": 5,
+      "reward": 1,
+      "seed": 473,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "b276b2dff5488fd3c53034269e74cb6f1105012b14d071362306a7b31b53fb41",
+      "policy": 5,
+      "reward": 1,
+      "seed": 472,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "6a93f33bd80b55218b75289d9c58dcc661ca9990a2313a0390c9443231134824",
+      "policy": 5,
+      "reward": 1,
+      "seed": 471,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "03a80bdf978cd3dbfb59c7e43393bdc1cccc23eb79dc4cd1f6e3d0ebbe606fac",
+      "policy": 5,
+      "reward": 0,
+      "seed": 470,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "9e5875d6b3c5101d36e44063cf502241fa858c7db080e6decd1d4132adb12ae6",
+      "policy": 5,
+      "reward": 1,
+      "seed": 469,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "2843fa99e51f063af13e035784a0d0762558faa147fb71287efe2eb3333e38ad",
+      "policy": 5,
+      "reward": 1,
+      "seed": 468,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "2bd6a7909c56ab92b640f38739965433583727164e15150e283b7d0fae15edd8",
+      "policy": 5,
+      "reward": 1,
+      "seed": 467,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "c9cacaeb4bcc743cef57608f1d6e9955398ae08c71898564340b1ae3fa69a3fb",
+      "policy": 5,
+      "reward": 1,
+      "seed": 466,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "e9d8a13c7e0acc34f129eb9425efec90682f94064da15799e6412204cf3ee839",
+      "policy": 5,
+      "reward": 0,
+      "seed": 465,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "c056f72fba3f6617b2d1b91ddec567e9afa82fa43956e8689a35cce04794701d",
+      "policy": 5,
+      "reward": 0,
+      "seed": 463,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "d5005ef0ac215e4d9e3ec5afa79073a1b4b8d4c9f195231d9f7b7645590699bd",
+      "policy": 5,
+      "reward": 1,
+      "seed": 464,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "3b595b26369a6625695c6f8c1118fd80fd9dad8365b8da5fa867a644c72b9e11",
+      "policy": 5,
+      "reward": 1,
+      "seed": 461,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "2dec701fd3f3b60e26fb96e7c07aef7d7f4a33189ffe1574657d63ff3d44a655",
+      "policy": 5,
+      "reward": 1,
+      "seed": 462,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "4bbcb9c06a243c0df49c362a824be44a866964bbac1c7a3a1eba91caa69a906d",
+      "policy": 5,
+      "reward": 1,
+      "seed": 460,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "906d7f3488ead6087102939a62d4b683eb54603ed19aa4d70950491379168649",
+      "policy": 5,
+      "reward": 1,
+      "seed": 459,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "88015e0c494495a0ec87d45b440ee4f74da88a24e816d9fee2927c8f71d0defb",
+      "policy": 5,
+      "reward": 0,
+      "seed": 458,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "51b1e36c4d73b473e3048ccdb6a472df5054b4fe264c37a96d0c56cdf4ac4215",
+      "policy": 5,
+      "reward": 1,
+      "seed": 455,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "4be002d2993ef095828def23c48da69dbf1e2a54a86530bc5ee96dfd78c279c9",
+      "policy": 5,
+      "reward": 1,
+      "seed": 457,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "161c96b5e097f9b062b7713742ba1100462d1f8f04e3d279b8b2f687d7a7c33c",
+      "policy": 5,
+      "reward": 1,
+      "seed": 456,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "bf63b6677639353f8ac0d061adfa7a0ef2f7c67a18d68a6840f6c0097b94de83",
+      "policy": 5,
+      "reward": 1,
+      "seed": 454,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "454d91a41ebe4cd2688182c8538bbb50bf9a1704afd18824da237b25a4420af6",
+      "policy": 5,
+      "reward": 0,
+      "seed": 453,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "1067bdf3e18e557436dfbe77a522a33235190fbab7295c452709676e375b9f9c",
+      "policy": 5,
+      "reward": 1,
+      "seed": 452,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "8c66a74e25ea39744961ef7373bc769e5eb284724a068a368c11765d9dad50c4",
+      "policy": 5,
+      "reward": 0,
+      "seed": 449,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "052fb6bd3f2a8283ae24f59fa293480de33239b38a7cf65c6302d87d41cca429",
+      "policy": 5,
+      "reward": 0,
+      "seed": 451,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "120e34de728daa00ce6f2528d880f89aab4db1a75bba66e6e5bdd9554c1bf023",
+      "policy": 5,
+      "reward": 0,
+      "seed": 450,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "a4f7fd4635bece297bc34c0c2e6330b2582deac404164a6d18f1b75d70d7d01b",
+      "policy": 5,
+      "reward": 1,
+      "seed": 448,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "b74e009a992d41313137e412d797efc12f49b430c10ec89803e999c200e096b9",
+      "policy": 5,
+      "reward": 1,
+      "seed": 447,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "98cd5176707f905bd2ecbb0698f32f3949fae664057aad4ffd10ceaa0960d791",
+      "policy": 5,
+      "reward": 1,
+      "seed": 446,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "c7a66971f5321f6c5d2489d949afc4a14413765b41d1137231046e4f6115c4b6",
+      "policy": 5,
+      "reward": 1,
+      "seed": 445,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "538bbf9432427306902e0f671df223f1097629bdcc26a031f27f1adfd34419eb",
+      "policy": 5,
+      "reward": 1,
+      "seed": 444,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "53309ddf2c8bf3e02a0abe81dba1a64a8cb5a092543553f9bd6febdb62c5d82c",
+      "policy": 5,
+      "reward": 1,
+      "seed": 443,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "ef34e268089c8c18f3f2faa55af12ac9c01e99127d91a8a5c52f180b15d06e12",
+      "policy": 5,
+      "reward": 1,
+      "seed": 442,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "52528500192513700d97a59b4aeabd968d686977c33b7a37626c4c8cc23a1598",
+      "policy": 5,
+      "reward": 0,
+      "seed": 441,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "1728cd262678d60b85824ccf227fb604e5c2f4e82fb1bedb5aae122366b7284f",
+      "policy": 5,
+      "reward": 0,
+      "seed": 440,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "a3fffc110218e45cbb2e7489a496ccf993cfff21e43f4a3d6ee8b6549b46431c",
+      "policy": 5,
+      "reward": 1,
+      "seed": 439,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "3ba0740ba0b4a118415ebf7ae6a4baf284d3a8d51527387e260168d4291d53ab",
+      "policy": 5,
+      "reward": 0,
+      "seed": 438,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "d27c83eb1ca213ebeac8112b591c43b1049ede5a1cb1251ac0d72ccd5a658185",
+      "policy": 5,
+      "reward": 1,
+      "seed": 437,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "85cd7b9fa905ef9f09ccb3b82a583a36116c106404998987994001faa9335bb2",
+      "policy": 5,
+      "reward": 1,
+      "seed": 436,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "0eddadd77f8d7c37504281e5538f7e4b6d089d0fd451a795bc9f0039b39031cc",
+      "policy": 5,
+      "reward": 1,
+      "seed": 434,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "08ebc310b9349a2ee88a58b727004f83682bea6b2df6ac8d5b557892bfc0a19b",
+      "policy": 5,
+      "reward": 1,
+      "seed": 435,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "b6c03566e0652dc428908b0091ea02d341296b2835055fa8fbb92006243dbd4f",
+      "policy": 5,
+      "reward": 0,
+      "seed": 433,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "fb46af7f484594c4a7f7853043381df4824564fa23aff02fd9d133f3c11def5b",
+      "policy": 5,
+      "reward": 1,
+      "seed": 432,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "425af0ec0464976eb22c5e36e1584b8033ead85ab78872618f3b3fbba9609a47",
+      "policy": 5,
+      "reward": 1,
+      "seed": 430,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "223339d404e2c16a03249035aceeab4cb565e5689a9420608f6fb8218b8c64ed",
+      "policy": 5,
+      "reward": 1,
+      "seed": 431,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "68359fdd8a637e74c6c1db76cd20cee062bc8e4bdd6ca3a917dce25e729050c3",
+      "policy": 5,
+      "reward": 1,
+      "seed": 429,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "c367a08a5bcf1bc6f06f5767d16e69c44cc9395977ffa3d45e39067bc3425803",
+      "policy": 5,
+      "reward": 1,
+      "seed": 428,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "dc999f9119fc926a797470ccbb570306bd780d12a2a336ca1f06962fdc4779b2",
+      "policy": 5,
+      "reward": 1,
+      "seed": 421,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "f35b9f9f828174bb00dc8a739c0fbe320a89e10268903ee36f866faa6ffd6a3d",
+      "policy": 5,
+      "reward": 0,
+      "seed": 427,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "f1c4c87a7a26801bdd0a130cb08c8a755c77e65ccfb54a56aeea62c7bb2d5a9b",
+      "policy": 5,
+      "reward": 0,
+      "seed": 426,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "5e3e77f3bca5feaf396bef78acedb6be062ca2efaf497c7373696222fae7409f",
+      "policy": 5,
+      "reward": 1,
+      "seed": 425,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "51a386b87520268670223b059833df0c9dc3ce2da0e62e16cdac6b8e918d396a",
+      "policy": 5,
+      "reward": 1,
+      "seed": 423,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "005468b0e8ea08f91735fd01c66ae5fc8380393d2dbf301b96e8ab768c922eb7",
+      "policy": 5,
+      "reward": 1,
+      "seed": 422,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:5",
+      "environment": "two-arm-bandit.v1",
+      "id": "0cec0efab662de990a79b92d59b4106cdd747c9e3b64bdfa90fca289621f223a",
+      "policy": 5,
+      "reward": 0,
+      "seed": 420,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "8a6a260ad337461bb8ffe1f791bd8430511210354cb49d8bf7ecacd36a004acd",
+      "policy": 4,
+      "reward": 1,
+      "seed": 419,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "536da37d48342dd8bf420d360b32afc806def962b5ec18a566fb6659bf139135",
+      "policy": 4,
+      "reward": 0,
+      "seed": 405,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "2106cb85218c1997ffd75b8097cb223bbdddd04ef88bbf550f5b40e3fd8da83b",
+      "policy": 4,
+      "reward": 1,
+      "seed": 418,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "c94f830260db1ebd54e88b289aa84dffbb6e45b9ccc4274787d0a6090a1d5808",
+      "policy": 4,
+      "reward": 1,
+      "seed": 417,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "0aacf1a0db0897740c634ba865c27e56dadad17650efa53862c7b24d7be6a1c3",
+      "policy": 4,
+      "reward": 0,
+      "seed": 416,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "312889fb2672841775971c1ba7bfbbbe243251d6a5f91bf641305b69a938053b",
+      "policy": 4,
+      "reward": 1,
+      "seed": 412,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "1ef96d9357f378267a1e94df5be62c032c90351839b90a970345bac08d20afc2",
+      "policy": 4,
+      "reward": 1,
+      "seed": 415,
+      "verifier": "bandit-reward.v1"
+    },
+    {
+      "batch": "learn:42c71af61629:4",
+      "environment": "two-arm-bandit.v1",
+      "id": "8140588174a54ee5d28a05772bb1f3361038a77ef57ed92ca8d840f561ee364e",
+      "policy": 4,
+      "reward": 1,
+      "seed": 414,
+      "verifier": "bandit-reward.v1"
+    }
+  ]
+}

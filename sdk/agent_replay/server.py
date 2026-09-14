@@ -90,14 +90,14 @@ def make_handler(directory,web_root,project):
                 ident=path.rsplit('/',1)[1]
                 try:uuid.UUID(ident);return self.send_json(read(store.directory/'comparisons'/(ident+'.json')))
                 except (ValueError,OSError):return self.send_json({'error':{'code':'not_found','message':'Unknown comparison'}},404)
-            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/v2.js','/regression-demo.json','/agent-replay-mvp.zip'}
+            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/v2.js','/regression-demo.json','/debugger.html','/rollout.js','/rollout.css','/rollout-demo.json','/agent-replay-mvp.zip'}
             if path in allowed:
                 from http.server import SimpleHTTPRequestHandler
                 return SimpleHTTPRequestHandler.do_GET(self)
             return super().do_GET()
         def do_HEAD(self):
             if not self.local_request(): return
-            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/v2.js','/regression-demo.json','/agent-replay-mvp.zip'}
+            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/v2.js','/regression-demo.json','/debugger.html','/rollout.js','/rollout.css','/rollout-demo.json','/agent-replay-mvp.zip'}
             if urlsplit(self.path).path not in allowed: return self.send_json({'error':{'code':'not_found','message':'Unknown resource'}},404)
             from http.server import SimpleHTTPRequestHandler
             return SimpleHTTPRequestHandler.do_HEAD(self)
