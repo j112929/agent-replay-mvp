@@ -1,0 +1,27 @@
+name: Agent Regression CI
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
+      - name: Prove failure, fix, and reintroduced regression
+        run: agent-replay demo --directory .replay/demo > .replay-story.json
+      - name: Run the current candidate against business assertions
+        run: agent-replay test .replay/demo/refund.case.json --project .replay/demo/agent-replay.json --report-dir .replay/reports
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: agent-regression-reports
+          path: |
+            .replay/reports
+            .replay/demo/before/results.json
+            .replay/demo/after/results.json
+            .replay/demo/regressed/results.json
+          retention-days: 14

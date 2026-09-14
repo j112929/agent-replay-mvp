@@ -34,6 +34,9 @@ def sanitize(value, depth=0):
     return f"<{type(value).__name__}>"
 
 def validate_trace(trace):
+    if isinstance(trace, dict) and trace.get("schema_version") == "2.0":
+        from .contracts import validate_v2
+        return validate_v2(trace)
     if not isinstance(trace, dict) or trace.get("schema_version") != VERSION:
         raise ValueError("Expected a schema_version 1.0 trajectory object")
     for key in ("id", "name", "started_at"):

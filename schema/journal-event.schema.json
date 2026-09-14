@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/journal-event.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "type": {
+      "enum": [
+        "run_started",
+        "step_started",
+        "step_completed",
+        "step_failed",
+        "run_output",
+        "failure_observed",
+        "run_finished"
+      ]
+    },
+    "payload": {},
+    "checksum": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "seq",
+    "type",
+    "payload",
+    "checksum"
+  ]
+}

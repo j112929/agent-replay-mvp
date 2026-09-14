@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/fixture-set.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "selector": {
+            "type": "object",
+            "properties": {
+              "boundary_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "llm",
+                  "tool",
+                  "agent"
+                ]
+              },
+              "scope_path": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "lane_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "occurrence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "input_digest": {
+                "type": "string"
+              }
+            },
+            "required": []
+          },
+          "consume": {
+            "enum": [
+              "once",
+              "sequence",
+              "repeat"
+            ]
+          },
+          "response": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "return",
+                  "raise"
+                ]
+              },
+              "value": {},
+              "error": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "responses": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "expected_calls": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "selector",
+          "consume"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "fixtures"
+  ]
+}

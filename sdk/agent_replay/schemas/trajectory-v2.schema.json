@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/trajectory-v2.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "running",
+            "completed",
+            "error",
+            "interrupted"
+          ]
+        },
+        "duration_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "start_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "error": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "status",
+        "duration_ms"
+      ]
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "present": {
+          "type": "boolean"
+        },
+        "value": {},
+        "replayability": {
+          "enum": [
+            "complete",
+            "redacted",
+            "truncated",
+            "unsupported"
+          ]
+        }
+      },
+      "required": [
+        "present",
+        "replayability"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "present": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "value"
+            ]
+          }
+        }
+      ]
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "present": {
+          "type": "boolean"
+        },
+        "value": {},
+        "replayability": {
+          "enum": [
+            "complete",
+            "redacted",
+            "truncated",
+            "unsupported"
+          ]
+        }
+      },
+      "required": [
+        "present",
+        "replayability"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "present": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "value"
+            ]
+          }
+        }
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "agent",
+              "llm",
+              "tool"
+            ]
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "seq": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "boundary_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scope_path": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "occurrence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "execution": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "enum": [
+                  "running",
+                  "completed",
+                  "error",
+                  "interrupted"
+                ]
+              },
+              "duration_ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "start_ms": {
+                "type": "number",
+                "minimum": 0
+              },
+              "error": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "status",
+              "duration_ms"
+            ]
+          },
+          "input": {
+            "type": "object",
+            "properties": {
+              "present": {
+                "type": "boolean"
+              },
+              "value": {},
+              "replayability": {
+                "enum": [
+                  "complete",
+                  "redacted",
+                  "truncated",
+                  "unsupported"
+                ]
+              }
+            },
+            "required": [
+              "present",
+              "replayability"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "present": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "value"
+                  ]
+                }
+              }
+            ]
+          },
+          "output": {
+            "type": "object",
+            "properties": {
+              "present": {
+                "type": "boolean"
+              },
+              "value": {},
+              "replayability": {
+                "enum": [
+                  "complete",
+                  "redacted",
+                  "truncated",
+                  "unsupported"
+                ]
+              }
+            },
+            "required": [
+              "present",
+              "replayability"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "present": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "value"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "execution",
+          "input",
+          "output"
+        ]
+      },
+      "maxItems": 2000
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "capture_health": {
+      "type": "object"
+    },
+    "evaluation": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "started_at",
+    "execution",
+    "input",
+    "output",
+    "steps"
+  ]
+}

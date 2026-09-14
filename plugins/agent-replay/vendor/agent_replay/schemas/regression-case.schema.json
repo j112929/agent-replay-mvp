@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/regression-case.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "entrypoint_id": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "trace_path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "trace_path",
+        "sha256"
+      ]
+    },
+    "replay_spec": {
+      "type": "object"
+    },
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "op": {
+            "enum": [
+              "equals",
+              "not_equals",
+              "exists",
+              "lte",
+              "gte",
+              "contains",
+              "count",
+              "forbidden",
+              "execution_completed",
+              "no_unhandled_error"
+            ]
+          },
+          "select": {
+            "type": "object",
+            "properties": {
+              "boundary_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "llm",
+                  "tool",
+                  "agent"
+                ]
+              },
+              "scope_path": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "lane_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "occurrence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "input_digest": {
+                "type": "string"
+              }
+            },
+            "required": []
+          },
+          "path": {
+            "type": "string"
+          },
+          "expected": {},
+          "quantifier": {
+            "enum": [
+              "all",
+              "any"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "op"
+        ]
+      }
+    },
+    "baseline": {
+      "type": "object"
+    },
+    "live_policy": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "entrypoint_id",
+    "source",
+    "replay_spec",
+    "assertions"
+  ]
+}

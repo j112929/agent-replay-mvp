@@ -117,10 +117,14 @@ def make_handler(trace_directory, web_root):
     return Handler
 
 def main(argv=None):
+    from .debug_cli import COMMANDS, main as modern_main
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] in COMMANDS: return modern_main(argv)
     parser = argparse.ArgumentParser(prog="agent-replay", description="Capture, inspect, and replay agent failures locally.")
     parser.add_argument("--version", action="version", version=__version__)
     commands = parser.add_subparsers(dest="command", required=True)
     server_cmd = commands.add_parser("serve", help="Serve the debugger on loopback")
+    server_cmd.add_argument("--project")
     server_cmd.add_argument("--port", type=int, default=8765)
     server_cmd.add_argument("--directory", default=".replay/traces")
     replay_cmd = commands.add_parser("replay", help="Replay one recorded step")
@@ -136,7 +140,14 @@ def main(argv=None):
     try:
         if args.command == "serve":
             Path(args.directory).mkdir(parents=True, exist_ok=True)
-            server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(args.directory, web_directory()))
+            if args.project:
+                from .project import load_project
+                from .server import make_handler as modern_handler
+                handler = modern_handler(Path(args.directory).parent, web_directory(), load_project(args.project))
+            else:
+                from .server import make_handler as modern_handler
+                handler = modern_handler(Path(args.directory).parent, web_directory(), {'_root':str(Path.cwd()),'entrypoints':{}})
+            server = ThreadingHTTPServer(("127.0.0.1", args.port), handler)
             print(f"Replay v{__version__} → http://127.0.0.1:{server.server_port}", flush=True)
             print(f"Trace directory: {Path(args.directory).resolve()}", flush=True)
             print("Live models use OPENAI_API_KEY / OPENAI_BASE_URL from this process environment.", flush=True)

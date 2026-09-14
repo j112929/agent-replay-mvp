@@ -66,3 +66,20 @@ To inspect in the UI, run `serve --directory <project>/.replay/traces` and use t
 loopback URL printed by the process only when that browser can reach it. The
 hosted demo at https://agent-replay-debugger.vercel.app supports manual JSON import;
 it does not receive local traces automatically.
+
+## Regression Debugger v0.2
+
+The helper now forwards to the same SDK CLI; it supports inspect, compare, demo,
+run, experiment, doctor, bundle export/import, recover, case create/accept, test,
+and cleanup. `serve --project <trusted-project.json>` enables registered agent
+execution in the local UI. Use `--help` for the selected command before execution.
+
+For new production capture use `capture(..., input=task, durability="sync")`,
+`run.set_output(result)`, and `run.fail(message)` for business failures. v2 files
+include execution and evaluation separately. Import v1 without rewriting it.
+
+For a whole-agent regression, use the user's trusted project registry and exact
+case/spec paths. Run doctor before a new entrypoint. A frozen mismatch is
+inconclusive, never a reason to call a real tool. Do not accept a new baseline
+unless the user explicitly asks to accept that passing candidate. Default test
+runs are offline; live cases require an authorized provider and `--live`.

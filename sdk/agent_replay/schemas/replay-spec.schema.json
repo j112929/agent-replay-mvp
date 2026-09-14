@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/replay-spec.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "scope": {
+      "const": "agent"
+    },
+    "policy": {
+      "enum": [
+        "frozen",
+        "hybrid"
+      ]
+    },
+    "entrypoint_id": {
+      "type": "string"
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "timeout_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3600
+        },
+        "max_steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_model_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_tokens": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": []
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "selector": {
+            "type": "object",
+            "properties": {
+              "boundary_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "llm",
+                  "tool",
+                  "agent"
+                ]
+              },
+              "scope_path": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "lane_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "occurrence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "input_digest": {
+                "type": "string"
+              }
+            },
+            "required": []
+          },
+          "consume": {
+            "enum": [
+              "once",
+              "sequence",
+              "repeat"
+            ]
+          },
+          "response": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "return",
+                  "raise"
+                ]
+              },
+              "value": {},
+              "error": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "responses": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "expected_calls": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "selector",
+          "consume"
+        ]
+      }
+    },
+    "model_rules": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "tool_rules": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "code_ref": {
+      "type": "string"
+    },
+    "determinism": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "entrypoint_id"
+  ]
+}

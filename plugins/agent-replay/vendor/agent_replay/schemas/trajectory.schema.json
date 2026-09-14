@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent Replay Trajectory v1.0",
+  "type": "object",
+  "required": ["schema_version", "id", "name", "started_at", "status", "duration_ms", "steps"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "minLength": 1, "maxLength": 240},
+    "name": {"type": "string", "minLength": 1, "maxLength": 240},
+    "started_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["success", "error", "running"]},
+    "duration_ms": {"type": "number", "minimum": 0},
+    "metadata": {"type": "object"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "replay": {
+      "type": "object",
+      "required": ["source_trace_id", "mode", "scope", "application_validated"],
+      "properties": {
+        "source_trace_id": {"type": "string"},
+        "source_step_id": {"type": "string"},
+        "mode": {"enum": ["recorded", "fixture", "live", "tool", "agent_rerun"]},
+        "scope": {"enum": ["step", "agent"]},
+        "application_validated": {"type": "boolean"}
+      }
+    },
+    "steps": {
+      "type": "array", "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "kind", "status", "start_ms", "duration_ms"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "maxLength": 240},
+          "name": {"type": "string", "minLength": 1, "maxLength": 240},
+          "kind": {"enum": ["agent", "llm", "tool"]},
+          "status": {"enum": ["success", "error", "running"]},
+          "start_ms": {"type": "number", "minimum": 0},
+          "duration_ms": {"type": "number", "minimum": 0},
+          "parent_id": {"type": ["string", "null"]},
+          "input": {}, "output": {},
+          "error": {"type": ["object", "null"]},
+          "model": {"type": "string"},
+          "request": {"type": "object"},
+          "response": {"type": "object"},
+          "usage": {"type": "object", "properties": {"total_tokens": {"type": "integer", "minimum": 0}}}
+        }
+      }
+    }
+  }
+}

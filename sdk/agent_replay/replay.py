@@ -112,3 +112,22 @@ def replay_agent(trace, agent, *, model=None, tool_overrides=None, directory=".r
         if run.path is None:
             raise
     return run
+
+
+async def async_replay_agent(trace, agent, *, model=None, tool_overrides=None, directory=".replay/traces"):
+    """Awaitable counterpart to the compatible replay_agent API."""
+    from .capture import Capture
+    from .migrations import legacy
+    validate_trace(trace)
+    trace = legacy(trace)
+    policy = ReplayPolicy(trace, model, tool_overrides)
+    run = Capture(trace['name'], directory, _policy=policy)
+    run.trace['replay'] = {'source_trace_id':trace['id'],'mode':'agent_rerun','scope':'agent','application_validated':False}
+    try:
+        with run:
+            result = agent(run)
+            if inspect.isawaitable(result): result = await result
+            run.set_output(result)
+    except Exception:
+        if run.path is None: raise
+    return run

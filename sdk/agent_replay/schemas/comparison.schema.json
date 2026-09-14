@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/comparison.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "source_trace_id": {
+      "type": "string"
+    },
+    "candidate_trace_id": {
+      "type": "string"
+    },
+    "aligned_pairs": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "added_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "removed_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ambiguous_groups": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_trace_id",
+    "candidate_trace_id",
+    "aligned_pairs",
+    "added_steps",
+    "removed_steps",
+    "ambiguous_groups"
+  ]
+}
