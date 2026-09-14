@@ -47,7 +47,9 @@ def demo(directory, rounds=8, actors=3, batch_size=64):
         processes = []
         try:
             for i in range(count):
-                env = dict(os.environ, AGENT_ROLLOUT_TOKEN=tokens[role])
+                sdk_root = str(Path(__file__).resolve().parents[2])
+                pythonpath = os.pathsep.join(x for x in (sdk_root, os.environ.get('PYTHONPATH', '')) if x)
+                env = dict(os.environ, AGENT_ROLLOUT_TOKEN=tokens[role], PYTHONPATH=pythonpath)
                 processes.append(subprocess.Popen([sys.executable, '-m', 'agent_replay.rollout.cli', 'worker', '--url', url, '--role', role, '--owner', f'{role}-{i}', '--drain'], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
             for process in processes:
                 stdout, stderr = process.communicate(timeout=120)
