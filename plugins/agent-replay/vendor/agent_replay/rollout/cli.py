@@ -91,24 +91,51 @@ def demo(directory, rounds=8, actors=3, batch_size=64):
 def main(argv=None):
     parser = argparse.ArgumentParser(prog='agent-replay rollout')
     commands = parser.add_subparsers(dest='command', required=True)
-    p = commands.add_parser('serve'); p.add_argument('--database', default='.replay/rollout.sqlite3'); p.add_argument('--tokens-file', required=True); p.add_argument('--host', default='127.0.0.1'); p.add_argument('--port', type=int, default=8877)
+    p = commands.add_parser('serve'); p.add_argument('--database', default='.replay/rollout.sqlite3'); p.add_argument('--tokens-file', required=True); p.add_argument('--host', default='127.0.0.1'); p.add_argument('--port', type=int, default=8877); p.add_argument('--tls-cert'); p.add_argument('--tls-key'); p.add_argument('--objects-root'); p.add_argument('--s3-bucket'); p.add_argument('--s3-prefix', default='rollout/'); p.add_argument('--s3-endpoint')
     p = commands.add_parser('tokens'); p.add_argument('--output', required=True)
     p = commands.add_parser('worker'); p.add_argument('--url', default='http://127.0.0.1:8877'); p.add_argument('--role', choices=['actor', 'verifier', 'learner'], required=True); p.add_argument('--owner', default='worker-'+uuid.uuid4().hex[:8]); p.add_argument('--adapter', default='agent_replay.rollout.bandit'); p.add_argument('--drain', action='store_true')
     p = commands.add_parser('request'); p.add_argument('action', choices=['initialize', 'enqueue', 'batch', 'snapshot', 'policy', 'trajectory']); p.add_argument('--url', default='http://127.0.0.1:8877'); p.add_argument('--json', default='{}')
     p = commands.add_parser('demo'); p.add_argument('--directory', default='.replay/rollout-demo'); p.add_argument('--rounds', type=int, default=8); p.add_argument('--actors', type=int, default=3); p.add_argument('--batch-size', type=int, default=64)
+    p = commands.add_parser('async-run'); p.add_argument('--config', required=True); p.add_argument('--directory', default='.replay/async-run')
+    p = commands.add_parser('backup'); p.add_argument('--database', required=True); p.add_argument('--output', required=True)
+    p = commands.add_parser('restore'); p.add_argument('--source', required=True); p.add_argument('--database', required=True); p.add_argument('--objects-root', required=True)
+    p = commands.add_parser('seal-checkpoint'); p.add_argument('directory')
     p = commands.add_parser('inspect'); p.add_argument('--database', required=True); p.add_argument('--output')
     p = commands.add_parser('export'); p.add_argument('trajectory_id'); p.add_argument('--database', required=True); p.add_argument('--output', required=True)
     p = commands.add_parser('replay'); p.add_argument('trajectory_id'); p.add_argument('--database', required=True); p.add_argument('--policy-version', type=int)
     args = parser.parse_args(argv)
     try:
-        if args.command == 'tokens':
+        if args.command == 'async-run':
+            from .async_runner import run as async_run
+            result = async_run(json.loads(Path(args.config).read_text()), args.directory)
+        elif args.command == 'backup':
+            from .artifacts import backup
+            result = {'backup': backup(Store(args.database), args.output)}
+        elif args.command == 'restore':
+            from .artifacts import restore
+            result = {'database': restore(args.source, args.database, args.objects_root)}
+        elif args.command == 'seal-checkpoint':
+            from .artifacts import seal_checkpoint
+            result = seal_checkpoint(args.directory)
+        elif args.command == 'tokens':
             data = {role: secrets.token_urlsafe(32) for role in ('admin', 'actor', 'verifier', 'learner')}
             fd = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
             with os.fdopen(fd, 'w') as stream:
                 json.dump(data, stream)
             result = {'tokens_file': str(Path(args.output).resolve())}
         elif args.command == 'serve':
-            server = make_server(Store(args.database), json.loads(Path(args.tokens_file).read_text()), args.host, args.port)
+            from .artifacts import LocalObjects, S3Objects
+            if args.objects_root and args.s3_bucket:
+                raise ValueError('Choose local objects or S3')
+            objects = S3Objects(args.s3_bucket,args.s3_prefix,args.s3_endpoint) if args.s3_bucket else LocalObjects(args.objects_root) if args.objects_root else None
+            server = make_server(Store(args.database,objects=objects), json.loads(Path(args.tokens_file).read_text()), args.host, args.port)
+            if args.tls_cert or args.tls_key:
+                import ssl
+                if not (args.tls_cert and args.tls_key):
+                    raise ValueError('TLS certificate and key required together')
+                context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+                context.load_cert_chain(args.tls_cert,args.tls_key)
+                server.socket=context.wrap_socket(server.socket,server_side=True)
             print(json.dumps({'listening': f'{args.host}:{server.server_port}'}), flush=True)
             try:
                 server.serve_forever()

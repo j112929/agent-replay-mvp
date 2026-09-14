@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rollout-benchmark
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: driver
+          image: agent-replay:0.4.0-cpu
+          command: [agent-replay, rollout, async-run, --config, /config/cluster-benchmark.json, --directory, /reports/run]
+          env:
+            - {name: SSL_CERT_FILE, value: /trust/ca.crt}
+          volumeMounts:
+            - {name: config, mountPath: /config, readOnly: true}
+            - {name: tokens, mountPath: /secrets, readOnly: true}
+            - {name: trust, mountPath: /trust, readOnly: true}
+            - {name: reports, mountPath: /reports}
+      volumes:
+        - name: config
+          configMap: {name: rollout-config}
+        - name: tokens
+          secret: {secretName: rollout-role-tokens, defaultMode: 256}
+        - name: trust
+          secret: {secretName: rollout-ca}
+        - name: reports
+          persistentVolumeClaim: {claimName: rollout-reports}

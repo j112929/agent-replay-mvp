@@ -1,0 +1,1 @@
+{"executor":"ray","actors":3,"verifiers":1,"actor_gpus":0,"learner_gpus":0,"updates":4,"batch_size":16,"max_inflight":32,"max_policy_lag":0,"timeout_seconds":180,"seed":100}

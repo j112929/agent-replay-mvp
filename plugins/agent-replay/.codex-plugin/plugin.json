@@ -1,6 +1,6 @@
 {
   "name": "agent-replay",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Capture production failures, compare controlled reruns, and turn fixes into regression CI.",
   "author": {
     "name": "Joe Ji",

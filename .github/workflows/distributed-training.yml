@@ -1,0 +1,24 @@
+name: Distributed training acceptance
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  cpu-ddp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -e '.[training,cluster]' 'ray[default,client]==2.58.0' 'transformers==5.17.0'
+      - run: python tests/training_smoke.py
+      - run: agent-replay rollout async-run --config examples/benchmarks/cpu-async.json --directory .replay/async-ci
+      - run: agent-replay rollout async-run --config examples/benchmarks/cpu-ray-smoke.json --directory .replay/ray-ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: distributed-cpu-evidence
+          path: .replay/*-ci/*.json
+          include-hidden-files: true

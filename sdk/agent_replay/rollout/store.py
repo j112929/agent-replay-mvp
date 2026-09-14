@@ -9,6 +9,8 @@ import time
 import uuid
 
 from ..serialization import canonical, digest
+from .metrics import MetricsMixin
+from .artifacts import LocalObjects, S3Objects
 
 
 class Conflict(ValueError):
@@ -41,18 +43,34 @@ def validate_trajectory(value):
     canonical(value)
 
 
-class Store:
-    def __init__(self, path, clock=time.time):
+class Store(MetricsMixin):
+    def __init__(self, path, clock=time.time, objects=None):
         self.path = str(Path(path).resolve())
         self.clock = clock
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
         with self.transaction() as db:
             db.executescript('''
+                CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY,value TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS measurements(id TEXT PRIMARY KEY,role TEXT NOT NULL,name TEXT NOT NULL,value REAL NOT NULL,recorded REAL NOT NULL);
+                CREATE INDEX IF NOT EXISTS measurements_time ON measurements(recorded);
                 CREATE TABLE IF NOT EXISTS policies(version INTEGER PRIMARY KEY, digest TEXT NOT NULL, weights TEXT NOT NULL, parent INTEGER, batch TEXT UNIQUE, created REAL NOT NULL);
                 CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, kind TEXT NOT NULL, payload TEXT NOT NULL, state TEXT NOT NULL DEFAULT 'queued', owner TEXT, token TEXT, deadline REAL, attempts INTEGER NOT NULL DEFAULT 0, max_attempts INTEGER NOT NULL DEFAULT 3, result TEXT, receipt TEXT, created REAL NOT NULL);
                 CREATE INDEX IF NOT EXISTS jobs_queue ON jobs(kind,state,created);
                 CREATE TABLE IF NOT EXISTS trajectories(id TEXT PRIMARY KEY, job TEXT UNIQUE NOT NULL, policy INTEGER NOT NULL, environment TEXT NOT NULL, seed INTEGER NOT NULL, digest TEXT NOT NULL, data TEXT NOT NULL, reward REAL, verifier TEXT, batch TEXT);
             ''')
+            setting = db.execute("SELECT value FROM settings WHERE key='objects_root'").fetchone()
+            configured = db.execute("SELECT value FROM settings WHERE key='objects_config'").fetchone()
+            options = json.loads(configured['value']) if configured else None
+            if objects is not None:
+                self.objects = objects
+            elif options and options['type'] == 's3':
+                self.objects = S3Objects(options['bucket'],options['prefix'],options.get('endpoint_url'))
+            else:
+                self.objects = LocalObjects(options['root'] if options else setting['value'] if setting else self.path+'.objects')
+            options = {'type':'local','root':str(self.objects.root)} if isinstance(self.objects,LocalObjects) else {'type':'s3','bucket':self.objects.bucket,'prefix':self.objects.prefix,'endpoint_url':self.objects.endpoint_url}
+            db.execute("INSERT OR REPLACE INTO settings VALUES('objects_config',?)", (canonical(options),))
+            if isinstance(self.objects, LocalObjects):
+                db.execute("INSERT OR REPLACE INTO settings VALUES('objects_root',?)", (str(self.objects.root),))
 
     @contextmanager
     def transaction(self):
@@ -101,7 +119,7 @@ class Store:
         db.execute('INSERT OR IGNORE INTO jobs(id,kind,payload,created) VALUES(?,?,?,?)', (key, kind, encoded, self.clock()))
         return key
 
-    def enqueue(self, count, environment, seed, key):
+    def enqueue(self, count, environment, seed, key, task=None):
         if type(count) is not int or not 1 <= count <= 10000 or type(seed) is not int or not isinstance(environment, str) or not environment or not isinstance(key, str) or not key:
             raise ValueError('Invalid rollout request')
         with self.transaction() as db:
@@ -111,6 +129,8 @@ class Store:
             ids = []
             for i in range(count):
                 payload = {'policy_version': policy['version'], 'policy_digest': policy['digest'], 'environment': environment, 'seed': seed+i, 'group': key, 'group_size': count}
+                if task is not None:
+                    payload['task'] = task
                 ids.append(self._enqueue(db, 'actor', payload, f'rollout:{key}:{i}'))
             return ids
 
@@ -161,6 +181,8 @@ class Store:
             return {'state': state}
 
     def _done(self, db, job, receipt, result):
+        row = db.execute('SELECT kind,created FROM jobs WHERE id=?', (job,)).fetchone()
+        self._metric(db, row['kind'], 'job_seconds', max(0, self.clock()-row['created']))
         db.execute("UPDATE jobs SET state='done',receipt=?,result=? WHERE id=?", (receipt, canonical(result), job))
         return result
 
@@ -175,8 +197,18 @@ class Store:
             for field in ('policy_version', 'policy_digest', 'environment', 'seed'):
                 if trajectory.get(field) != payload[field]:
                     raise Conflict('Trajectory provenance mismatch: '+field)
+            if 'task' in payload and trajectory.get('task') != payload['task']:
+                raise Conflict('Trajectory task mismatch')
             trace_id = digest({'job': job, 'trajectory': trajectory})
-            db.execute('INSERT INTO trajectories(id,job,policy,environment,seed,digest,data) VALUES(?,?,?,?,?,?,?)', (trace_id, job, payload['policy_version'], payload['environment'], payload['seed'], receipt, canonical(trajectory)))
+            object_key = self.objects.put(trajectory)
+            db.execute('INSERT INTO trajectories(id,job,policy,environment,seed,digest,data) VALUES(?,?,?,?,?,?,?)', (trace_id, job, payload['policy_version'], payload['environment'], payload['seed'], receipt, canonical({'$artifact': object_key})))
+            self._metric(db, 'actor', 'rollouts', 1)
+            tokens = trajectory.get('generation_tokens')
+            if tokens is not None:
+                if type(tokens) is not int or tokens < 0:
+                    raise ValueError('Invalid generated token count')
+                self._metric(db, 'actor', 'generated_tokens', tokens)
+                self._metric(db, 'actor', 'tokenized_rollouts', 1)
             self._enqueue(db, 'verifier', {'trajectory_id': trace_id}, 'verify:'+trace_id)
             return self._done(db, job, receipt, {'trajectory_id': trace_id})
 
@@ -187,6 +219,10 @@ class Store:
                 raise ValueError('Unknown trajectory')
             result = dict(row)
             result['data'] = json.loads(result['data'])
+            if '$artifact' in result['data']:
+                result['data'] = self.objects.get(result['data']['$artifact'])
+            if digest(result['data']) != result['digest']:
+                raise ValueError('Trajectory checksum mismatch')
             return result
 
     def verify(self, job, token, reward, verifier):
@@ -201,23 +237,27 @@ class Store:
             db.execute('UPDATE trajectories SET reward=?,verifier=? WHERE id=?', (reward, verifier, trace_id))
             return self._done(db, job, receipt, {'trajectory_id': trace_id, 'reward': reward, 'verifier': verifier})
 
-    def batch(self, size, environment, verifier, key):
+    def batch(self, size, environment, verifier, key, max_policy_lag=0):
         if type(size) is not int or not 1 <= size <= 10000 or not all(isinstance(x, str) and x for x in (environment, verifier, key)):
             raise ValueError('Invalid batch request')
+        if type(max_policy_lag) is not int or not 0 <= max_policy_lag <= 16:
+            raise ValueError('Invalid policy lag')
         with self.transaction() as db:
             job_id = 'learn:'+key
             old = db.execute('SELECT payload FROM jobs WHERE id=?', (job_id,)).fetchone()
             if old:
                 payload = json.loads(old['payload'])
-                if (payload['size'], payload['environment'], payload['verifier']) != (size, environment, verifier):
+                if (payload['size'], payload['environment'], payload['verifier'], payload.get('max_policy_lag', 0)) != (size, environment, verifier, max_policy_lag):
                     raise Conflict('Batch key reused')
                 return job_id
             policy = self._policy(db)
-            rows = db.execute('SELECT id FROM trajectories WHERE policy=? AND environment=? AND verifier=? AND reward IS NOT NULL AND batch IS NULL ORDER BY id LIMIT ?', (policy['version'], environment, verifier, size)).fetchall()
+            eligible = db.execute('SELECT policy,count(*) AS n FROM trajectories WHERE policy BETWEEN ? AND ? AND environment=? AND verifier=? AND reward IS NOT NULL AND batch IS NULL GROUP BY policy HAVING count(*)>=? ORDER BY policy DESC LIMIT 1', (max(0, policy['version']-max_policy_lag), policy['version'], environment, verifier, size)).fetchone()
+            behavior_version = eligible['policy'] if eligible else policy['version']
+            rows = db.execute('SELECT id FROM trajectories WHERE policy=? AND environment=? AND verifier=? AND reward IS NOT NULL AND batch IS NULL ORDER BY id LIMIT ?', (behavior_version, environment, verifier, size)).fetchall()
             if len(rows) < size:
                 raise Conflict('Not enough verified, unconsumed samples for current policy')
             ids = [r['id'] for r in rows]
-            self._enqueue(db, 'learner', {'policy_version': policy['version'], 'policy_digest': policy['digest'], 'trajectory_ids': ids, 'size': size, 'environment': environment, 'verifier': verifier}, job_id)
+            self._enqueue(db, 'learner', {'policy_version': policy['version'], 'policy_digest': policy['digest'], 'behavior_policy_version': behavior_version, 'max_policy_lag': max_policy_lag, 'trajectory_ids': ids, 'size': size, 'environment': environment, 'verifier': verifier}, job_id)
             db.executemany('UPDATE trajectories SET batch=? WHERE id=?', [(job_id, i) for i in ids])
             return job_id
 
@@ -235,7 +275,23 @@ class Store:
                 raise Conflict('Stale learner: active policy has changed')
             version = current['version']+1
             db.execute('INSERT INTO policies VALUES(?,?,?,?,?,?)', (version, digest(weights), canonical(weights), current['version'], job, self.clock()))
+            sample_ids = payload['trajectory_ids']
+            placeholders = ','.join('?' for _ in sample_ids)
+            earliest = db.execute(f'SELECT min(j.created) FROM jobs j JOIN trajectories t ON j.id=t.job WHERE t.id IN ({placeholders})', sample_ids).fetchone()[0]
+            self._metric(db, 'learner', 'consumed_rollouts', len(sample_ids))
+            self._metric(db, 'learner', 'training_step_seconds', max(0, self.clock()-earliest))
             return self._done(db, job, receipt, {'policy_version': version, 'policy_digest': digest(weights), 'metrics': metrics})
+
+    def scheduler_status(self, max_policy_lag=0):
+        if type(max_policy_lag) is not int or not 0 <= max_policy_lag <= 16:
+            raise ValueError('Invalid policy lag')
+        with self.transaction() as db:
+            current = self._policy(db)['version']
+            return {'current': current, 'controller_time': self.clock(),
+                'active': db.execute("SELECT count(*) FROM jobs WHERE kind='actor' AND state IN ('queued','leased')").fetchone()[0],
+                'available': db.execute('SELECT count(*) FROM trajectories WHERE policy BETWEEN ? AND ? AND batch IS NULL', (max(0,current-max_policy_lag),current)).fetchone()[0],
+                'learning': db.execute("SELECT count(*) FROM jobs WHERE kind='learner' AND state IN ('queued','leased')").fetchone()[0],
+                'exhausted': db.execute("SELECT count(*) FROM jobs WHERE state='failed'").fetchone()[0]}
 
     def snapshot(self):
         with self.transaction() as db:

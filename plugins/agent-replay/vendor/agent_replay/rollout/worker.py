@@ -3,12 +3,16 @@ import threading
 import time
 from ..serialization import digest
 from . import bandit
+from .metrics import emit, GPUSampler
 
 
 def run_once(client, role, owner, adapter=bandit, lease_seconds=60):
+    claim_started = time.monotonic()
     job = client.claim(kind=role, owner=owner, seconds=lease_seconds)
+    emit(client, role, 'claim_seconds', time.monotonic()-claim_started)
     if job is None:
         return None
+    busy_started = time.monotonic()
     stop = threading.Event()
     lease_errors = []
 
@@ -60,18 +64,32 @@ def run_once(client, role, owner, adapter=bandit, lease_seconds=60):
     finally:
         stop.set()
         thread.join(timeout=2)
+        emit(client, role, 'busy_seconds', time.monotonic()-busy_started)
 
 
-def run(client, role, owner, adapter=bandit, drain=False):
-    while True:
+def run(client, role, owner, adapter=bandit, drain=False, stop_event=None, poll_seconds=0.2):
+    sampler = GPUSampler(client, role).start()
+    try:
+        _loop(client, role, owner, adapter, drain, stop_event, poll_seconds)
+    finally:
+        sampler.close()
+
+def _loop(client, role, owner, adapter, drain, stop_event, poll_seconds):
+    while stop_event is None or not stop_event.is_set():
+        idle_started = time.monotonic()
         try:
             result = run_once(client, role, owner, adapter)
         except Exception:
             if drain:
                 raise
-            time.sleep(1)
+            emit(client, role, 'worker_errors', 1)
+            time.sleep(poll_seconds)
             continue
         if result is None:
             if drain:
                 return
-            time.sleep(1)
+            if stop_event is not None:
+                stop_event.wait(poll_seconds)
+            else:
+                time.sleep(poll_seconds)
+            emit(client, role, 'idle_seconds', time.monotonic()-idle_started)

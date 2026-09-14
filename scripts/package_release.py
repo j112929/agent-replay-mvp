@@ -24,11 +24,11 @@ for p in (root/'schema').glob('*.json'):
 sync(check)
 excluded={'.git','.openai','.sites-runtime','.venv','node_modules','__pycache__','.replay','.env','.DS_Store','.vercel'}
 paths=[]
-for folder in ('sdk','dist','examples','tests','schema','scripts','docs','plugins','.github'):
+for folder in ('sdk','dist','examples','tests','schema','scripts','docs','plugins','.github','deploy'):
     for p in (root/folder).rglob('*'):
         if p.is_file() and not any(part in excluded or part.endswith('.egg-info') for part in p.relative_to(root).parts) and p.suffix not in ('.pyc','.zip','.whl'):
             paths.append(p)
-for name in ('README.md','LICENSE','pyproject.toml','package.json','vercel.json','.gitignore'):
+for name in ('README.md','LICENSE','pyproject.toml','package.json','vercel.json','.gitignore','.dockerignore'):
     paths.append(root/name)
 buffer=io.BytesIO()
 with zipfile.ZipFile(buffer,'w',zipfile.ZIP_DEFLATED) as z:

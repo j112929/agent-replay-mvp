@@ -1,0 +1,403 @@
+{
+  "reports": [
+    {
+      "actor_idle": {
+        "fraction": 0.8109541741679142,
+        "seconds": 3.723748542019166,
+        "worker_observed_seconds": 4.591811301594134
+      },
+      "completed_rollouts": 192,
+      "config": {
+        "actors": 3,
+        "batch_size": 16,
+        "executor": "process",
+        "final_policy_version": 4,
+        "initial_policy_version": 0,
+        "max_inflight": 32,
+        "max_policy_lag": 0,
+        "seed": 100,
+        "timeout_seconds": 180,
+        "updates": 4,
+        "verifiers": 1
+      },
+      "definitions": {
+        "gpu": "Mean nvidia-smi utilization.gpu samples across reporting workers/devices; sampled activity, not memory utilization or achieved FLOPS",
+        "idle": "Reported worker waiting seconds / (waiting + claimed-job busy seconds); partial intervals from crashed workers are unavailable",
+        "rollout_throughput": "Committed trajectory jobs / full wall-clock window; a GRPO job contains one prompt group",
+        "step_latency": "Controller clock: earliest enqueue among batch samples to policy publication, including queue, rollout, verification and learning",
+        "tokens_per_second": "Committed completion tokens / full wall-clock measurement window; null for non-token tasks"
+      },
+      "end_to_end_training_step_latency_seconds": {
+        "count": 4,
+        "max": 0.48507213592529297,
+        "mean": 0.4300352931022644,
+        "p50": 0.41594791412353516,
+        "p95": 0.48507213592529297
+      },
+      "generated_tokens": null,
+      "gpu_utilization": {
+        "mean_percent": null,
+        "reason": "No GPU samples reported",
+        "samples": 0
+      },
+      "hardware": "macOS-26.6.2-arm64-arm-64bit",
+      "learner_consumed_rollouts": 64,
+      "learner_idle": {
+        "fraction": 0.9619054258642653,
+        "seconds": 1.6874039160320535,
+        "worker_observed_seconds": 1.7542305830284022
+      },
+      "measurement_window_seconds": 1.8968554160092026,
+      "rollout_throughput_per_second": 101.2201554106581,
+      "schema_version": "rollout-benchmark.v1",
+      "software": {
+        "agent_replay": "0.4.0",
+        "dependencies": {
+          "ray": "2.58.0",
+          "torch": "2.14.0",
+          "transformers": "5.17.0",
+          "vllm": null
+        },
+        "rollout_source_digest": "2c8d072f30d0905d5ebd97a33a7908af67ac892c710cf9aa3c553ba12a158e32"
+      },
+      "tokens_per_second": null,
+      "warmup_excluded": false
+    },
+    {
+      "actor_idle": {
+        "fraction": 0.8135953654237839,
+        "seconds": 2.919484833138995,
+        "worker_observed_seconds": 3.5883744637831114
+      },
+      "completed_rollouts": 170,
+      "config": {
+        "actors": 3,
+        "batch_size": 16,
+        "executor": "process",
+        "final_policy_version": 4,
+        "initial_policy_version": 0,
+        "max_inflight": 32,
+        "max_policy_lag": 0,
+        "seed": 100,
+        "timeout_seconds": 180,
+        "updates": 4,
+        "verifiers": 1
+      },
+      "definitions": {
+        "gpu": "Mean nvidia-smi utilization.gpu samples across reporting workers/devices; sampled activity, not memory utilization or achieved FLOPS",
+        "idle": "Reported worker waiting seconds / (waiting + claimed-job busy seconds); partial intervals from crashed workers are unavailable",
+        "rollout_throughput": "Committed trajectory jobs / full wall-clock window; a GRPO job contains one prompt group",
+        "step_latency": "Controller clock: earliest enqueue among batch samples to policy publication, including queue, rollout, verification and learning",
+        "tokens_per_second": "Committed completion tokens / full wall-clock measurement window; null for non-token tasks"
+      },
+      "end_to_end_training_step_latency_seconds": {
+        "count": 4,
+        "max": 0.41793203353881836,
+        "mean": 0.37304019927978516,
+        "p50": 0.3978700637817383,
+        "p95": 0.41793203353881836
+      },
+      "generated_tokens": null,
+      "gpu_utilization": {
+        "mean_percent": null,
+        "reason": "No GPU samples reported",
+        "samples": 0
+      },
+      "hardware": "macOS-26.6.2-arm64-arm-64bit",
+      "learner_consumed_rollouts": 64,
+      "learner_idle": {
+        "fraction": 0.9635409260555435,
+        "seconds": 1.4435465820715763,
+        "worker_observed_seconds": 1.4981684150989167
+      },
+      "measurement_window_seconds": 1.6282701669842936,
+      "rollout_throughput_per_second": 104.40527834201843,
+      "schema_version": "rollout-benchmark.v1",
+      "software": {
+        "agent_replay": "0.4.0",
+        "dependencies": {
+          "ray": "2.58.0",
+          "torch": "2.14.0",
+          "transformers": "5.17.0",
+          "vllm": null
+        },
+        "rollout_source_digest": "2c8d072f30d0905d5ebd97a33a7908af67ac892c710cf9aa3c553ba12a158e32"
+      },
+      "tokens_per_second": null,
+      "warmup_excluded": false
+    },
+    {
+      "actor_idle": {
+        "fraction": 0.7660171443429111,
+        "seconds": 2.8848723339033313,
+        "worker_observed_seconds": 3.7660675811348483
+      },
+      "completed_rollouts": 192,
+      "config": {
+        "actors": 3,
+        "batch_size": 16,
+        "executor": "process",
+        "final_policy_version": 4,
+        "initial_policy_version": 0,
+        "max_inflight": 32,
+        "max_policy_lag": 0,
+        "seed": 100,
+        "timeout_seconds": 180,
+        "updates": 4,
+        "verifiers": 1
+      },
+      "definitions": {
+        "gpu": "Mean nvidia-smi utilization.gpu samples across reporting workers/devices; sampled activity, not memory utilization or achieved FLOPS",
+        "idle": "Reported worker waiting seconds / (waiting + claimed-job busy seconds); partial intervals from crashed workers are unavailable",
+        "rollout_throughput": "Committed trajectory jobs / full wall-clock window; a GRPO job contains one prompt group",
+        "step_latency": "Controller clock: earliest enqueue among batch samples to policy publication, including queue, rollout, verification and learning",
+        "tokens_per_second": "Committed completion tokens / full wall-clock measurement window; null for non-token tasks"
+      },
+      "end_to_end_training_step_latency_seconds": {
+        "count": 4,
+        "max": 0.4311859607696533,
+        "mean": 0.3824615478515625,
+        "p50": 0.39443016052246094,
+        "p95": 0.4311859607696533
+      },
+      "generated_tokens": null,
+      "gpu_utilization": {
+        "mean_percent": null,
+        "reason": "No GPU samples reported",
+        "samples": 0
+      },
+      "hardware": "macOS-26.6.2-arm64-arm-64bit",
+      "learner_consumed_rollouts": 64,
+      "learner_idle": {
+        "fraction": 0.9614207628263978,
+        "seconds": 1.488946166005917,
+        "worker_observed_seconds": 1.548693583055865
+      },
+      "measurement_window_seconds": 1.6767210830003023,
+      "rollout_throughput_per_second": 114.50920606093756,
+      "schema_version": "rollout-benchmark.v1",
+      "software": {
+        "agent_replay": "0.4.0",
+        "dependencies": {
+          "ray": "2.58.0",
+          "torch": "2.14.0",
+          "transformers": "5.17.0",
+          "vllm": null
+        },
+        "rollout_source_digest": "2c8d072f30d0905d5ebd97a33a7908af67ac892c710cf9aa3c553ba12a158e32"
+      },
+      "tokens_per_second": null,
+      "warmup_excluded": false
+    },
+    {
+      "actor_idle": {
+        "fraction": 0.8507678468374611,
+        "seconds": 3.599855793872848,
+        "worker_observed_seconds": 4.231302119907923
+      },
+      "completed_rollouts": 176,
+      "config": {
+        "actors": 3,
+        "batch_size": 16,
+        "executor": "ray",
+        "final_policy_version": 4,
+        "initial_policy_version": 0,
+        "max_inflight": 32,
+        "max_policy_lag": 0,
+        "seed": 100,
+        "timeout_seconds": 180,
+        "updates": 4,
+        "verifiers": 1
+      },
+      "definitions": {
+        "gpu": "Mean nvidia-smi utilization.gpu samples across reporting workers/devices; sampled activity, not memory utilization or achieved FLOPS",
+        "idle": "Reported worker waiting seconds / (waiting + claimed-job busy seconds); partial intervals from crashed workers are unavailable",
+        "rollout_throughput": "Committed trajectory jobs / full wall-clock window; a GRPO job contains one prompt group",
+        "step_latency": "Controller clock: earliest enqueue among batch samples to policy publication, including queue, rollout, verification and learning",
+        "tokens_per_second": "Committed completion tokens / full wall-clock measurement window; null for non-token tasks"
+      },
+      "end_to_end_training_step_latency_seconds": {
+        "count": 4,
+        "max": 0.43921399116516113,
+        "mean": 0.4119577407836914,
+        "p50": 0.40379977226257324,
+        "p95": 0.43921399116516113
+      },
+      "generated_tokens": null,
+      "gpu_utilization": {
+        "mean_percent": null,
+        "reason": "No GPU samples reported",
+        "samples": 0
+      },
+      "hardware": "macOS-26.6.2-arm64-arm-64bit",
+      "learner_consumed_rollouts": 64,
+      "learner_idle": {
+        "fraction": 0.9513910698063051,
+        "seconds": 1.6534322910592891,
+        "worker_observed_seconds": 1.737910249037668
+      },
+      "measurement_window_seconds": 5.407626166997943,
+      "rollout_throughput_per_second": 32.54662851402445,
+      "schema_version": "rollout-benchmark.v1",
+      "software": {
+        "agent_replay": "0.4.0",
+        "dependencies": {
+          "ray": "2.58.0",
+          "torch": "2.14.0",
+          "transformers": "5.17.0",
+          "vllm": null
+        },
+        "rollout_source_digest": "2c8d072f30d0905d5ebd97a33a7908af67ac892c710cf9aa3c553ba12a158e32"
+      },
+      "tokens_per_second": null,
+      "warmup_excluded": false
+    },
+    {
+      "actor_idle": {
+        "fraction": 0.787793605691724,
+        "seconds": 3.106996829912532,
+        "worker_observed_seconds": 3.9439223769586533
+      },
+      "completed_rollouts": 176,
+      "config": {
+        "actors": 3,
+        "batch_size": 16,
+        "executor": "ray",
+        "final_policy_version": 4,
+        "initial_policy_version": 0,
+        "max_inflight": 32,
+        "max_policy_lag": 0,
+        "seed": 100,
+        "timeout_seconds": 180,
+        "updates": 4,
+        "verifiers": 1
+      },
+      "definitions": {
+        "gpu": "Mean nvidia-smi utilization.gpu samples across reporting workers/devices; sampled activity, not memory utilization or achieved FLOPS",
+        "idle": "Reported worker waiting seconds / (waiting + claimed-job busy seconds); partial intervals from crashed workers are unavailable",
+        "rollout_throughput": "Committed trajectory jobs / full wall-clock window; a GRPO job contains one prompt group",
+        "step_latency": "Controller clock: earliest enqueue among batch samples to policy publication, including queue, rollout, verification and learning",
+        "tokens_per_second": "Committed completion tokens / full wall-clock measurement window; null for non-token tasks"
+      },
+      "end_to_end_training_step_latency_seconds": {
+        "count": 4,
+        "max": 0.43842077255249023,
+        "mean": 0.3639339208602905,
+        "p50": 0.3764810562133789,
+        "p95": 0.43842077255249023
+      },
+      "generated_tokens": null,
+      "gpu_utilization": {
+        "mean_percent": null,
+        "reason": "No GPU samples reported",
+        "samples": 0
+      },
+      "hardware": "macOS-26.6.2-arm64-arm-64bit",
+      "learner_consumed_rollouts": 64,
+      "learner_idle": {
+        "fraction": 0.9427600366916381,
+        "seconds": 1.4539702920010313,
+        "worker_observed_seconds": 1.5422485419549048
+      },
+      "measurement_window_seconds": 4.583480708999559,
+      "rollout_throughput_per_second": 38.398765299574194,
+      "schema_version": "rollout-benchmark.v1",
+      "software": {
+        "agent_replay": "0.4.0",
+        "dependencies": {
+          "ray": "2.58.0",
+          "torch": "2.14.0",
+          "transformers": "5.17.0",
+          "vllm": null
+        },
+        "rollout_source_digest": "2c8d072f30d0905d5ebd97a33a7908af67ac892c710cf9aa3c553ba12a158e32"
+      },
+      "tokens_per_second": null,
+      "warmup_excluded": false
+    },
+    {
+      "actor_idle": {
+        "fraction": 0.8598857580286033,
+        "seconds": 3.756573166931048,
+        "worker_observed_seconds": 4.36868866806617
+      },
+      "completed_rollouts": 176,
+      "config": {
+        "actors": 3,
+        "batch_size": 16,
+        "executor": "ray",
+        "final_policy_version": 4,
+        "initial_policy_version": 0,
+        "max_inflight": 32,
+        "max_policy_lag": 0,
+        "seed": 100,
+        "timeout_seconds": 180,
+        "updates": 4,
+        "verifiers": 1
+      },
+      "definitions": {
+        "gpu": "Mean nvidia-smi utilization.gpu samples across reporting workers/devices; sampled activity, not memory utilization or achieved FLOPS",
+        "idle": "Reported worker waiting seconds / (waiting + claimed-job busy seconds); partial intervals from crashed workers are unavailable",
+        "rollout_throughput": "Committed trajectory jobs / full wall-clock window; a GRPO job contains one prompt group",
+        "step_latency": "Controller clock: earliest enqueue among batch samples to policy publication, including queue, rollout, verification and learning",
+        "tokens_per_second": "Committed completion tokens / full wall-clock measurement window; null for non-token tasks"
+      },
+      "end_to_end_training_step_latency_seconds": {
+        "count": 4,
+        "max": 0.44484400749206543,
+        "mean": 0.4215275049209595,
+        "p50": 0.4152379035949707,
+        "p95": 0.44484400749206543
+      },
+      "generated_tokens": null,
+      "gpu_utilization": {
+        "mean_percent": null,
+        "reason": "No GPU samples reported",
+        "samples": 0
+      },
+      "hardware": "macOS-26.6.2-arm64-arm-64bit",
+      "learner_consumed_rollouts": 64,
+      "learner_idle": {
+        "fraction": 0.9521513563811366,
+        "seconds": 1.6623098748386838,
+        "worker_observed_seconds": 1.7458462498616427
+      },
+      "measurement_window_seconds": 4.9168645000318065,
+      "rollout_throughput_per_second": 35.79516986869609,
+      "schema_version": "rollout-benchmark.v1",
+      "software": {
+        "agent_replay": "0.4.0",
+        "dependencies": {
+          "ray": "2.58.0",
+          "torch": "2.14.0",
+          "transformers": "5.17.0",
+          "vllm": null
+        },
+        "rollout_source_digest": "2c8d072f30d0905d5ebd97a33a7908af67ac892c710cf9aa3c553ba12a158e32"
+      },
+      "tokens_per_second": null,
+      "warmup_excluded": false
+    }
+  ],
+  "scope": "CPU bandit orchestration; cold startup included; GPU and token throughput unmeasured",
+  "summary": {
+    "process": {
+      "actor_idle_fraction_median": 0.8109541741679142,
+      "latency_p95_median": 0.4311859607696533,
+      "learner_idle_fraction_median": 0.9619054258642653,
+      "repetitions": 3,
+      "throughput_max": 114.50920606093756,
+      "throughput_median": 104.40527834201843,
+      "throughput_min": 101.2201554106581
+    },
+    "ray": {
+      "actor_idle_fraction_median": 0.8507678468374611,
+      "latency_p95_median": 0.43921399116516113,
+      "learner_idle_fraction_median": 0.9513910698063051,
+      "repetitions": 3,
+      "throughput_max": 38.398765299574194,
+      "throughput_median": 35.79516986869609,
+      "throughput_min": 32.54662851402445
+    }
+  }
+}

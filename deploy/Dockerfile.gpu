@@ -1,0 +1,7 @@
+FROM vllm/vllm-openai:v0.26.0
+WORKDIR /app
+COPY . /app
+RUN pip install --no-cache-dir '.[cluster,storage,training]' 'ray[default,client]==2.58.0'
+ENV PYTHONUNBUFFERED=1 TOKENIZERS_PARALLELISM=false
+ENTRYPOINT []
+CMD ["agent-replay", "rollout", "--help"]

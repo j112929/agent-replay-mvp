@@ -1,0 +1,9 @@
+.git
+.replay
+.venv
+node_modules
+build
+**/__pycache__
+.env
+.vercel
+.openai

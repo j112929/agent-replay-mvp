@@ -1,0 +1,1 @@
+{"executor":"ray","actors":1,"verifiers":1,"updates":2,"batch_size":8,"max_inflight":16,"timeout_seconds":180,"seed":100}

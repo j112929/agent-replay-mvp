@@ -1,0 +1,7 @@
+{
+  "checkpoint_root": "/checkpoints", "group_size": 4,
+  "tensor_parallel_size": 1, "learner_processes": 2, "device": "cuda",
+  "max_model_len": 1024, "max_new_tokens": 64, "temperature": 1.0, "top_p": 1.0,
+  "learning_rate": 0.000001, "grpo_iterations": 1, "clip_epsilon": 0.2,
+  "gpu_memory_utilization": 0.8, "timeout_seconds": 1800, "seed": 42
+}

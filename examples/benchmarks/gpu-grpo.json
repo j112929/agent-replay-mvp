@@ -1,0 +1,9 @@
+{
+  "executor": "ray", "adapter": "agent_replay.rollout.llm",
+  "actors": 2, "actor_gpus": 1, "learner_gpus": 2, "verifiers": 1,
+  "updates": 10, "batch_size": 4, "max_inflight": 8, "max_policy_lag": 1,
+  "environment": "llm-exact-answer.v1", "verifier": "exact-answer.v1",
+  "task": {"prompt": "What is 2 + 2? Answer with only the number.", "expected_answer": "4"},
+  "initial_weights": {"format":"hf-checkpoint.v1","path":"/checkpoints/initial","manifest_digest":"REPLACE_WITH_SEALED_MANIFEST_DIGEST"},
+  "timeout_seconds": 7200, "seed": 100
+}

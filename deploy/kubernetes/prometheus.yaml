@@ -1,0 +1,12 @@
+# Merge into a Prometheus server that can reach the private controller service.
+scrape_configs:
+  - job_name: agent-rollout
+    scrape_interval: 5s
+    scheme: https
+    metrics_path: /metrics
+    authorization:
+      credentials_file: /secrets/admin-token
+    tls_config:
+      ca_file: /trust/ca.crt
+    static_configs:
+      - targets: ["rollout-controller:8877"]

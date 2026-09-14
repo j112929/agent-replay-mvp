@@ -3,6 +3,6 @@ from .capture import Capture, capture, step, tool
 from .replay import replay_step, replay_agent, RecordedError, ReplayMismatch
 
 __all__ = ["Capture", "capture", "step", "tool", "replay_step", "replay_agent", "RecordedError", "ReplayMismatch", "async_replay_agent"]
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 from .replay import async_replay_agent

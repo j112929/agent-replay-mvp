@@ -21,6 +21,9 @@ ROUTES = {
     'enqueue': ('admin', 'enqueue'),
     'batch': ('admin', 'batch'),
     'snapshot': ('admin', 'snapshot'),
+    'scheduler_status': ('admin', 'scheduler_status'),
+    'metrics': ('admin', 'metrics'),
+    'measure': ('actor verifier learner admin', 'measure'),
 }
 
 
@@ -38,6 +41,17 @@ def make_server(store, tokens, host='127.0.0.1', port=8877):
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', str(len(data)))
             self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            self.wfile.write(data)
+
+        def do_GET(self):
+            if self.path != '/metrics' or self.headers.get('Authorization') != 'Bearer '+tokens['admin']:
+                return self.reply({'error': 'Unauthorized'}, 401)
+            from .metrics import prometheus
+            data = prometheus(store.metrics()).encode()
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/plain; version=0.0.4')
+            self.send_header('Content-Length', str(len(data)))
             self.end_headers()
             self.wfile.write(data)
 
@@ -65,6 +79,8 @@ def make_server(store, tokens, host='127.0.0.1', port=8877):
                     raise ValueError('Expected object')
                 if action in ('claim', 'fail') and role != 'admin' and args.get('kind') != role:
                     return self.reply({'error': 'Cannot claim another role'}, 403)
+                if action == 'measure' and role != 'admin' and args.get('role') != role:
+                    return self.reply({'error': 'Cannot report another role'}, 403)
                 # Heartbeats require a capability token already obtained by claiming a job.
                 result = getattr(store, route[1])(**args)
                 self.reply({'result': result})

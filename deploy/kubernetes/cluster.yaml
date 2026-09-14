@@ -1,0 +1,124 @@
+# Requires KubeRay operator, GPU device plugin, prepared images, TLS/role secrets,
+# and a bound RWX checkpoint PVC. Review values before applying; no public ingress.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rollout-controller-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rollout-controller
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {app: rollout-controller}
+  template:
+    metadata:
+      labels: {app: rollout-controller}
+    spec:
+      containers:
+        - name: controller
+          image: agent-replay:0.4.0-cpu
+          command: [agent-replay, rollout, serve]
+          args: [--host, "0.0.0.0", --port, "8877", --database, /data/controller.sqlite3, --tokens-file, /secrets/tokens.json, --tls-cert, /tls/tls.crt, --tls-key, /tls/tls.key]
+          ports: [{containerPort: 8877}]
+          resources:
+            requests: {cpu: "1", memory: 1Gi}
+            limits: {cpu: "2", memory: 4Gi}
+          readinessProbe:
+            tcpSocket: {port: 8877}
+            initialDelaySeconds: 5
+          volumeMounts:
+            - {name: data, mountPath: /data}
+            - {name: tokens, mountPath: /secrets, readOnly: true}
+            - {name: tls, mountPath: /tls, readOnly: true}
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: rollout-controller-data}
+        - name: tokens
+          secret: {secretName: rollout-role-tokens, defaultMode: 256}
+        - name: tls
+          secret: {secretName: rollout-controller-tls, defaultMode: 256}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollout-controller
+spec:
+  selector: {app: rollout-controller}
+  ports: [{port: 8877, targetPort: 8877}]
+---
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: rollout-ray
+spec:
+  rayVersion: "2.58.0"
+  headGroupSpec:
+    rayStartParams: {num-cpus: "0", dashboard-host: "0.0.0.0"}
+    template:
+      spec:
+        containers:
+          - name: ray-head
+            image: agent-replay:0.4.0-gpu
+            resources:
+              requests: {cpu: "2", memory: 4Gi}
+              limits: {cpu: "2", memory: 4Gi}
+            ports:
+              - {containerPort: 6379, name: gcs-server}
+              - {containerPort: 8265, name: dashboard}
+              - {containerPort: 10001, name: client}
+            env:
+              - {name: ROLLOUT_LLM_CONFIG, value: /config/llm-config.json}
+              - {name: SSL_CERT_FILE, value: /trust/ca.crt}
+              - {name: CUDA_VISIBLE_DEVICES, value: ""}
+            volumeMounts:
+              - {name: checkpoints, mountPath: /checkpoints}
+              - {name: config, mountPath: /config, readOnly: true}
+              - {name: trust, mountPath: /trust, readOnly: true}
+        volumes:
+          - name: checkpoints
+            persistentVolumeClaim: {claimName: rollout-checkpoints-rwx}
+          - name: config
+            configMap: {name: rollout-config}
+          - name: trust
+            secret: {secretName: rollout-ca}
+  workerGroupSpecs:
+    - groupName: gpu-workers
+      replicas: 2
+      minReplicas: 2
+      maxReplicas: 2
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+            - name: ray-worker
+              image: agent-replay:0.4.0-gpu
+              resources:
+                requests: {cpu: "4", memory: 24Gi, nvidia.com/gpu: "2"}
+                limits: {cpu: "8", memory: 48Gi, nvidia.com/gpu: "2"}
+              env:
+                - {name: ROLLOUT_LLM_CONFIG, value: /config/llm-config.json}
+                - {name: SSL_CERT_FILE, value: /trust/ca.crt}
+              volumeMounts:
+                - {name: checkpoints, mountPath: /checkpoints}
+                - {name: config, mountPath: /config, readOnly: true}
+                - {name: trust, mountPath: /trust, readOnly: true}
+                - {name: shm, mountPath: /dev/shm}
+          volumes:
+            - name: checkpoints
+              persistentVolumeClaim: {claimName: rollout-checkpoints-rwx}
+            - name: config
+              configMap: {name: rollout-config}
+            - name: trust
+              secret: {secretName: rollout-ca}
+            - name: shm
+              emptyDir: {medium: Memory, sizeLimit: 8Gi}
