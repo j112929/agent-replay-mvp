@@ -1,4 +1,6 @@
-# Distributed RL Rollout & Replay Infrastructure — v0.3
+# Distributed RL Rollout & Replay Infrastructure — v0.3 baseline
+
+For the v0.4 extensions and current validation boundaries, see [distributed training](distributed-training.md).
 
 This release implements a persistent, network-worker learning loop. The controller schedules rollout jobs pinned to immutable policies. Actors submit episode transitions; independently authorized verifiers attach rewards; learners consume reserved, policy-consistent batches and publish a new policy using compare-and-swap. Existing agent replay, structural diff and regression CI remain available at `/debugger.html`.
 
