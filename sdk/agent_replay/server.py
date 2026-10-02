@@ -54,9 +54,9 @@ class Store:
             finally:save(self.directory/'jobs'/(ident+'.json'),job)
         threading.Thread(target=work,daemon=True).start();return job
 
-def make_handler(directory,web_root,project):
+def make_handler(directory,web_root,project,public=False):
     from .cli import make_handler as legacy_handler
-    Base=legacy_handler(str(Path(directory)/'traces'),web_root);store=Store(directory,project)
+    Base=legacy_handler(str(Path(directory)/'traces'),web_root,public=public);store=Store(directory,project)
     class Handler(Base):
         def do_GET(self):
             if not self.local_request():return
