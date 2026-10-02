@@ -12,6 +12,7 @@ import math
 from typing import Any
 
 FAILURE_TYPES = ("none", "tool_execution", "model_execution", "looping", "high_cost", "unknown")
+FEATURE_NAMES = ("step_count", "tool_fraction", "error_rate", "tool_error_rate", "llm_error_rate", "repeat_rate", "duration_s", "failure_markers")
 
 @dataclass(frozen=True)
 class RiskPrediction:
@@ -72,9 +73,15 @@ def _sigmoid(x: float) -> float:
     z = math.exp(x)
     return z / (1.0 + z)
 
-def predict(trace: dict[str, Any]) -> RiskPrediction:
+def predict(trace: dict[str, Any], model: dict[str, Any] | None = None) -> RiskPrediction:
     f = extract_features(trace)
-    logit = _BIAS + sum(_WEIGHTS[k] * f[k] for k in _WEIGHTS)
+    if model:
+        names=model["feature_names"]; means=model["means"]; scales=model["scales"]; weights=model["weights"]
+        z=[(f.get(k,0.0)-means[i])/scales[i] for i,k in enumerate(names)]
+        raw=model["bias"]+sum(a*v for a,v in zip(weights,z))
+        cal=model.get("calibration",{}); logit=cal.get("a",1.0)*raw+cal.get("b",0.0)
+    else:
+        logit = _BIAS + sum(_WEIGHTS[k] * f[k] for k in _WEIGHTS)
     p = max(0.01, min(0.99, _sigmoid(logit)))
 
     reasons: list[str] = []
