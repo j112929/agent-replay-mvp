@@ -15,6 +15,7 @@ from .runtime.fidelity import doctor
 from .comparison import compare
 from .regression import cases
 from .regression.runner import run_suite
+from .trajectory_model import predict as predict_trajectory
 
 class Store:
     def __init__(self,directory,project):
@@ -60,7 +61,7 @@ def make_handler(directory,web_root,project):
         def do_GET(self):
             if not self.local_request():return
             path=urlsplit(self.path).path
-            if path=='/api/v1/health':return self.send_json({'service':'agent-replay','version':'0.2.0','schema_versions':['1.0','2.0'],'session_token':store.token,'capabilities':['inspect','run','compare','case','suite'],'entrypoints':list(project.get('entrypoints',{})),'suites':list(project.get('suites',{}))+['created-cases']})
+            if path=='/api/v1/health':return self.send_json({'service':'agent-replay','version':'0.2.0','schema_versions':['1.0','2.0'],'session_token':store.token,'capabilities':['inspect','run','compare','case','suite','trajectory-risk'],'entrypoints':list(project.get('entrypoints',{})),'suites':list(project.get('suites',{}))+['created-cases']})
             if path=='/api/v1/traces':
                 query=parse_qs(urlsplit(self.path).query)
                 try:offset=max(0,int(query.get('cursor',['0'])[0]));limit=min(100,max(1,int(query.get('limit',['100'])[0])))
@@ -112,7 +113,9 @@ def make_handler(directory,web_root,project):
                 body=json.loads(self.rfile.read(size))
                 if not isinstance(body,dict):raise ValueError('JSON object required')
                 path=urlsplit(self.path).path;status=200
-                if path=='/api/v1/traces/import':
+                if path=='/api/v1/trajectory/predict':
+                    trace=to_v2(validate_trace(body['trace']));value=predict_trajectory(trace).to_dict()
+                elif path=='/api/v1/traces/import':
                     trace=to_v2(validate_trace(body['trace']));old=store.traces().get(trace['id'])
                     if old and digest(old)!=digest(trace):return self.send_json({'error':{'code':'conflict','message':'Trace ID already has different content'}},409)
                     save(store.directory/'traces'/(digest(trace)+'.json'),trace);value={'id':trace['id']};status=201
