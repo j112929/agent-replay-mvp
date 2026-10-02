@@ -28,7 +28,7 @@ def web_directory():
         return packaged
     raise RuntimeError("Web assets not found. Run from the full source download or use a packaged wheel.")
 
-def make_handler(trace_directory, web_root):
+def make_handler(trace_directory, web_root, public=False):
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=str(web_root), **kwargs)
@@ -48,6 +48,8 @@ def make_handler(trace_directory, web_root):
             self.wfile.write(data)
 
         def local_request(self):
+            if public:
+                return True
             port = self.server.server_port
             hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
             host = self.headers.get("Host", "")
@@ -128,7 +130,9 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     server_cmd = commands.add_parser("serve", help="Serve the debugger on loopback")
     server_cmd.add_argument("--project")
-    server_cmd.add_argument("--port", type=int, default=8765)
+    server_cmd.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8765")))
+    server_cmd.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"))
+    server_cmd.add_argument("--public", action="store_true", default=os.environ.get("AGENT_REPLAY_PUBLIC") == "1")
     server_cmd.add_argument("--directory", default=".replay/traces")
     replay_cmd = commands.add_parser("replay", help="Replay one recorded step")
     replay_cmd.add_argument("trace")
@@ -146,12 +150,12 @@ def main(argv=None):
             if args.project:
                 from .project import load_project
                 from .server import make_handler as modern_handler
-                handler = modern_handler(Path(args.directory).parent, web_directory(), load_project(args.project))
+                handler = modern_handler(Path(args.directory).parent, web_directory(), load_project(args.project), public=args.public)
             else:
                 from .server import make_handler as modern_handler
-                handler = modern_handler(Path(args.directory).parent, web_directory(), {'_root':str(Path.cwd()),'entrypoints':{}})
-            server = ThreadingHTTPServer(("127.0.0.1", args.port), handler)
-            print(f"Replay v{__version__} → http://127.0.0.1:{server.server_port}", flush=True)
+                handler = modern_handler(Path(args.directory).parent, web_directory(), {'_root':str(Path.cwd()),'entrypoints':{}}, public=args.public)
+            server = ThreadingHTTPServer((args.host, args.port), handler)
+            print(f"Replay v{__version__} → http://{args.host}:{server.server_port}", flush=True)
             print(f"Trace directory: {Path(args.directory).resolve()}", flush=True)
             print("Live models use OPENAI_API_KEY / OPENAI_BASE_URL from this process environment.", flush=True)
             try:
