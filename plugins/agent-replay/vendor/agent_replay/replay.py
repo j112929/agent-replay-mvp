@@ -15,6 +15,9 @@ class ReplayMismatch(RuntimeError):
 
 def replay_step(trace, step_id, *, mode="recorded", fixture=None, model=None, base_url=None, api_key=None, tool_fn=None):
     validate_trace(trace)
+    if trace.get("schema_version") == "2.0":
+        from .migrations import legacy
+        trace = legacy(trace)
     source = next((s for s in trace["steps"] if s["id"] == step_id), None)
     if source is None:
         raise ValueError("Step not found")
