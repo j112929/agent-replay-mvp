@@ -181,7 +181,8 @@ def make_handler(directory,web_root,project,access=None):
             try:
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<=5*1024*1024:return self.send_json({'error':{'code':'too_large','message':'Request exceeds size limit'}},413)
-                body=json.loads(self.rfile.read(size))
+                try:body=json.loads(self.rfile.read(size))
+                except (ValueError,RecursionError):raise ValueError('Malformed JSON document') from None
                 if not isinstance(body,dict):raise ValueError('JSON object required')
                 path=urlsplit(self.path).path;status=200
                 if access and not path.startswith('/api/v1/guard/') and path not in ('/api/v1/traces/import','/api/v1/safe-replay','/api/v1/retention'):

@@ -78,6 +78,12 @@ class GuardApiTests(unittest.TestCase):
         self.denied('guard/import', 'a', {'trace': payload, 'format': 'generic'}, code=400)
         payload = example(); payload['output'] = 'x' * (1024 * 1024)
         self.denied('guard/import', 'a', {'trace': payload, 'format': 'generic'}, code=400)
+        deeply_nested = b'{"trace":' + b'[' * 2000 + json.dumps(CANARY).encode() + b']' * 2000 + b'}'
+        request = Request(f'http://127.0.0.1:{self.server.server_port}/api/v1/guard/import', deeply_nested,
+            headers={'Authorization': 'Bearer ' + self.tokens['a'], 'Content-Type': 'application/json'})
+        with self.assertRaises(HTTPError) as error: urlopen(request)
+        self.assertEqual(error.exception.code, 400)
+        self.assertNotIn(CANARY, error.exception.read().decode()); error.exception.close()
         self.assertEqual(self.request('guard/usage')['imports'], 0)
         for path in self.root.rglob('*'):
             if path.is_file(): self.assertNotIn(CANARY, path.read_text())

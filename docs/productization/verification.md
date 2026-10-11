@@ -16,6 +16,7 @@ Local verification on 2026-10-11, Python 3.12:
 | Canary scan across capture/journal/import/case/fixture/report files | Synthetic token absent |
 | CLI release decision | PASS exits 0; regression exits 1; absent candidate exits 3 |
 | Tenant HTTP integration | Foreign cases/runs unavailable; VIEWER cannot mutate; ADMIN approval uses authenticated subject |
+| Malformed/deep HTTP JSON | Returns controlled HTTP 400 without payload contents or persistence |
 | Storage limit at final report commit | Oversized staged report rejected and temporary artifacts removed |
 
 The full suite covers the existing benchmark, capture, regression, replay, rollout,
