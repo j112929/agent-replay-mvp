@@ -3,8 +3,21 @@
   "version": "0.4.0",
   "private": true,
   "type": "module",
+  "engines": {"node": ">=24.15.0"},
   "scripts": {
+    "start": "node saas/server.mjs",
+    "start:env": "node --env-file=.env saas/server.mjs",
+    "test:saas": "node --test tests/saas/*.test.mjs",
+    "test:ui": "playwright test --config tests/saas/playwright.config.mjs",
     "test": "node --test tests/*.test.mjs",
     "package": "python scripts/package_release.py"
+  },
+  "dependencies": {
+    "better-auth": "1.7.7",
+    "nodemailer": "10.1.0",
+    "stripe": "23.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0"
   }
 }

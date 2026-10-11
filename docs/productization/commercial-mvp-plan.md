@@ -1,5 +1,9 @@
 # Commercial MVP plan and implementation checklist
 
+Update: [self-service-plan.md](self-service-plan.md) extends this original slice
+with the implemented account/test billing/product UI foundation. Hosted operations
+and real customer/business validation remain separate.
+
 Goal: one failed trajectory becomes one approved, validated declarative regression
 test that evaluates candidate evidence safely and emits a CI decision. Keep Agent
 Benchmark, Evaluation, Replay & Regression as the underlying infrastructure.
@@ -64,9 +68,9 @@ flowchart TD
 - [x] P0: persist reports, versions, task classification and blocking exit codes.
 - [x] P0: bound imports, cases, runs, bytes, steps; no model calls or retry loop.
 - [x] P0: automated synthetic demo, CLI gate exit tests and GitHub Actions wiring.
-- [ ] P1: customer-facing approval workflow and suite management UI.
-- [ ] P1: self-service auth, invites, project access, key rotation and revocation.
-- [ ] P1: Stripe test billing and server-derived entitlements; live payments disabled.
+- [x] P1: customer-facing approval workflow and suite management UI.
+- [x] P1: self-service auth, invites, project access, key rotation and revocation.
+- [x] P1: Stripe test billing and server-derived entitlements; live payments disabled.
 - [ ] P1: hosted health/error alerts, restore drill, per-record retention and encryption.
 - [ ] Business P0: ten interviews, three design partners, two paid continuations.
 

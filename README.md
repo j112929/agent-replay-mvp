@@ -22,10 +22,34 @@ Recorded playback is inspection; fresh candidate captures are evaluated separate
 [Commercial MVP plan](docs/productization/commercial-mvp-plan.md) ·
 [Architecture decisions](docs/productization/architecture-decisions.md)
 
-**Scope:** a local/offline design-partner prototype, not a deployed self-service SaaS.
-Signup/invites, hosted tenant API, Stripe billing and the full product UI are planned.
-No live billing is enabled. Prices are hypotheses, and no customers or product-market
-fit are claimed. Existing Vercel hosting remains static; Python services run locally.
+## Self-service product workspace
+
+The connected workspace adds registration/login, email verification and password
+reset, organizations/projects/invites, roles, scoped revocable API keys, monthly
+usage quotas and Stripe **test** Checkout/Portal with signed webhook entitlements.
+Seven product views cover overview, failures, regression tests, test runs,
+integrations, team/projects and billing. Existing SDK and benchmark commands remain.
+
+```sh
+python -m pip install -e '.[dev]'
+npm ci
+cp saas/.env.example .env
+# Generate and privately set BETTER_AUTH_SECRET in .env; configure SMTP as needed.
+npm run start:env
+```
+
+Open `http://127.0.0.1:3000/debugger.html`, register, create a project and choose
+**Failures → Load synthetic A/B demo**. Generate, review and approve a test, then
+compare A/B: **FAIL**, zero external tool operations. Integrations provides CI keys
+and a GitHub Actions configuration. [Setup, API and demo](docs/productization/self-service.md)
+· [Controller operations](docs/operations/saas-runbook.md).
+
+**Verified scope:** offline/local single-controller implementation; a persistent
+Linux host is required for SQLite and artifacts. Existing Vercel hosting remains
+static and falls back to the prior debugger. No hosted customer service, live
+billing, real Stripe transaction or SMTP delivery is claimed. Prices remain
+hypotheses, and no customers or product-market fit are claimed. Live keys/events
+are rejected until separately authorized and reviewed.
 
 ## Agent Benchmark, Evaluation, Replay & Regression Platform
 

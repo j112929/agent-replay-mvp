@@ -1,0 +1,119 @@
+{
+  "synthetic": true,
+  "traces": [
+    {
+      "id": "coding-A",
+      "name": "Repair addition",
+      "started_at": "2026-10-11T12:00:00Z",
+      "status": "completed",
+      "duration_ms": 4,
+      "input": {
+        "task": "Repair add(a,b)"
+      },
+      "output": {
+        "fixed": true
+      },
+      "metadata": {
+        "agent_id": "coding-demo",
+        "agent_version": "A",
+        "authorization": "Bearer sk-syntheticGuardToken012345678901234"
+      },
+      "steps": [
+        {
+          "id": "read-A",
+          "parent_id": null,
+          "kind": "tool",
+          "name": "repo.read",
+          "status": "completed",
+          "start_ms": 0,
+          "duration_ms": 1,
+          "input": {
+            "path": "math.py"
+          },
+          "output": {
+            "content": "return a - b"
+          }
+        },
+        {
+          "id": "patch-A",
+          "parent_id": null,
+          "kind": "tool",
+          "name": "repo.patch",
+          "status": "completed",
+          "start_ms": 2,
+          "duration_ms": 1,
+          "input": {
+            "content": "return a + b"
+          },
+          "output": {
+            "simulated": true,
+            "applied": true
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "id": "coding-B",
+      "name": "Repair addition",
+      "started_at": "2026-10-11T12:00:00Z",
+      "status": "completed",
+      "duration_ms": 4,
+      "input": {
+        "task": "Repair add(a,b)"
+      },
+      "output": {
+        "fixed": false
+      },
+      "metadata": {
+        "agent_id": "coding-demo",
+        "agent_version": "B",
+        "authorization": "Bearer sk-syntheticGuardToken012345678901234"
+      },
+      "steps": [
+        {
+          "id": "read-B",
+          "parent_id": null,
+          "kind": "tool",
+          "name": "repo.read",
+          "status": "completed",
+          "start_ms": 0,
+          "duration_ms": 1,
+          "input": {
+            "path": "math.py"
+          },
+          "output": {
+            "content": "return a - b"
+          }
+        },
+        {
+          "id": "patch-B",
+          "parent_id": null,
+          "kind": "tool",
+          "name": "repo.patch",
+          "status": "completed",
+          "start_ms": 2,
+          "duration_ms": 1,
+          "input": {
+            "content": "return a * b"
+          },
+          "output": {
+            "simulated": true,
+            "applied": true
+          }
+        }
+      ],
+      "failures": [
+        {
+          "category": "wrong_answer",
+          "message": "addition verifier rejected patch"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "output": {
+      "fixed": true
+    }
+  }
+}

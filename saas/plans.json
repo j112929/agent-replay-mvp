@@ -1,0 +1,6 @@
+{
+  "trial": {"label":"Trial","monthly_usd":0,"imports":100,"cases":25,"runs":250,"storage_bytes":67108864,"projects":2,"seats":3},
+  "starter": {"label":"Starter","monthly_usd":299,"imports":1000,"cases":100,"runs":2000,"storage_bytes":268435456,"projects":3,"seats":5},
+  "team": {"label":"Team","monthly_usd":799,"imports":5000,"cases":500,"runs":10000,"storage_bytes":1073741824,"projects":10,"seats":15},
+  "business": {"label":"Business","monthly_usd":1999,"imports":10000,"cases":1000,"runs":25000,"storage_bytes":2147483648,"projects":20,"seats":30}
+}
