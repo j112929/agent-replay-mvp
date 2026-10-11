@@ -21,10 +21,30 @@ def run_case(path,project,directory,allow_live=False,cancel=None):
             baseline_path=(Path(path).parent/baseline.get('result_path','')).resolve()
             if not baseline_path.is_relative_to(Path(project['_root']).resolve()) or not baseline_path.is_file() or hashlib.sha256(baseline_path.read_bytes()).hexdigest()!=baseline.get('sha256'):
                 result['baseline_state']='stale'
-        experiment=execute(trace,spec,project,Path(directory)/'runs',cancel=cancel)
+        if case.get('candidate'):
+            import hashlib
+            from ..storage import within
+            from ..contracts import validate_v2
+            from ..comparison import compare
+            from ..security.sanitizer import sanitize_artifact
+            reference = case['candidate']
+            candidate_path = (Path(path).parent / reference['trace_path']).resolve()
+            within(project['_root'], candidate_path)
+            if hashlib.sha256(candidate_path.read_bytes()).hexdigest() != reference['sha256']:
+                raise ValueError('Candidate evidence checksum mismatch')
+            captured = validate_v2(sanitize_artifact(read(candidate_path)))
+            if captured.get('replay') or captured.get('metadata', {}).get('candidate_entrypoint') != case['entrypoint_id']:
+                result.update(verdict='inconclusive', reason='Candidate identity mismatch or playback evidence')
+                return result
+            captured['fidelity'] = {'level': 'captured_candidate', 'gaps': ['Evaluates captured evidence, does not execute candidate code']}
+            save(Path(directory)/'runs'/'traces'/(captured['id']+'.json'), captured)
+            experiment = {'id': str(uuid.uuid4()), 'duration_ms': captured['execution']['duration_ms'],
+                'state': 'completed', 'trace': captured, 'comparison': compare(trace,captured)}
+        else:
+            experiment=execute(trace,spec,project,Path(directory)/'runs',cancel=cancel)
         result.update(experiment_id=experiment['id'],duration_ms=experiment['duration_ms'])
         if experiment['state']!='completed':
-            result.update(reason=experiment.get('error',{}).get('message','Execution unavailable'),verdict='error');return result
+            result.update(reason=experiment.get('error',{}).get('message','Execution unavailable'),verdict='inconclusive' if experiment.get('error',{}).get('type') == 'ReplayDenied' else 'error');return result
         candidate=experiment['trace'];error=candidate['execution'].get('error',{})
         result.update(execution_status=candidate['execution']['status'],candidate_commit=candidate['provenance']['code'].get('commit'),fidelity=candidate['fidelity'],candidate_trace_id=candidate['id'],comparison=experiment['comparison'])
         incomplete = next((s.get('error',{}) for s in candidate['steps'] if (s.get('error') or {}).get('type') in ('ReplayMismatch','RecordedError')), None)

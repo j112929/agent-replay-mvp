@@ -80,7 +80,8 @@ def main(argv):
                     if not isinstance(variants,list) or not 1<=len(variants)<=20:raise ValueError('Supply 1–20 explicit variants')
                     value={'experiments':[execute(trace,resolve_spec({**spec,**v},project,Path(args.variants).parent),project,args.directory) for v in variants]}
                     code=2 if any(x['state']!='completed' for x in value['experiments']) else 0
-        print(json.dumps(value,ensure_ascii=False));return code
+        from .security.sanitizer import sanitize_artifact
+        print(json.dumps(sanitize_artifact(value),ensure_ascii=False));return code
     except (ValueError,OSError,KeyError,TypeError) as exc:
         import sys
-        print(json.dumps({'error':str(exc)}),file=sys.stderr);return 2
+        print(json.dumps({'error':__import__('agent_replay.schema',fromlist=['sanitize']).sanitize(str(exc))}),file=sys.stderr);return 2

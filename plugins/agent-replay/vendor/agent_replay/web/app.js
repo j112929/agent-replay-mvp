@@ -31,11 +31,12 @@ const statusLabel = status => ({success:'Completed',error:'Failed',running:'Runn
 const badge = status => `<span class="badge ${esc(status)}">${icon(status==='error'?'error':'check')}${statusLabel(status)}</span>`;
 const time = value => new Date(value).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 let saved=[]; let storeError=false;
-try { saved=JSON.parse(localStorage.getItem('replay.traces.v1')||'[]').map(validateTrace); } catch {storeError=true;}
+// Historical browser caches are not loaded; imports go through the sanitized debugger.
+
 const state={traces:[...saved,...structuredClone(demoTraces)],selected:saved[0]?.id||demoTraces[0].id,step:null,tab:'output',view:'traces',query:'',filter:'all',runner:false,busy:false};
 let toastTimer;
 function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4200);}
-function persist(){try{localStorage.setItem('replay.traces.v1',JSON.stringify(state.traces.filter(t=>!t.id.startsWith('demo-'))));}catch{toast('Browser storage is full. Export this run to keep a copy.');}}
+function persist(){ /* no browser evidence persistence */ }
 function current(){return state.traces.find(t=>t.id===state.selected);}
 function currentStep(){const t=current();return t?.steps.find(s=>s.id===state.step)||t?.steps.find(s=>s.status==='error')||t?.steps[0];}
 function code(value){return `<pre class="json"><code>${esc(pretty(value)).replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;)(\s*:)?/g,(m,s,key)=>`<span class="${key?'json-key':'json-string'}">${s}</span>${key||''}`)}</code></pre>`;}
@@ -76,7 +77,7 @@ function bind(){
 }
 async function copy(text){try{await navigator.clipboard.writeText(text);toast('Copied to clipboard.');}catch{toast('Clipboard is unavailable. Select and copy the text manually.');}}
 const actions={import:()=>$('#file-import').click(),home:()=>{state.view='traces';render();},export:()=>download(current(),`${current().id.replace(/[^a-zA-Z0-9_-]/g,'_')}.json`),'copy-id':()=>copy(current().id),'copy-payload':()=>{const s=currentStep();copy(pretty(state.tab==='input'?s.input:state.tab==='output'?(s.status==='error'?s.error:s.output):{id:s.id,kind:s.kind,model:s.model,start_ms:s.start_ms,duration_ms:s.duration_ms,usage:s.usage,replay_mode:s.replay_mode,parent_id:s.parent_id}));},replay:()=>openReplay(),'download-demo':()=>download(demoTraces[0],'example-trace.json'),sync:()=>syncRunner()};
-$('#file-import').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>5*1024*1024)throw new Error('Maximum trace size is 5 MB.');const value=JSON.parse(await file.text());const list=Array.isArray(value)?value:[value];if(list.length>100)throw new Error('Import at most 100 trajectories at once.');if(!list.length)throw new Error('The import contains no trajectories.');const checked=list.map(validateTrace);checked.forEach(addTrace);state.view=checked[0].replay?'replays':'traces';state.query='';state.filter='all';selectTrace(checked[0].id);toast(`Imported ${checked.length} ${checked.length===1?'trajectory':'trajectories'}.`);}catch(err){toast(`Import failed: ${err.message}`);}e.target.value='';});
+$('#file-import').addEventListener('change',e=>{toast('Use /debugger.html with the local runner for sanitized imports.');e.target.value='';});
 
 function openReplay(){
   const trace=current(), step=currentStep();if(!trace||!step)return;

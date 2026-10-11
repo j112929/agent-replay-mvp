@@ -1,0 +1,123 @@
+[
+  {
+    "id": "create-file",
+    "instruction": "Create result.txt in the working directory containing exactly 'hello agent'.",
+    "tags": [
+      "filesystem",
+      "easy"
+    ],
+    "timeout_seconds": 5,
+    "metadata": {
+      "demo_actions": {
+        "demo": [
+          {
+            "operation": "write_file",
+            "arguments": {
+              "path": "/workspace/result.txt",
+              "content": "hello agent"
+            }
+          }
+        ],
+        "demo-v2": [
+          {
+            "operation": "write_file",
+            "arguments": {
+              "path": "/workspace/result.txt",
+              "content": "hello agent"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "preserve-answer",
+    "instruction": "Create result.txt in the working directory containing exactly 'hello agent'.",
+    "tags": [
+      "filesystem",
+      "easy"
+    ],
+    "timeout_seconds": 5,
+    "metadata": {
+      "demo_actions": {
+        "demo": [
+          {
+            "operation": "write_file",
+            "arguments": {
+              "path": "/workspace/result.txt",
+              "content": "hello agent"
+            }
+          }
+        ],
+        "demo-v2": [
+          {
+            "operation": "write_file",
+            "arguments": {
+              "path": "/workspace/result.txt",
+              "content": "wrong"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "fix-answer",
+    "instruction": "Create result.txt in the working directory containing exactly 'hello agent'.",
+    "tags": [
+      "reasoning",
+      "tool_use"
+    ],
+    "timeout_seconds": 5,
+    "metadata": {
+      "demo_actions": {
+        "demo": [
+          {
+            "operation": "write_file",
+            "arguments": {
+              "path": "/workspace/result.txt",
+              "content": "wrong"
+            }
+          }
+        ],
+        "demo-v2": [
+          {
+            "operation": "write_file",
+            "arguments": {
+              "path": "/workspace/result.txt",
+              "content": "hello agent"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "finish-task",
+    "instruction": "Create result.txt in the working directory containing exactly 'hello agent'.",
+    "tags": [
+      "long_horizon",
+      "tool_use"
+    ],
+    "timeout_seconds": 0.15,
+    "metadata": {
+      "demo_actions": {
+        "demo": [
+          {
+            "operation": "wait",
+            "seconds": 2
+          }
+        ],
+        "demo-v2": [
+          {
+            "operation": "write_file",
+            "arguments": {
+              "path": "/workspace/result.txt",
+              "content": "hello agent"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

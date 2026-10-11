@@ -6,7 +6,7 @@ def to_v2(trace):
     if trace.get('schema_version') == '2.0':
         return copy.deepcopy(trace)
     t = copy.deepcopy(trace)
-    result = {k: t[k] for k in ('id','name','started_at','tags','metadata','replay') if k in t}
+    result = {k: t[k] for k in ('id','name','started_at','tags','metadata','replay','privacy','security') if k in t}
     result.update(schema_version='2.0', execution={'status': {'success':'completed','error':'error','running':'running'}[t['status']], 'duration_ms': t['duration_ms']},
                   input=envelope(t.get('input', MISSING)), output=envelope(t.get('output', MISSING)), steps=[], failures=t.get('failures', []),
                   provenance=t.get('provenance', {'code': {'commit': None, 'dirty': None, 'source_available': False}}),

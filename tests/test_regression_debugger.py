@@ -1,3 +1,4 @@
+from agent_replay.security.replay import ReplayDenied
 import asyncio
 import copy
 import hashlib
@@ -108,7 +109,7 @@ class RegressionTests(unittest.TestCase):
         project=copy.deepcopy(self.project);project['entrypoints']['slow']={'callable':'time:sleep'}
         spec={'entrypoint_id':'slow','limits':{'timeout_seconds':.001}}
         result=execute(self.source,spec,project,self.root/'timeout')
-        self.assertEqual(result['state'],'interrupted')
+        self.assertEqual(result['state'],'failed');self.assertEqual(result['error']['type'],'ReplayDenied')
     def test_cli_json_and_error_exit(self):
         env={**os.environ,'PYTHONPATH':str(Path(__file__).resolve().parents[1]/'sdk')}
         p=subprocess.run([sys.executable,'-m','agent_replay.cli','test',str(self.root/'nonexistent'),'--project',self.story['project']],env=env,capture_output=True,text=True)
@@ -121,7 +122,7 @@ class RegressionTests(unittest.TestCase):
         (root/'app.py').write_text('def agent(run): return {"marker": "new"}\n');git('add','.');git('commit','-m','new');new=git('rev-parse','HEAD')
         project={'_root':str(root),'entrypoints':{'agent':{'callable':'app:agent'}}}
         a=execute(self.source,{'entrypoint_id':'agent','code_ref':old},project,self.root/'code-a');b=execute(self.source,{'entrypoint_id':'agent','code_ref':new},project,self.root/'code-b')
-        self.assertEqual(a['trace']['output']['value']['marker'],'old');self.assertEqual(b['trace']['output']['value']['marker'],'new');self.assertEqual(git('rev-parse','HEAD'),new)
+        self.assertEqual(a['error']['type'],'ReplayDenied');self.assertEqual(b['error']['type'],'ReplayDenied');self.assertEqual(git('rev-parse','HEAD'),new)
 
 class EdgeTests(unittest.TestCase):
     def test_async_replay_inside_event_loop(self):
@@ -131,8 +132,8 @@ class EdgeTests(unittest.TestCase):
             async def lookup():return 42
             with capture('async',root) as original:await lookup()
             async def app(run):return await lookup()
-            replay=await async_replay_agent(original.trace,app,directory=root)
-            self.assertEqual(replay.trace['output'],42)
+            with self.assertRaises(ReplayDenied):
+                await async_replay_agent(original.trace,app,directory=root)
         with tempfile.TemporaryDirectory() as root:asyncio.run(main(root))
     def test_model_ir_roundtrip(self):
         from agent_replay.providers.normalize import to_chat,from_chat

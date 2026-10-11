@@ -1,4 +1,53 @@
-# Distributed RL Rollout & Replay Infrastructure
+# Agent Benchmark, Evaluation, Replay & Regression Platform
+
+Safely reproduce production agent failures from sanitized recorded evidence,
+compare versions, detect regressions and enforce CI release gates—without
+re-executing dangerous real-world operations during default replay.
+
+## Security pilot workflow
+
+```sh
+pip install -e .
+agent-replay security-demo --directory .replay/security-demo
+```
+
+The offline demo captures simulated Model A/B behavior, redacts a synthetic API
+token, intercepts a simulated payment, detects the critical-task regression,
+plays back recorded observations and writes a **FAIL** production gate decision.
+No real provider/payment operation runs. Open
+`.replay/security-demo/candidate/reports/index.html` for evidence.
+
+```sh
+agent-replay benchmark run --benchmark local \
+  --suite examples/benchmarks/terminal-smoke --agent demo \
+  --output .replay/benchmarks/baseline
+agent-replay benchmark run --benchmark local \
+  --suite examples/benchmarks/terminal-smoke --agent demo-v2 \
+  --output .replay/benchmarks/candidate
+agent-replay benchmark compare .replay/benchmarks/baseline .replay/benchmarks/candidate
+agent-replay benchmark report .replay/benchmarks/candidate --baseline .replay/benchmarks/baseline
+```
+
+Expected smoke outcome: 2/4 → 3/4, with two new passes and one new failure.
+Use fresh output directories. [Benchmark guide](docs/benchmarks.md).
+
+**Security compatibility change:** host-based agent/tool/model replay execution
+is now denied. `MOCK_REPLAY / TRACE_PLAYBACK` is supported. SANDBOX_REPLAY and
+MODEL_RERUN are disabled until a verified isolation backend exists. Legacy examples
+below that request executable reruns are historical; see the migration guide.
+Normal capture, benchmark agents and training are real trusted execution, not
+sandboxed replay. This is a pilot security foundation, not enterprise certification.
+
+- [Repository assessment and file-level plan](docs/architecture/security-gap-analysis.md)
+- [Security architecture and organization roles](docs/security/security-architecture.md)
+- [Sanitization data flow](docs/security/data-flow.md) · [Threat model](docs/security/threat-model.md)
+- [Replay isolation / breaking changes](docs/security/replay-isolation.md)
+- [PASS / FAIL / INCONCLUSIVE gates](docs/security/release-gates.md)
+- [Retention and backup limits](docs/security/data-retention.md)
+
+## Existing rollout and replay capabilities
+
+### Distributed RL Rollout & Replay Infrastructure
 
 Ray / process Actor workers → versioned trajectories → independent rewards → replay/debug → real policy updates. Includes a CPU-only REINFORCE demo and preserves the Agent Regression Debugger.
 

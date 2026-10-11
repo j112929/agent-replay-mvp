@@ -8,8 +8,10 @@ from .storage import read,save
 from .schema import validate_trace
 
 def export_bundle(source, output):
-    trace=validate_trace(read(source)); data=Path(source).read_bytes()
-    manifest={'schema_version':'1.0','source_trace_id':trace['id'],'files':[{'path':'trace.json','sha256':hashlib.sha256(data).hexdigest(),'size':len(data)}], 'replay_requirements':['Trusted local entrypoint and environment required']}
+    from .security.sanitizer import sanitize_artifact
+    from .serialization import canonical
+    trace=validate_trace(sanitize_artifact(read(source))); data=(canonical(trace)+"\n").encode()
+    manifest={'schema_version':'1.0','source_trace_id':trace['id'],'files':[{'path':'trace.json','sha256':hashlib.sha256(data).hexdigest(),'size':len(data)}], 'replay_requirements':['Data-only playback; redacted responses need explicit isolated fixtures']}
     with zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED) as z:
         z.writestr('manifest.json',json.dumps(manifest)); z.writestr('trace.json',data)
     return manifest

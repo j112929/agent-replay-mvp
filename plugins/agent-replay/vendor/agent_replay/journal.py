@@ -13,6 +13,8 @@ class Journal:
         self.path=Path(path); self.path.parent.mkdir(parents=True,exist_ok=True)
         self.stream=self.path.open('x'); self.seq=0; self.durable_seq=0; self.lock=threading.Lock(); self.durability=durability
     def append(self, kind, payload):
+        from .security.sanitizer import sanitize_artifact
+        payload = sanitize_artifact(payload)
         with self.lock:
             self.seq+=1
             record={'schema_version':'1.0','seq':self.seq,'type':kind,'payload':payload}

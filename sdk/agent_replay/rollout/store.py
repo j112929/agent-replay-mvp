@@ -172,6 +172,8 @@ class Store(MetricsMixin):
             return {'deadline': deadline}
 
     def fail(self, job, token, kind, error, retryable=True):
+        from ..schema import sanitize
+        error = sanitize(error)
         if not isinstance(error, str) or type(retryable) is not bool:
             raise ValueError('Invalid failure report')
         with self.transaction() as db:
@@ -187,6 +189,8 @@ class Store(MetricsMixin):
         return result
 
     def complete(self, job, token, trajectory):
+        from ..security.sanitizer import sanitize_artifact
+        trajectory = sanitize_artifact(trajectory)
         validate_trajectory(trajectory)
         receipt = digest(trajectory)
         with self.transaction() as db:

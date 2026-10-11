@@ -33,6 +33,8 @@ class LocalObjects:
         return self.root/key[:2]/key
 
     def put(self, value):
+        from ..security.sanitizer import sanitize_artifact
+        value = sanitize_artifact(value)
         key = digest(value)
         path = self.path(key)
         if path.exists():
@@ -62,6 +64,8 @@ class S3Objects:
         return self.prefix+key
 
     def put(self, value):
+        from ..security.sanitizer import sanitize_artifact
+        value = sanitize_artifact(value)
         key = digest(value)
         self.client.put_object(Bucket=self.bucket, Key=self._key(key), Body=canonical(value).encode(), ContentType='application/json')
         return key

@@ -5,6 +5,8 @@ import xml.etree.ElementTree as ET
 from ..storage import save
 
 def write_reports(results,directory):
+    from ..security.sanitizer import sanitize_artifact
+    results=sanitize_artifact(results)
     directory=Path(directory);directory.mkdir(parents=True,exist_ok=True)
     save(directory/'results.json',{'schema_version':'1.0','results':results})
     suite=ET.Element('testsuite',name='Agent regressions',tests=str(len(results)),failures=str(sum(r['verdict']=='fail' for r in results)),errors=str(sum(r['verdict']=='error' for r in results)),skipped=str(sum(r['verdict']=='inconclusive' for r in results)))

@@ -29,7 +29,8 @@ class Span:
         if not isinstance(name, str) or not name.strip() or len(name) > 240:
             raise ValueError("Step name must be a non-empty string (max 240 characters)")
         self.run = run
-        self.event = {"id": str(uuid.uuid4()), "name": name, "kind": kind, "status": "running", "input": sanitize(input), "output": None, "error": None, **sanitize(extra)}
+        self.capture_path = "/steps/" + str(len(run.trace["steps"]))
+        self.event = {"id": str(uuid.uuid4()), "name": name, "kind": kind, "status": "running", "input": run._clean(input, self.capture_path + "/input"), "output": None, "error": None, **run._clean(extra)}
 
     def __enter__(self):
         if not self.run._entered or self.run._closed:
@@ -52,14 +53,14 @@ class Span:
         return self
 
     def set_output(self, output):
-        self.event["output"] = self.run._clean(output)
+        self.event["output"] = self.run._clean(output, self.capture_path + "/output")
         return output
 
     def __exit__(self, exc_type, exc, tb):
         self.event["duration_ms"] = round((time.perf_counter()-self.started)*1000, 3)
         self.event["status"] = "error" if exc is not None else "success"
         if exc is not None:
-            self.event["error"] = {"type": type(exc).__name__, "message": sanitize(str(exc))}
+            self.event["error"] = {"type": type(exc).__name__, "message": self.run._clean(str(exc), self.capture_path + "/error/message")}
         try:
             self.run._record('step_failed' if exc is not None else 'step_completed', self.event)
         except Exception:
@@ -70,10 +71,12 @@ class Span:
         return False
 
 class Capture:
-    def __init__(self, name, directory=".replay/traces", metadata=None, *, _policy=None, input=MISSING, entrypoint_id=None, durability=None, on_capture_error="warn", redactor=None):
+    def __init__(self, name, directory=".replay/traces", metadata=None, *, _policy=None, input=MISSING, entrypoint_id=None, durability=None, on_capture_error="warn", redactor=None, sanitization_policy="STANDARD", sensitive_fields=(), secret_patterns=(), pii=False):
         if not isinstance(name, str) or not name.strip() or len(name) > 240:
             raise ValueError("Capture name must be a non-empty string (max 240 characters)")
         if on_capture_error not in ('warn','raise'): raise ValueError('Invalid capture error policy')
+        from .security.sanitizer import Sanitizer
+        self.sanitizer = Sanitizer(sanitization_policy, sensitive_fields, secret_patterns, pii)
         self.directory = directory
         self.input = None if input is MISSING else input
         self.modern = durability is not None or input is not MISSING or entrypoint_id is not None
@@ -88,20 +91,22 @@ class Capture:
         self.path = None
         self.policy = _policy
         self._entered = self._closed = False
-        self.trace = {"schema_version": VERSION, "id": str(uuid.uuid4()), "name": name, "started_at": dt.datetime.now(dt.timezone.utc).isoformat(), "status": "running", "duration_ms": 0, "steps": [], "metadata": sanitize(metadata or {}), "tags": []}
+        self.trace = {"schema_version": VERSION, "id": str(uuid.uuid4()), "name": name, "started_at": dt.datetime.now(dt.timezone.utc).isoformat(), "status": "running", "duration_ms": 0, "steps": [], "metadata": self._clean(metadata or {}), "tags": []}
 
     @property
     def _current_event(self):
         return _event.get()
 
-    def _clean(self, value):
-        cleaned = sanitize(value)
+    def _clean(self, value, path=""):
+        cleaned = self.sanitizer.sanitize(value, path)
         if not self.redactor: return cleaned
         try:
-            return sanitize(self.redactor(cleaned))
+            return self.sanitizer.sanitize(self.redactor(cleaned), path)
         except Exception:
-            self.trace.setdefault('capture_health', {})['state'] = 'partial'
-            if self.on_capture_error == 'raise': raise
+            self.sanitizer.failed = True
+            if hasattr(self, 'trace'):
+                self.trace.setdefault('capture_health', {})['state'] = 'partial'
+            if self.on_capture_error == 'raise': raise ValueError('Custom sanitizer failed; raw payload omitted') from None
             warnings.warn('Capture redactor failed; value omitted', RuntimeWarning)
             return '[CAPTURE_ERROR]'
 
@@ -116,7 +121,7 @@ class Capture:
             warnings.warn('Agent Replay capture persistence failed: ' + type(exc).__name__, RuntimeWarning)
 
     def set_output(self, value):
-        self.trace['output'] = self._clean(value)
+        self.trace['output'] = self._clean(value, '/output')
         self._record('run_output', self.trace['output'])
         return value
 
@@ -132,7 +137,7 @@ class Capture:
         self._start = time.perf_counter()
         self.trace["started_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
         if self.modern:
-            self.trace['input'] = self._clean(self.input)
+            self.trace['input'] = self._clean(self.input, '/input')
             self.trace['provenance'] = collect()
             self.trace['capture_health'] = {'state':'complete','dropped_events':0,'persistence_errors':0}
             try:
@@ -151,7 +156,8 @@ class Capture:
         self.trace["duration_ms"] = round((time.perf_counter()-self._start)*1000, 3)
         self.trace["status"] = "error" if exc is not None else "success"
         if exc is not None:
-            self.trace["error"] = {"type": type(exc).__name__, "message": sanitize(str(exc))}
+            self.trace["error"] = {"type": type(exc).__name__, "message": self._clean(str(exc))}
+        self.trace["privacy"] = self.sanitizer.metadata()
         self._closed = True
         _active.reset(self._token)
         _parent.reset(self._parent_token)
@@ -204,8 +210,8 @@ class Capture:
                 if self.policy:
                     event.event["replay_mode"] = "live"
             message = payload["choices"][0]["message"]
-            event.event["usage"] = sanitize(payload.get("usage", {}))
-            event.event["response"] = sanitize(payload)
+            event.event["usage"] = self._clean(payload.get("usage", {}))
+            event.event["response"] = self._clean(payload)
             event.set_output(message)
             # Return the full provider response, matching Chat Completions semantics.
             return payload

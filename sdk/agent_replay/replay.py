@@ -14,7 +14,15 @@ class ReplayMismatch(RuntimeError):
     """A changed call cannot be safely matched to a captured tool observation."""
 
 def replay_step(trace, step_id, *, mode="recorded", fixture=None, model=None, base_url=None, api_key=None, tool_fn=None):
+    from .security.replay import deny_execution
+    from .security.sanitizer import sanitize_artifact
+    if mode in ('live', 'tool'):
+        deny_execution()
+    trace = sanitize_artifact(trace)
     validate_trace(trace)
+    if trace.get('schema_version') == '2.0':
+        from .migrations import legacy
+        trace = legacy(trace)
     source = next((s for s in trace["steps"] if s["id"] == step_id), None)
     if source is None:
         raise ValueError("Step not found")
@@ -37,20 +45,6 @@ def replay_step(trace, step_id, *, mode="recorded", fixture=None, model=None, ba
     try:
         if mode == "fixture":
             event.update(output=sanitize(fixture), status="success")
-        elif mode == "live":
-            request = copy.deepcopy(source["request"])
-            request["model"] = model or source.get("model") or request.get("model")
-            event.update(model=request["model"], request=sanitize(request), input=sanitize(request))
-            payload = completion(request, base_url=base_url, api_key=api_key)
-            event.update(output=sanitize(payload["choices"][0]["message"]), response=sanitize(payload), usage=sanitize(payload.get("usage", {})), status="success")
-        elif mode == "tool":
-            if not isinstance(source.get("input"), dict):
-                raise ValueError("Tool replay expects input to be keyword arguments")
-            value = tool_fn(**source["input"])
-            if inspect.isawaitable(value):
-                import asyncio
-                value = asyncio.run(value)
-            event.update(output=sanitize(value), status="success")
     except Exception as exc:
         event.update(status="error", error={"type": type(exc).__name__, "message": sanitize(str(exc))})
     if mode not in ("recorded", "fixture"):
@@ -87,47 +81,12 @@ class ReplayPolicy:
         return {"choices": [{"message": copy.deepcopy(event.get("output")), "index": 0, "finish_reason": "stop"}], "usage": copy.deepcopy(event.get("usage", {}))}
 
 def replay_agent(trace, agent, *, model=None, tool_overrides=None, directory=".replay/traces"):
-    """Rerun an explicit agent(run) entrypoint from the start. No checkpoint resume.
-
-    Decorated tools use matched recordings or named fixtures. run.chat uses live
-    completions when model is provided. Uninstrumented application code executes
-    normally, so this is not a sandbox. A completed rerun is not task correctness.
-    """
-    from .capture import Capture
-    validate_trace(trace)
-    policy = ReplayPolicy(trace, model, tool_overrides)
-    run = Capture(trace["name"], directory, _policy=policy)
-    run.trace["replay"] = {"source_trace_id": trace["id"], "mode": "agent_rerun", "scope": "agent", "application_validated": False, "model": model}
-    run.trace["metadata"] = {"note": "Agent entrypoint rerun from start. Instrumented tools use frozen observations or fixtures; uninstrumented code executes normally."}
-    run.trace["tags"] = ["replay"]
-    try:
-        with run:
-            result = agent(run)
-            if inspect.isawaitable(result):
-                import asyncio
-                result = asyncio.run(result)
-            run.trace["output"] = sanitize(result)
-    except Exception:
-        # The exception was captured and persisted; callers inspect trace.status.
-        if run.path is None:
-            raise
-    return run
+    """Compatibility entrypoint: executable replay fails closed without isolation."""
+    from .security.replay import deny_execution
+    deny_execution()
 
 
 async def async_replay_agent(trace, agent, *, model=None, tool_overrides=None, directory=".replay/traces"):
-    """Awaitable counterpart to the compatible replay_agent API."""
-    from .capture import Capture
-    from .migrations import legacy
-    validate_trace(trace)
-    trace = legacy(trace)
-    policy = ReplayPolicy(trace, model, tool_overrides)
-    run = Capture(trace['name'], directory, _policy=policy)
-    run.trace['replay'] = {'source_trace_id':trace['id'],'mode':'agent_rerun','scope':'agent','application_validated':False}
-    try:
-        with run:
-            result = agent(run)
-            if inspect.isawaitable(result): result = await result
-            run.set_output(result)
-    except Exception:
-        if run.path is None: raise
-    return run
+    """Awaitable compatibility entrypoint; never invokes agent."""
+    from .security.replay import deny_execution
+    deny_execution()
