@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | No verified isolation for executable agents | critical | deny host replay; consume candidate evidence only | executable workloads deferred |
 | Generated verifier overfits example pair | high | explicit expectations, positive/negative validation and review; obtain held-out examples | general validity unproven |
-| Partial imported traces | high | retain missing payloads/parents as errors or limitations; block unsupported fixtures | targeted tests required |
+| Partial imported traces | high | reject missing parents; retain missing payload limitations and block unsupported fixtures | targeted offline tests pass; real adapter exports still need pilot validation |
 | Candidate evidence is forged or misleading | high | checksums/task identity/version checks; customer CI is trusted capture boundary | no execution attestation |
 | Unknown secrets / historical raw evidence | high | configured fields, fail-closed imports, explicit migration | complete detection not claimed |
 | File controller concurrency/quotas | high | one controller, bounded files and OS lock; transactional store before multi-instance | hosted service deferred |

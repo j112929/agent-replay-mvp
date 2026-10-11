@@ -51,6 +51,14 @@ Actions uses contents: read, no customer secrets, no pull_request_target, and sh
 retention of sanitized synthetic artifacts. Repository owners configure required
 checks; no branch-protection administration occurs in this slice.
 
+## ADR 007: exact JSON assertions preserve nested value types
+
+The previous assertion engine compared Python containers, where nested `true` and
+`1` could compare equal. Exact assertions and predicates now compare canonical JSON;
+array membership uses the same comparison. This intentional correctness change
+prevents misleading positive verifier evidence. Numeric inequality operators keep
+their explicit numeric semantics. Existing offline regression tests still pass.
+
 ## Decisions requiring separate approval
 
 No new live billing, production release, hosting migration, remote public tenant

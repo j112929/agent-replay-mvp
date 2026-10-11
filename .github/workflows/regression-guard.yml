@@ -1,0 +1,44 @@
+name: Agent Regression Guard
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  failure-to-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - name: Validate imports, verifier approval, tenant isolation and budgets
+        run: python -m unittest discover -s tests -p 'test_guard*.py' -v
+      - name: Production failure to approved regression test (synthetic only)
+        run: agent-replay guard demo --directory .replay/guard-ci
+      - name: Prove the critical regression blocks a release
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          config = json.loads(Path('.replay/guard-ci/ci-input.json').read_text())
+          command = ['agent-replay','guard','run',config['case'],'--directory',config['directory'],
+                     '--baseline',config['baseline'],'--candidate',config['candidate'],
+                     '--output','.replay/guard-ci/ci-gate.json']
+          result = subprocess.run(command, capture_output=True, text=True)
+          gate = json.loads(Path('.replay/guard-ci/ci-gate.json').read_text())
+          assert result.returncode == 1, 'Synthetic critical regression must exit 1'
+          assert gate['decision'] == 'FAIL' and gate['classification'] == 'regression'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## Synthetic release decision: FAIL\n\n')
+              summary.write('Agent A passes; Agent B regresses. Candidate release is blocked (exit 1).\n\n')
+              summary.write('This CI job verifies the failure path and therefore succeeds when blocking is correct.\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-guard-synthetic-evidence
+          path: .replay/guard-ci/
+          include-hidden-files: true
+          retention-days: 7

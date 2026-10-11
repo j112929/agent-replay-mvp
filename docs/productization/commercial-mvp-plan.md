@@ -55,15 +55,15 @@ flowchart TD
 ## Prioritized checklist
 
 - [x] Phase 0: inspect actual branch state, architecture and safety constraints.
-- [ ] P0: reject invalid/oversized imports before any persistence; scope by principal.
-- [ ] P0: three file formats and explicit missing-history limitations.
-- [ ] P0: build fixtures and require supplied expected outcome plus positive evidence.
-- [ ] P0: validate declarative rules; incomplete drafts cannot be approved or block.
-- [ ] P0: bind approval to immutable case/source/fixture/validation versions.
-- [ ] P0: use recorded playback for inspection and captured candidates for evaluation.
-- [ ] P0: persist reports, versions, task classification and blocking exit codes.
-- [ ] P0: bound imports, cases, runs, bytes, steps; no model calls or retry loop.
-- [ ] P0: automated synthetic end-to-end demo and GitHub Actions result.
+- [x] P0: reject invalid/oversized imports before persistence; scope by principal.
+- [x] P0: three file formats and explicit missing-history limitations.
+- [x] P0: build fixtures and require supplied expected outcome plus positive evidence.
+- [x] P0: validate declarative rules; incomplete drafts cannot be approved or treated as valid release evidence.
+- [x] P0: bind approval to immutable case/source/fixture/validation versions.
+- [x] P0: use recorded playback for inspection and captured candidates for evaluation.
+- [x] P0: persist reports, versions, task classification and blocking exit codes.
+- [x] P0: bound imports, cases, runs, bytes, steps; no model calls or retry loop.
+- [x] P0: automated synthetic demo, CLI gate exit tests and GitHub Actions wiring.
 - [ ] P1: customer-facing approval workflow and suite management UI.
 - [ ] P1: self-service auth, invites, project access, key rotation and revocation.
 - [ ] P1: Stripe test billing and server-derived entitlements; live payments disabled.
@@ -124,3 +124,7 @@ support docs and restore rehearsal. Five to ten hours/week is a design goal. Tra
 support minutes and incidents; do not offer mandatory 24/7 or per-customer branches.
 Revenue arithmetic: about 11 Team accounts at $799/month gives $105,468 ARR; about
 32 gives $306,816 ARR before churn/discounts. These are targets, not forecasts.
+
+The checked items cover this narrow local slice only. See
+[verified implementation scope](verification.md) for actual test results and the
+separate customer release-gate setup still required.
