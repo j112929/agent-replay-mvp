@@ -31,6 +31,7 @@ import asyncio
 import contextlib
 from dataclasses import asdict
 import io
+import importlib
 import json
 import os
 import shutil
@@ -256,7 +257,7 @@ class LocalTests(unittest.TestCase):
                  'arguments': json.dumps({'path': 'result.txt', 'content': 'hello agent'})}}]}}], 'usage': usage},
             {'choices': [{'message': {'role': 'assistant', 'content': 'done'}}], 'usage': usage}]
         tasks = read(self.suite / 'tasks.json')[:1]; save(self.suite / 'tasks.json', tasks)
-        with patch('agent_replay.capture.completion', side_effect=responses) as provider:
+        with patch.object(importlib.import_module('agent_replay.capture'), 'completion', side_effect=responses) as provider:
             _, results = run_benchmark(LocalAdapter(self.suite), OpenAICompatibleAgent(config), config, self.root / 'model')
         self.assertTrue(results[0].success)
         self.assertEqual(results[0].tokens, 30)
