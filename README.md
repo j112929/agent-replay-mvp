@@ -1,4 +1,69 @@
-# Distributed RL Rollout & Replay Infrastructure
+# Agent Evaluation, Replay & Regression Infrastructure
+
+Run agents against benchmark and production workloads, capture trajectories, replay
+failures, compare agent/model/prompt versions, detect regressions, and enforce
+quality gates in CI. The product is the evaluation and control plane around agents.
+
+```mermaid
+flowchart TD
+    A[Agent / Model / Prompt] --> B[Benchmark Runner]
+    B --> C[Trajectory Store]
+    C --> D[Evaluator]
+    D --> E[Metrics]
+    E --> F[Regression Comparison]
+    F --> G[Replay]
+    G --> H[CI Gate]
+```
+
+## Five-minute offline benchmark demo
+
+Python 3.10+, Linux/macOS, no runtime dependencies or API keys:
+
+```sh
+pip install -e .
+agent-replay benchmark run --benchmark local \
+  --suite examples/benchmarks/terminal-smoke --agent demo \
+  --output .replay/benchmarks/baseline
+agent-replay benchmark run --benchmark local \
+  --suite examples/benchmarks/terminal-smoke --agent demo-v2 \
+  --output .replay/benchmarks/candidate
+agent-replay benchmark compare \
+  .replay/benchmarks/baseline .replay/benchmarks/candidate
+agent-replay benchmark report .replay/benchmarks/candidate \
+  --baseline .replay/benchmarks/baseline
+```
+
+Expected: **2/4 → 3/4**, with **2 newly passing and 1 newly failing task**.
+Overall improvement still contains a regression; the default gate catches it:
+
+```sh
+# Expected exit 1: one new regression.
+agent-replay benchmark gate \
+  --baseline .replay/benchmarks/baseline --candidate .replay/benchmarks/candidate
+# Explicit tolerance for this synthetic demo: expected exit 0.
+agent-replay benchmark gate \
+  --baseline .replay/benchmarks/baseline --candidate .replay/benchmarks/candidate \
+  --max-new-failures 1 --max-success-drop 0 --max-cost-increase 0
+```
+
+Each run stores metadata, per-task results, existing trajectory v2 files and
+JSON/HTML/JUnit reports. Open `.replay/benchmarks/candidate/reports/index.html`.
+Failed trajectories work with the existing inspect/replay/debug workflow.
+Use fresh output directories when repeating the demo.
+
+**Implemented:** local adapter, deterministic demo agents, evaluation, metrics,
+task/tag regressions and CI gates. **Experimental:** optional OpenAI-compatible
+agent. **Planned:** Terminal-Bench, SWE-bench, tau-bench, OSWorld, WebArena and
+trajectory-prefix failure prediction. Those adapters and ML features are not implemented.
+Local execution runs trusted code in fresh working directories, not a security sandbox.
+
+See [benchmark formats, extension points, replay, metrics, CI and roadmap](docs/benchmarks.md).
+The existing replay, regression, rollout and training features remain available below.
+
+---
+
+## Distributed RL Rollout & Replay Infrastructure
+
 
 Ray / process Actor workers → versioned trajectories → independent rewards → replay/debug → real policy updates. Includes a CPU-only REINFORCE demo and preserves the Agent Regression Debugger.
 
