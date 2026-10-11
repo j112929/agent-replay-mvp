@@ -21,6 +21,12 @@ class AccessControl:
         self.root = Path(root).resolve()
         self.identities = config.get('identities', [])
         self.retention_days = config.get('retention_days', 30)
+        self.guard_limits = config.get('guard_limits')
+        self.sensitive_fields = config.get('sensitive_fields', [])
+        from ..guard.store import GuardStore
+        GuardStore(root, limits=self.guard_limits, sensitive_fields=self.sensitive_fields)
+        from .sanitizer import Sanitizer
+        Sanitizer(sensitive_fields=self.sensitive_fields)
         self.lock = threading.Lock()
         if type(self.retention_days) is not int or self.retention_days < 1:
             raise ValueError('Invalid retention days')
@@ -61,7 +67,7 @@ class AccessControl:
             raise AccessDenied('Legacy API disabled in organization mode')
         if method not in ('GET','HEAD') and principal['role']=='VIEWER':
             raise AccessDenied('Viewer cannot modify data')
-        if any(x in path for x in ('/retention','/policies','/admin','/accept')) and principal['role']!='ADMIN':
+        if any(x in path for x in ('/retention','/policies','/admin','/accept','/approve')) and principal['role']!='ADMIN':
             raise AccessDenied('Administrator required')
 
     def audit(self, principal, action, outcome='allowed', resource=None):

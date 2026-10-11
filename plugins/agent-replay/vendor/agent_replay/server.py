@@ -15,6 +15,7 @@ from .runtime.fidelity import doctor
 from .comparison import compare
 from .regression import cases
 from .regression.runner import run_suite
+from .guard.store import QuotaExceeded
 
 class Store:
     def __init__(self,directory,project):
@@ -94,10 +95,26 @@ def make_handler(directory,web_root,project,access=None):
             if access or urlsplit(self.path).path != '/api/v1/health':
                 value=sanitize_artifact(value)
             return super().send_json(value,status)
+        def guard_store(self,store):
+            from .guard.store import GuardStore
+            return GuardStore(store.directory, org_id=self.principal['org_id'] if access else 'local',
+                limits=access.guard_limits if access else None,
+                sensitive_fields=access.sensitive_fields if access else ())
         def do_GET(self):
             if not self.local_request():return
             store,project=self.context()
             path=urlsplit(self.path).path
+            if path.startswith('/api/v1/guard/'):
+                guard=self.guard_store(store)
+                try:
+                    if path=='/api/v1/guard/cases':return self.send_json({'items':guard.list_cases()})
+                    if path=='/api/v1/guard/usage':return self.send_json(guard.usage())
+                    if path.startswith('/api/v1/guard/cases/'):return self.send_json(guard.get_case(path.rsplit('/',1)[1]))
+                    if path.startswith('/api/v1/guard/runs/'):
+                        ident=path.rsplit('/',1)[1];uuid.UUID(ident)
+                        return self.send_json(read(within(store.directory,'guard/runs/'+ident+'/gate.json')))
+                except (ValueError,OSError,KeyError,TypeError):
+                    return self.send_json({'error':{'code':'not_found','message':'Unknown guard resource'}},404)
             if path=='/api/v1/health' and access:
                 return self.send_json({'service':'agent-replay','capabilities':['inspect','safe-replay','compare'], 'entrypoints':[],'suites':[], 'organization':self.principal['org_id'],'role':self.principal['role'],'retention_days':access.retention_days})
             if path=='/api/v1/health':return self.send_json({'service':'agent-replay','version':'0.2.0','schema_versions':['1.0','2.0'],'session_token':store.token,'capabilities':['inspect','run','compare','case','suite'],'entrypoints':list(project.get('entrypoints',{})),'suites':list(project.get('suites',{}))+['created-cases']})
@@ -164,10 +181,26 @@ def make_handler(directory,web_root,project,access=None):
             try:
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<=5*1024*1024:return self.send_json({'error':{'code':'too_large','message':'Request exceeds size limit'}},413)
-                body=json.loads(self.rfile.read(size))
+                try:body=json.loads(self.rfile.read(size))
+                except (ValueError,RecursionError):raise ValueError('Malformed JSON document') from None
                 if not isinstance(body,dict):raise ValueError('JSON object required')
                 path=urlsplit(self.path).path;status=200
-                if path=='/api/v1/benchmark-gate' and access:
+                if access and not path.startswith('/api/v1/guard/') and path not in ('/api/v1/traces/import','/api/v1/safe-replay','/api/v1/retention'):
+                    # Existing artifact-producing routes share the tenant byte cap.
+                    self.guard_store(store).ensure_storage(5*1024*1024)
+                if path.startswith('/api/v1/guard/'):
+                    guard=self.guard_store(store)
+                    if path=='/api/v1/guard/import':
+                        value=guard.import_trace(body['trace'],body.get('format','native'));status=201
+                    elif path=='/api/v1/guard/cases':
+                        value=guard.generate(body['source_id'],body.get('positive_id'),body.get('expected'),body.get('case_id'));status=201
+                    elif path.startswith('/api/v1/guard/cases/') and path.endswith('/approve'):
+                        value=guard.approve(path.split('/')[-2], self.principal['subject'] if access else body.get('reviewer'),body.get('version'))
+                    elif path=='/api/v1/guard/runs':
+                        from .guard.runner import run as run_guard
+                        value=run_guard(guard,body['case_id'],body.get('baseline_id'),body.get('candidate_id'),body.get('version'));status=201
+                    else:return self.send_json({'error':{'code':'not_found','message':'Unknown guard route'}},404)
+                elif path=='/api/v1/benchmark-gate' and access:
                     from .benchmark.release import release_gate
                     from .security.access import AccessDenied
                     # Run IDs resolve only in the authenticated organization namespace.
@@ -194,8 +227,12 @@ def make_handler(directory,web_root,project,access=None):
                 elif path=='/api/v1/safe-replay':
                     from .security.replay import playback
                     value=playback(store.traces()[body['source_id']],body.get('mode','MOCK_REPLAY'),body.get('kind','TRACE_PLAYBACK'))
-                    save(store.directory/'traces'/(value['id']+'.json'),value)
+                    if access:
+                        guard=self.guard_store(store);guard.import_trace(value);value=read(guard.trace_path(value['id']))
+                    else:save(store.directory/'traces'/(value['id']+'.json'),value)
                 elif path=='/api/v1/traces/import':
+                    if access:
+                        value=self.guard_store(store).import_trace(body['trace']);return self.send_json(value,201)
                     from .security.sanitizer import sanitize_artifact
                     trace=to_v2(validate_trace(sanitize_artifact(body['trace'])));old=store.traces().get(trace['id'])
                     if old and digest(old)!=digest(trace):return self.send_json({'error':{'code':'conflict','message':'Trace ID already has different content'}},409)
@@ -230,6 +267,7 @@ def make_handler(directory,web_root,project,access=None):
                     value=store.start(body,lambda event:run_suite(paths,project,store.directory/'reports',cancel=event),self.headers.get('Idempotency-Key'));status=202
                 else:return self.send_json({'error':{'code':'not_found','message':'Unknown route'}},404)
                 return self.send_json(value,status)
+            except QuotaExceeded as exc:return self.send_json({'error':{'code':'quota_exceeded','message':str(exc)}},429)
             except RuntimeError as exc:return self.send_json({'error':{'code':'busy','message':str(exc)}},429)
             except (ValueError,KeyError,TypeError,OSError) as exc:return self.send_json({'error':{'code':'invalid_request','message':str(exc)}},400)
     Handler.store=store

@@ -52,7 +52,10 @@
               "count",
               "forbidden",
               "execution_completed",
-              "no_unhandled_error"
+              "no_unhandled_error",
+              "json_schema",
+              "predicate",
+              "ordered"
             ]
           },
           "select": {
@@ -115,6 +118,73 @@
     },
     "live_policy": {
       "type": "object"
+    },
+    "guard": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "validated",
+                "incomplete"
+              ]
+            },
+            "confidence": {
+              "const": "example_pair_only"
+            }
+          },
+          "required": [
+            "status",
+            "confidence"
+          ]
+        },
+        "fixture_digest": {
+          "type": "string"
+        },
+        "replay_mode": {
+          "const": "RECORDED_REPLAY"
+        },
+        "compatibility": {
+          "type": "object",
+          "properties": {
+            "agent_id": {
+              "type": "string"
+            },
+            "input_digest": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "agent_id",
+            "input_digest"
+          ]
+        },
+        "positive": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "critical": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "validation",
+        "fixture_digest",
+        "replay_mode",
+        "compatibility"
+      ]
     }
   },
   "required": [

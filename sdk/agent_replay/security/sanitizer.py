@@ -73,6 +73,11 @@ class Sanitizer:
                 self.finding(path, 'depth_limit')
                 return FAILED
             if isinstance(value, str):
+                if value == REDACTED:
+                    return REDACTED
+                if value == FAILED:
+                    self.failed = True
+                    return FAILED
                 # Serialized tool arguments and HTTP JSON bodies are structured data too.
                 if value.lstrip().startswith(('{', '[')):
                     try:

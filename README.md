@@ -1,4 +1,33 @@
-# Agent Benchmark, Evaluation, Replay & Regression Platform
+# Agent Regression Guard
+
+**Turn production agent failures into regression tests that run automatically in CI.**
+
+Built incrementally on the Agent Benchmark, Evaluation, Replay & Regression Platform.
+The first commercial prototype imports sanitized native/generic/OTLP JSON, generates
+recorded fixtures and declarative verifiers, validates them on positive/negative
+examples, requires explicit approval, and evaluates candidate evidence with CI gates.
+
+```sh
+pip install -e .
+agent-replay guard demo --directory .replay/guard-demo
+```
+
+The offline synthetic coding A/B demo returns **PASS → FAIL → INCONCLUSIVE**,
+with zero model calls or real tool operations and no persisted synthetic token.
+It reuses existing trajectory v2, assertions, comparison and JSON/HTML/JUnit reports.
+Recorded playback is inspection; fresh candidate captures are evaluated separately.
+
+[End-to-end guide](docs/productization/vertical-slice.md) ·
+[Repository assessment](docs/productization/current-state-assessment.md) ·
+[Commercial MVP plan](docs/productization/commercial-mvp-plan.md) ·
+[Architecture decisions](docs/productization/architecture-decisions.md)
+
+**Scope:** a local/offline design-partner prototype, not a deployed self-service SaaS.
+Signup/invites, hosted tenant API, Stripe billing and the full product UI are planned.
+No live billing is enabled. Prices are hypotheses, and no customers or product-market
+fit are claimed. Existing Vercel hosting remains static; Python services run locally.
+
+## Agent Benchmark, Evaluation, Replay & Regression Platform
 
 Safely reproduce production agent failures from sanitized recorded evidence,
 compare versions, detect regressions and enforce CI release gates—without

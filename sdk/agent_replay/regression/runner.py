@@ -6,10 +6,16 @@ from .reports import write_reports
 from ..experiments import execute,resolve_spec
 from ..storage import save,read
 
-def run_case(path,project,directory,allow_live=False,cancel=None):
+def run_case(path,project,directory,allow_live=False,cancel=None,candidate_reference=None):
     rid=str(uuid.uuid4());result={'schema_version':'1.0','id':rid,'case_id':Path(path).stem,'verdict':'error','assertions':[]}
     try:
         case,trace=load(path,project['_root'])
+        if case.get('guard'):
+            from ..guard.store import require_approval
+            try:require_approval(case,path,project['_root'])
+            except (ValueError,OSError):
+                result.update(verdict='inconclusive',reason='Generated case requires valid approval for its exact version')
+                return result
         if not case.get('assertions') or not any(a.get('op') not in ('execution_completed','no_unhandled_error') for a in case['assertions']):raise ValueError('Case needs at least one business assertion')
         spec=resolve_spec({**case['replay_spec'],'entrypoint_id':case['entrypoint_id']},project,Path(path).parent)
         if any(r.get('mode')=='live' for r in spec.get('model_rules',[])) and not allow_live:raise ValueError('Live model rules require --live; default CI is offline')
@@ -21,13 +27,13 @@ def run_case(path,project,directory,allow_live=False,cancel=None):
             baseline_path=(Path(path).parent/baseline.get('result_path','')).resolve()
             if not baseline_path.is_relative_to(Path(project['_root']).resolve()) or not baseline_path.is_file() or hashlib.sha256(baseline_path.read_bytes()).hexdigest()!=baseline.get('sha256'):
                 result['baseline_state']='stale'
-        if case.get('candidate'):
+        if candidate_reference or case.get('candidate'):
             import hashlib
             from ..storage import within
             from ..contracts import validate_v2
             from ..comparison import compare
             from ..security.sanitizer import sanitize_artifact
-            reference = case['candidate']
+            reference = candidate_reference or case['candidate']
             candidate_path = (Path(path).parent / reference['trace_path']).resolve()
             within(project['_root'], candidate_path)
             if hashlib.sha256(candidate_path.read_bytes()).hexdigest() != reference['sha256']:
