@@ -32,7 +32,9 @@ CI without custom branches. Two paid continuations, measured reduced manual work
 low false positives and manageable support are business validation goals. All
 remain unverified until real evidence exists.
 
-Self-service signup, org/project/invite management, scoped keys, hosted storage,
-billing/entitlements, integrations/usage/billing UI, alerts and restore drills are
-separate work. Under-30-minute onboarding is a target, not a measured result. Do not
-label the technical slice as a complete commercial SaaS.
+Self-service signup, org/project/invite management, scoped keys, transactional
+usage and test billing/entitlements, and connected product UI are now implemented
+in the single-controller foundation; see [self-service.md](self-service.md).
+Hosted operations, real Stripe/SMTP verification, alerts and restore drills remain
+unverified. Under-30-minute onboarding is a target, not a measured customer result.
+Do not label the local technical slice as a launched commercial SaaS.

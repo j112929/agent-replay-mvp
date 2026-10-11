@@ -1,5 +1,9 @@
 # Agent Regression Guard operator runbook
 
+The later Node self-service controller has its own
+[account/billing/backup runbook](saas-runbook.md). The instructions below retain the
+original Python/local slice boundary and should not be used to host it publicly.
+
 Scope: local/offline design-partner demonstration, one controller. Vercel serves
 static UI and SDK; the Python API is not a hosted SaaS. No new production deployment
 or live billing occurs as part of this slice.
@@ -44,4 +48,6 @@ TLS and storage encryption, bounded retention, restore rehearsal and alerts. Bef
 billing: Stripe test-mode signed webhook/duplicate/out-of-order tests and operator
 approval of exact live settings. Before release: all required CI checks plus owner
 configured branch/deployment gates. No automatic emails/invites or commercial charges
-are sent by this implementation.
+were sent by the original offline slice. The new controller sends configured SMTP
+verification/reset/invitation messages only when explicitly requested in product
+flows; no real messages or commercial charges are sent during offline tests.

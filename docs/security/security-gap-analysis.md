@@ -13,9 +13,12 @@ digest-bound approval; arbitrary generated code is prohibited. Candidate playbac
 must not be accepted as fresh agent execution. Incomplete critical evidence blocks
 the gate. Quotas must be checked server-side and before writes.
 
-Hosted gaps: self-service accounts, project membership, revocable scoped keys,
-transactional entitlements, TLS termination for a public API, managed encryption
-at rest, per-record retention, backup deletion guarantees, tamper-resistant audit,
+The additive SaaS controller now implements Better Auth accounts, project
+membership, scoped hashed keys, transactional entitlements and usage reservations,
+server-side roles, audit events and fail-closed recorded evaluation. Offline HTTP
+and browser tests verify these boundaries; see [self-service.md](../productization/self-service.md).
+Remaining hosted gaps: TLS infrastructure, managed encryption at rest, complete
+self-service retention/deletion, backup deletion guarantees, tamper-resistant audit,
 error monitoring and restore drill. Vercel serves static assets only. Nothing here
 claims SOC 2, complete regulatory compliance, secure arbitrary-code isolation, or
 live commercial billing. Do not expose the loopback pilot via a public proxy as a

@@ -7,10 +7,10 @@
 | Partial imported traces | high | reject missing parents; retain missing payload limitations and block unsupported fixtures | targeted offline tests pass; real adapter exports still need pilot validation |
 | Candidate evidence is forged or misleading | high | checksums/task identity/version checks; customer CI is trusted capture boundary | no execution attestation |
 | Unknown secrets / historical raw evidence | high | configured fields, fail-closed imports, explicit migration | complete detection not claimed |
-| File controller concurrency/quotas | high | one controller, bounded files and OS lock; transactional store before multi-instance | hosted service deferred |
+| File controller concurrency/quotas | high | one controller lock, bounded workers, transactional SQLite reservations; managed store before multi-instance | offline tenant/quota tests; hosted service deferred |
 | Local audit/backups can be read by OS admin | high | file permissions, restricted backups; managed encryption/KMS later | not enterprise compliance |
 | Public CI artifacts leak data | high | synthetic fixture CI only; sanitized reports; private artifacts for real customers | operator configuration required |
-| Billing duplicate/out-of-order events | high | signed test webhooks and event ledger before entitlement changes | billing absent |
+| Billing duplicate/out-of-order events | high | verified test signatures, event ledger, current provider state reconciliation | offline SDK tests pass; real Stripe test account flow unverified |
 | No product demand / price validation | high | ten interviews, three partners, two paid continuations | no customer evidence |
 | Excessive support burden | medium | standard integrations, measure support minutes, no custom branches | 5–10 hours/week unverified |
 | Static site looks like hosted SaaS | medium | label local API requirements; no remote API claim | hosting unchanged |

@@ -1,5 +1,10 @@
 # Agent Regression Guard: repository assessment
 
+Update: the subsequent self-service implementation is assessed in
+[self-service-plan.md](self-service-plan.md) and documented in
+[self-service.md](self-service.md). The matrix below records the pre-guard baseline;
+it is retained as provenance, not the status of the latest implementation.
+
 Assessed 2026-10-11 before implementation. Main is `6c9fa59`; the reusable
 benchmark implementation is open PR #2 (`f8c43e6`), and the tested privacy/reliability
 foundation is open PR #3 (`b5016bf`). This slice is stacked on PR #3, not a claim

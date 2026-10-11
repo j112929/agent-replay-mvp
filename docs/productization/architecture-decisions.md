@@ -66,3 +66,29 @@ API or untrusted-code execution is authorized by this immediate assessment/slice
 These are deferred, not worked around. Candidate approval is a product action:
 the CLI must require explicit reviewer input and HTTP must require ADMIN. The demo
 uses an explicitly named synthetic reviewer and does not approve customer cases.
+
+## ADR 008: additive self-service control plane
+
+The later self-service request authorizes implementing accounts, test billing and
+the full workspace. Add one Node controller using Better Auth and SQLite; retain
+vanilla UI and Python guard code. Existing rollout SQLite is unrelated and is not
+repurposed. A fixed JSON worker bridges the established evaluator; no arbitrary
+agent code, model rerun or production tool capability enters the SaaS service.
+
+## ADR 009: billing is authoritative and test-only
+
+Use hosted Stripe test Checkout/Portal and the provider SDK's signature verifier.
+Retrieve current subscription state for every relevant webhook, serialize
+reconciliation and deduplicate event IDs. Reject live keys/events. Central plan
+configuration and transactional monthly reservations bound usage. Redirects,
+client status and request-selected price IDs never grant entitlements.
+
+## ADR 010: durable single controller and immutable review
+
+Separate account metadata from JSON evidence. Enforce a controller process lock,
+server-derived tenant roots, current memberships, project ACLs and hashed scoped
+keys. Store small job receipts and pinned suite versions. Case control sidecars
+permit explicit rejection/disable without rewriting approved evidence; disabled
+required cases block gates as INCONCLUSIVE. Rejected versions require regeneration.
+Production hosting requires durable disk/TLS/SMTP; no stateless Vercel deployment
+or managed storage migration is claimed by this implementation.

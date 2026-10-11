@@ -43,6 +43,11 @@ def require_approval(case, path, root):
     if not isinstance(guard, dict) or guard.get('validation', {}).get('status') != 'validated':
         raise ValueError('Generated test is not validated')
     path = within(root, Path(path).resolve())
+    control = within(root, path.parent / ('control-' + str(guard['version']) + '.json'))
+    if control.exists():
+        state = read(control)
+        if state.get('enabled') is not True or state.get('review_state') == 'rejected':
+            raise ValueError('Required case version is disabled or rejected')
     approval = read(within(root, path.parent / ('approval-' + str(guard['version']) + '.json')))
     if approval.get('state') != 'approved' or approval.get('case_digest') != cases.case_digest(case):
         raise ValueError('Exact case version requires explicit approval')
@@ -138,7 +143,26 @@ class GuardStore:
         path = self.case_path(ident, version); case = read(path)
         try: review = require_approval(case, path, self.root)
         except (ValueError, OSError): review = {'state': 'draft' if case['guard']['validation']['status'] == 'validated' else 'incomplete'}
-        return {'case': case, 'review': review}
+        control_path = within(self.root, path.parent / ('control-' + str(case['guard']['version']) + '.json'))
+        control = read(control_path) if control_path.exists() else {'enabled': True}
+        if control.get('review_state') == 'rejected': review = {'state': 'rejected'}
+        elif control.get('enabled') is not True: review = {'state': 'disabled'}
+        return {'case': case, 'review': review, 'control': control}
+
+    def control(self, ident, operation, reviewer, version=None):
+        if operation not in ('enable', 'disable', 'reject'): raise ValueError('Invalid case control')
+        if not isinstance(reviewer, str) or not re.fullmatch(r'[A-Za-z0-9_.@-]{1,120}', reviewer): raise ValueError('Reviewer required')
+        with self.locked():
+            path = self.case_path(ident, version); case = read(path)
+            if operation == 'reject' and (path.parent / ('approval-' + str(case['guard']['version']) + '.json')).exists():
+                raise ValueError('Disable an approved version instead of rejecting it')
+            target = within(self.root, path.parent / ('control-' + str(case['guard']['version']) + '.json'))
+            if target.exists() and read(target).get('review_state') == 'rejected' and operation == 'enable':
+                raise ValueError('Rejected versions require regeneration and review')
+            state = {'enabled': operation == 'enable', 'review_state': 'rejected' if operation == 'reject' else 'reviewed',
+                     'reviewer': reviewer, 'updated_at': now(), 'version': case['guard']['version']}
+            self.ensure_storage(2048); save(target, state)
+        return self.get_case(ident, version)
 
     def generate(self, source_id, positive_id=None, expected=None, case_id=None):
         source_path = self.trace_path(source_id)
@@ -177,6 +201,9 @@ class GuardStore:
             raise ValueError('Explicit reviewer identity is required')
         with self.locked():
             path = self.case_path(ident, version); case = read(path)
+            control = path.parent / ('control-' + str(case['guard']['version']) + '.json')
+            if control.exists() and read(control).get('enabled') is not True:
+                raise ValueError('Disabled or rejected versions cannot be approved')
             positive = case['guard'].get('positive')
             if not positive or case['guard']['validation']['status'] != 'validated':
                 raise ValueError('Incomplete verifier cannot be approved')
