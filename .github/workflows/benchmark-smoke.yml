@@ -1,0 +1,33 @@
+name: Agent benchmark quality gate
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m unittest discover -s tests -v
+      - run: agent-replay benchmark run --benchmark local --suite examples/benchmarks/terminal-smoke --agent demo --output .replay/benchmarks/baseline
+      - run: agent-replay benchmark run --benchmark local --suite examples/benchmarks/terminal-smoke --agent demo-v2 --output .replay/benchmarks/candidate
+      - run: agent-replay benchmark compare .replay/benchmarks/baseline .replay/benchmarks/candidate --output .replay/benchmarks/comparison.json
+      - run: agent-replay benchmark report .replay/benchmarks/candidate --baseline .replay/benchmarks/baseline
+      - name: Verify strict gate detects the intentional regression
+        shell: bash
+        run: |
+          set +e
+          agent-replay benchmark gate --baseline .replay/benchmarks/baseline --candidate .replay/benchmarks/candidate
+          status=$?
+          set -e
+          test "$status" -eq 1
+      - name: Apply explicit demo tolerance
+        run: agent-replay benchmark gate --baseline .replay/benchmarks/baseline --candidate .replay/benchmarks/candidate --max-new-failures 1 --max-success-drop 0 --max-cost-increase 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-evidence
+          path: .replay/benchmarks/

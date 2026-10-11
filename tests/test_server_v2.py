@@ -47,7 +47,8 @@ class ServerTests(unittest.TestCase):
             job=self.get('experiments/'+job['id'])
             if job['state'] not in ('running','queued'):break
             time.sleep(.05)
-        self.assertEqual(job['state'],'completed');candidate=job['result']['trace'];self.assertEqual(candidate['execution']['status'],'completed')
+        self.assertEqual(job['state'],'failed');self.assertEqual(job['result']['error']['type'],'ReplayDenied')
+        candidate=self.post('safe-replay',{'source_id':self.source['id']});self.assertTrue(candidate['replay']['simulated'])
         report=self.post('comparisons',{'source_id':self.source['id'],'candidate_id':candidate['id']});self.assertEqual(report['coverage']['aligned'],2)
     def test_job_restart_does_not_retry(self):
         from agent_replay.server import Store

@@ -12,26 +12,8 @@ VERSION = "1.0"
 SECRET_KEYS = {"authorization", "api_key", "apikey", "api-key", "password", "secret", "access_token", "refresh_token", "client_secret", "cookie", "set-cookie"}
 
 def sanitize(value, depth=0):
-    if depth > 30:
-        return "[MAX_DEPTH]"
-    if hasattr(value, "model_dump"):
-        value = value.model_dump(mode="json")
-    elif dataclasses.is_dataclass(value) and not isinstance(value, type):
-        value = dataclasses.asdict(value)
-    if isinstance(value, dict):
-        return {str(k): "[REDACTED]" if str(k).lower() in SECRET_KEYS else sanitize(v, depth + 1) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [sanitize(v, depth + 1) for v in value]
-    if isinstance(value, str):
-        value = re.sub(r"(?i)Bearer\s+[A-Za-z0-9._~+/=-]+", "Bearer [REDACTED]", value)
-        return re.sub(r"\bsk-[A-Za-z0-9_-]{12,}", "[REDACTED]", value)
-    if isinstance(value, float) and not math.isfinite(value):
-        return str(value)
-    if value is None or isinstance(value, (bool, int, float)):
-        return value
-    if isinstance(value, (dt.datetime, dt.date, Path)):
-        return str(value)
-    return f"<{type(value).__name__}>"
+    from .security.sanitizer import sanitize as clean
+    return clean(value)
 
 def validate_trace(trace):
     if isinstance(trace, dict) and trace.get("schema_version") == "2.0":
@@ -88,6 +70,8 @@ def validate_trace(trace):
     return trace
 
 def write_trace(trace, directory):
+    from .security.sanitizer import sanitize_artifact
+    trace = sanitize_artifact(trace)
     validate_trace(trace)
     target = Path(directory)
     target.mkdir(parents=True, exist_ok=True)

@@ -34,9 +34,20 @@ def demo(directory):
           'replay_spec':{'scope':'agent','policy':'frozen','fixture_set':'fixtures.json','limits':{'max_model_calls':0,'timeout_seconds':20}},
           'assertions':[{'id':'completed','op':'execution_completed'},{'id':'one-refund','select':{'boundary_id':'payments.refund'},'op':'count','expected':1},{'id':'amount-limit','select':{'boundary_id':'payments.refund'},'path':'/input/value/amount_minor','op':'lte','expected':3000},{'id':'correct-order','select':{'boundary_id':'payments.refund'},'path':'/input/value/order_id','op':'equals','expected':'o_1042'}]}
     path=directory/'refund.case.json';save(path,case);configured=load_project(directory/'agent-replay.json')
-    before=run_suite([path],configured,directory/'before')
-    case['entrypoint_id']='fixed';save(path,case);after=run_suite([path],configured,directory/'after')
-    case['entrypoint_id']='broken';save(path,case);regressed=run_suite([path],configured,directory/'regressed')
-    case['entrypoint_id']='fixed';save(path,case)
+    def evaluated(entrypoint, function, label):
+        # Real execution of bundled synthetic doubles is capture, not executable replay.
+        with capture('Refund limit', directory/'candidates', input={'order_id':'o_1042'},
+                     metadata={'candidate_entrypoint': entrypoint}, durability='sync') as candidate:
+            candidate.set_output(function(candidate))
+        case['entrypoint_id'] = entrypoint
+        case['candidate'] = {'trace_path': str(candidate.path.relative_to(directory)),
+            'sha256': hashlib.sha256(candidate.path.read_bytes()).hexdigest()}
+        save(path,case)
+        return run_suite([path],configured,directory/label)
+    before=evaluated('broken',broken,'before')
+    after=evaluated('fixed',fixed,'after')
+    fixed_case=read(path)
+    regressed=evaluated('broken',broken,'regressed')
+    save(path,fixed_case)
     if (before['exit_code'],after['exit_code'],regressed['exit_code'])!=(1,0,1):raise ValueError('Demo did not produce fail/pass/fail')
     return {'synthetic':True,'external_calls':0,'before':before,'after':after,'regressed':regressed,'case':str(path),'project':str(directory/'agent-replay.json')}

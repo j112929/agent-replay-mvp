@@ -47,42 +47,11 @@ def resolve_spec(spec,project,base=None):
     return spec
 
 def execute(trace,spec,project,directory='.replay',cancel=None):
-    directory=Path(directory).resolve();directory.mkdir(parents=True,exist_ok=True)
-    spec=resolve_spec(spec,project)
-    eid=str(uuid.uuid4());start=time.monotonic()
-    result={'schema_version':'1.0','id':eid,'source_trace_id':trace['id'],'source_digest':digest(trace),'spec':spec,'spec_id':digest(spec),'state':'running'}
-    save(directory/'experiments'/f'{eid}.json',result)
-    context=checkout(project,spec['code_ref']) if spec.get('code_ref') else contextlib.nullcontext(project)
-    try:
-        with context as selected, tempfile.TemporaryDirectory(prefix='replay-worker-') as temp:
-            inp=Path(temp)/'request.json';out=Path(temp)/'result.json'
-            save(inp,{'trace':trace,'spec':spec,'project':selected,'directory':str(directory/'traces')})
-            env=os.environ.copy();env['PYTHONPATH']=str(Path(__file__).resolve().parents[1])
-            profile=selected.get('environment_profiles',{}).get(spec.get('environment_profile'),{})
-            interpreter=profile.get('interpreter',sys.executable)
-            with (Path(temp)/'worker.log').open('w') as log:
-                process=subprocess.Popen([interpreter,'-m','agent_replay.runtime.worker',str(inp),str(out)],env=env,cwd=selected['_root'],stdout=log,stderr=log,start_new_session=True)
-                try:
-                    deadline=time.monotonic()+spec['limits']['timeout_seconds']
-                    while process.poll() is None:
-                        if cancel and cancel.is_set():raise Cancelled('Cancelled by user')
-                        if time.monotonic()>deadline:raise TimeoutError('Worker time budget exceeded')
-                        time.sleep(.05)
-                finally:
-                    if process.poll() is None:
-                        os.killpg(process.pid,signal.SIGTERM)
-                        try:process.wait(timeout=2)
-                        except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
-            result['worker_exit_code']=process.returncode
-            if not out.is_file():raise RuntimeError('Worker exited without a result; inspect capture journal')
-            payload=read(out)
-            if payload.get('error'):result.update(state='failed',error=payload['error'])
-            else:
-                candidate=payload['trace'];report=compare(trace,candidate)
-                result.update(state='completed',trace=candidate,candidate_trace_id=candidate['id'],comparison=report)
-                save(directory/'comparisons'/f"{report['id']}.json",report)
-    except (Exception,KeyboardInterrupt) as exc:
-        result.update(state='cancelled' if isinstance(exc,(Cancelled,KeyboardInterrupt)) else 'interrupted' if isinstance(exc,TimeoutError) else 'failed',error={'type':type(exc).__name__,'message':str(exc)})
-    result['duration_ms']=round((time.monotonic()-start)*1000,3)
-    save(directory/'experiments'/f'{eid}.json',result)
+    """Executable legacy requests fail closed; use safe-playback for recorded data."""
+    from .security.replay import isolation_status
+    result = {'schema_version': '1.0', 'id': str(uuid.uuid4()),
+        'source_trace_id': trace.get('id'), 'state': 'failed', 'duration_ms': 0,
+        'error': {'type': 'ReplayDenied', 'message': isolation_status()['reason']},
+        'security': {'execution_kind': 'SANDBOX_EXECUTION', 'sandbox': isolation_status()}}
+    save(Path(directory)/'experiments'/(result['id']+'.json'), result)
     return result

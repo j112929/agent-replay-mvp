@@ -30,7 +30,7 @@ def envelope(value=MISSING):
     if value is MISSING:
         return {'present': False, 'replayability': 'unsupported'}
     encoded = canonical(value)
-    state = 'redacted' if '[REDACTED]' in encoded else 'truncated' if '[MAX_DEPTH]' in encoded else 'unsupported' if '[CAPTURE_ERROR]' in encoded or isinstance(value,str) and value.startswith('<') and value.endswith('>') else 'complete'
+    state = 'redacted' if '[REDACTED]' in encoded else 'truncated' if '[MAX_DEPTH]' in encoded else 'unsupported' if ('[CAPTURE_ERROR]' in encoded or '[SANITIZATION_FAILED]' in encoded) or isinstance(value,str) and value.startswith('<') and value.endswith('>') else 'complete'
     return {'present': True, 'value': value, 'replayability': state}
 
 def unwrap(value, default=None):

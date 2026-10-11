@@ -27,7 +27,7 @@ def accept(case_path,result_path):
     fixture=case.get('replay_spec',{}).get('fixture_set')
     if fixture and digest(read(Path(case_path).parent/fixture))!=result.get('fixture_digest'):raise ValueError('Fixture changed since the candidate ran')
     if not result.get('assertions') or not all(a.get('verdict')=='pass' for a in result['assertions']):raise ValueError('Passing assertion evidence is required')
-    if result.get('verdict')!='pass' or result.get('case_digest')!=case_digest(case) or result.get('case_id')!=case['id'] or result.get('execution_status')!='completed' or result.get('fidelity',{}).get('level') not in ('controlled_boundaries','live_variant'):
+    if result.get('verdict')!='pass' or result.get('case_digest')!=case_digest(case) or result.get('case_id')!=case['id'] or result.get('execution_status')!='completed' or result.get('fidelity',{}).get('level') not in ('controlled_boundaries','live_variant','captured_candidate'):
         raise ValueError('Accept requires a complete passing candidate run for this exact case')
     path=Path(case_path).parent/'baselines'/(result['id']+'.json');save(path,result)
     case['baseline']={'result_path':str(path.relative_to(Path(case_path).parent)),'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'case_digest':case_digest(case),'fixture_digest':result.get('fixture_digest')}

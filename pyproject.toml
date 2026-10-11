@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agent-replay-debugger"
 version = "0.4.0"
-description = "Production failures to controlled replay, structural diff, and regression CI"
+description = "Privacy-safe agent benchmark evaluation, recorded replay, regression and release gates"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

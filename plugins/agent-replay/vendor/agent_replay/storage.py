@@ -6,6 +6,8 @@ import tempfile
 from .serialization import canonical
 
 def save(path, value):
+    from .security.sanitizer import sanitize_artifact
+    value = sanitize_artifact(value)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temp = tempfile.mkstemp(prefix='.pending-', dir=path.parent)

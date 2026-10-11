@@ -1,3 +1,4 @@
+from agent_replay.security.replay import ReplayDenied
 import asyncio
 import copy
 import json
@@ -83,11 +84,9 @@ class SDKTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             with capture('agent',self.directory) as run:
                 agent(run)
-        result=replay_agent(run.trace,agent,tool_overrides={'lookup':{'ok':True}},directory=self.directory)
+        with self.assertRaises(ReplayDenied):
+            replay_agent(run.trace,agent,tool_overrides={'lookup':{'ok':True}},directory=self.directory)
         self.assertEqual(calls,['1042'])
-        self.assertEqual(result.trace['status'],'success')
-        self.assertTrue(result.trace['output'])
-        self.assertEqual(result.trace['replay']['scope'],'agent')
 
     def test_changed_tool_inputs_fail_closed_without_live_execution(self):
         calls=[]
@@ -97,9 +96,8 @@ class SDKTests(unittest.TestCase):
             return {'id':order_id}
         with capture('matching',self.directory) as run:
             lookup('one')
-        result=replay_agent(run.trace,lambda _:lookup('two'),directory=self.directory)
-        self.assertEqual(result.trace['status'],'error')
-        self.assertEqual(result.trace['steps'][0]['error']['type'],'ReplayMismatch')
+        with self.assertRaises(ReplayDenied):
+            replay_agent(run.trace,lambda _:lookup('two'),directory=self.directory)
         self.assertEqual(calls,['one'])
 
     def test_live_model_capture_and_replay_use_actual_transport(self):
@@ -117,13 +115,10 @@ class SDKTests(unittest.TestCase):
         try:
             with capture('model',self.directory) as run:
                 run.chat(model='model-a',messages=[{'role':'user','content':'hello'}],base_url=url,api_key='')
-            result=replay_step(run.trace,run.trace['steps'][0]['id'],mode='live',model='model-b',base_url=url,api_key='')
-            self.assertEqual(result['status'],'success')
-            self.assertEqual(result['steps'][0]['output']['content'],'output from model-b')
-            self.assertEqual(result['steps'][0]['model'],'model-b')
-            self.assertEqual(result['steps'][0]['response']['choices'][0]['message']['content'],'output from model-b')
+            with self.assertRaises(ReplayDenied):
+                replay_step(run.trace,run.trace['steps'][0]['id'],mode='live',model='model-b',base_url=url,api_key='')
+            self.assertEqual(len(requests),1)
             self.assertEqual(requests[0][0],'/v1/chat/completions')
-            self.assertEqual(requests[0][1]['messages'],requests[1][1]['messages'])
             self.assertEqual(run.trace['steps'][0]['model'],'model-a')
             runner=ThreadingHTTPServer(('127.0.0.1',0),make_handler(self.directory,Path(self.directory)))
             worker=threading.Thread(target=runner.serve_forever,daemon=True);worker.start()
@@ -131,10 +126,11 @@ class SDKTests(unittest.TestCase):
                 body=json.dumps({'trace':run.trace,'step_id':run.trace['steps'][0]['id'],'model':'model-c'}).encode()
                 req=Request(f'http://127.0.0.1:{runner.server_port}/api/replay',data=body,headers={'Content-Type':'application/json'})
                 with patch.dict(os.environ,{'OPENAI_BASE_URL':url,'OPENAI_API_KEY':''}):
-                    with urlopen(req) as response:
-                        through_runner=json.load(response)
-                self.assertEqual(through_runner['steps'][0]['output']['content'],'output from model-c')
-                self.assertTrue(Path(self.directory,through_runner['id']+'.json').exists())
+                    with self.assertRaises(HTTPError) as error:
+                        urlopen(req)
+                    self.assertEqual(error.exception.code,400)
+                    error.exception.close()
+                self.assertEqual(len(requests),1)
             finally:
                 runner.shutdown();runner.server_close();worker.join()
         finally:
@@ -162,10 +158,9 @@ class SDKTests(unittest.TestCase):
             with run.span('model',kind='llm',input={},request={'model':'x','messages':[{'role':'user','content':'hi'}]},model='x') as span:
                 span.set_output({'role':'assistant','content':'old'})
         with patch('agent_replay.replay.completion',side_effect=RuntimeError('provider unavailable')):
-            result=replay_step(run.trace,run.trace['steps'][0]['id'],mode='live',model='y')
-        self.assertEqual(result['status'],'error')
-        self.assertIsNone(result['steps'][0]['output'])
-        self.assertEqual(result['steps'][0]['model'],'y')
+            with self.assertRaises(ReplayDenied):
+                replay_step(run.trace,run.trace['steps'][0]['id'],mode='live',model='y')
+        self.assertEqual(run.trace['steps'][0]['status'],'success')
 
 if __name__=='__main__':
     unittest.main()

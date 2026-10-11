@@ -17,7 +17,8 @@ def load_trace(path):
     file = Path(path)
     if file.stat().st_size > LIMIT:
         raise ValueError("Trace exceeds 5 MB")
-    return validate_trace(json.loads(file.read_text(encoding="utf-8")))
+    from .security.sanitizer import sanitize_artifact
+    return validate_trace(sanitize_artifact(json.loads(file.read_text(encoding="utf-8"))))
 
 def web_directory():
     packaged = Path(__file__).resolve().parent / "web"
@@ -119,6 +120,15 @@ def make_handler(trace_directory, web_root):
 def main(argv=None):
     from .debug_cli import COMMANDS, main as modern_main
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == 'benchmark':
+        from .benchmark.cli import main as benchmark_main
+        return benchmark_main(argv[1:])
+    if argv and argv[0] == 'security-demo':
+        from .security.cli import demo_main
+        return demo_main(argv[1:])
+    if argv and argv[0] == 'safe-replay':
+        from .security.cli import replay_main
+        return replay_main(argv[1:])
     if argv and argv[0] == 'rollout':
         from .rollout.cli import main as rollout_main
         return rollout_main(argv[1:])
@@ -128,6 +138,7 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     server_cmd = commands.add_parser("serve", help="Serve the debugger on loopback")
     server_cmd.add_argument("--project")
+    server_cmd.add_argument("--access-config", help="Server-managed identity digest/organization config")
     server_cmd.add_argument("--port", type=int, default=8765)
     server_cmd.add_argument("--directory", default=".replay/traces")
     replay_cmd = commands.add_parser("replay", help="Replay one recorded step")
@@ -150,6 +161,12 @@ def main(argv=None):
             else:
                 from .server import make_handler as modern_handler
                 handler = modern_handler(Path(args.directory).parent, web_directory(), {'_root':str(Path.cwd()),'entrypoints':{}})
+            if args.access_config:
+                from .security.access import AccessControl
+                from .storage import read
+                from .server import make_handler as modern_handler
+                access = AccessControl(Path(args.directory).parent,read(args.access_config))
+                handler = modern_handler(Path(args.directory).parent,web_directory(),{'_root':str(Path.cwd()),'entrypoints':{}},access=access)
             server = ThreadingHTTPServer(("127.0.0.1", args.port), handler)
             print(f"Replay v{__version__} → http://127.0.0.1:{server.server_port}", flush=True)
             print(f"Trace directory: {Path(args.directory).resolve()}", flush=True)
@@ -161,6 +178,9 @@ def main(argv=None):
             finally:
                 server.server_close()
             return 0
+        if args.model or args.tool:
+            from .security.replay import deny_execution
+            deny_execution()
         trace = load_trace(args.trace)
         fixture, function = None, None
         replay_mode = "recorded"
