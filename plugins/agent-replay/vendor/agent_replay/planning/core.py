@@ -104,6 +104,11 @@ class Planner:
         start=time.monotonic(); deadline=start+self.config.max_planning_latency_ms/1000
         counts={'predictions':0,'model_calls':0,'tokens':0,'reserved_tokens':0,'cost_usd':0,'usage_complete':True}
         def generation_cost(actions):
+            if hasattr(self.generator,'last_generation_cost'):
+                value=self.generator.last_generation_cost
+                if value is None:counts['cost_usd']=None
+                elif counts['cost_usd'] is not None:counts['cost_usd']+=value
+                return
             for action in actions:
                 if action.generation_cost is None: counts['cost_usd']=None
                 elif counts['cost_usd'] is not None: counts['cost_usd']+=action.generation_cost
@@ -174,6 +179,8 @@ class Planner:
             session['status']='selected'
         except (Exception, asyncio.TimeoutError) as exc:
             # External/model errors never interpolate prompts, observations or credentials.
+            counts['known_cost_lower_bound_usd']=counts.get('cost_usd')
+            counts['cost_usd']=None;counts['usage_complete']=False
             session.update(status='failed',reason=type(exc).__name__ if not isinstance(exc,PlanningFailure) else str(exc))
             if counts['reserved_tokens']: counts['usage_complete']=False
             if len(canonical(session).encode())>128*1024:

@@ -69,6 +69,20 @@ class WorldModelTests(unittest.TestCase):
 if __name__=='__main__':unittest.main()
 
 class TrainingTests(unittest.TestCase):
+    def test_sampled_policy_cannot_mutate_context_or_drop_duplicate_generation_cost(self):
+        from agent_replay.world_model.providers import SampledCandidateGenerator
+        from agent_replay.planning.core import Planner
+        from agent_replay.planning.contracts import PlanningConfig
+        snap=RefundEnvironment(tasks(1)[0]).snapshot();context=AgentContext('t','g','Refund',snap['state'],0,ENVIRONMENT)
+        original=asdict(context)
+        async def sampler(copy,seed):
+            copy.state['requested_minor']=99999
+            candidate=action('orders.lookup');candidate.generation_cost=.1;return candidate
+        generator=SampledCandidateGenerator(sampler,SCHEMAS)
+        result=asyncio.run(Planner(generator,DeterministicRefundModel(),PlanningConfig(enabled=True,horizon=1,rollouts_per_candidate=1)).plan(context))
+        self.assertEqual(asdict(context),original);self.assertEqual(result['status'],'selected')
+        self.assertAlmostEqual(result['budget']['cost_usd'],.6)
+
     def test_cpu_supervised_checkpoint_evaluation_and_integrity(self):
         from agent_replay.world_model.training import train,TabularWorldModel
         from agent_replay.world_model.registry import promote

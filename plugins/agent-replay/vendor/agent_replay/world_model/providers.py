@@ -1,5 +1,6 @@
 """Optional bounded model-response retry and sampled candidate adapters."""
 import asyncio
+import copy
 from dataclasses import replace
 import time
 from ..planning.core import CandidateGenerator
@@ -27,13 +28,16 @@ class RetryingWorldModel:
 
 class SampledCandidateGenerator(CandidateGenerator):
     """Trusted async sampler (including an LLM policy) with existing schema validation."""
-    def __init__(self,sampler,schemas,seed=0):super().__init__(lambda c:[],schemas);self.sampler=sampler;self.seed=seed
+    def __init__(self,sampler,schemas,seed=0):
+        super().__init__(lambda c:[],schemas);self.sampler=sampler;self.seed=seed;self.last_generation_cost=0
     async def generate(self,context,k):
         if type(k) is not int or not 1<=k<=8:raise ValueError('Candidate limit')
-        result=[];seen=set()
+        result=[];seen=set();self.last_generation_cost=0
         for i in range(min(16,k*2)):
-            value=await self.sampler(context,self.seed+i)
+            value=await self.sampler(copy.deepcopy(context),self.seed+i)
             action=self.validate(CandidateAction(**value) if isinstance(value,dict) else value)
+            if action.generation_cost is None:self.last_generation_cost=None
+            elif self.last_generation_cost is not None:self.last_generation_cost+=action.generation_cost
             if action.key not in seen:seen.add(action.key);result.append(action)
             if len(result)==k:break
         if not result:raise ValueError('No valid sampled candidates')
