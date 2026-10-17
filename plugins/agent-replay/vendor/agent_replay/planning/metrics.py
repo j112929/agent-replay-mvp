@@ -54,6 +54,7 @@ def trace_metrics(trace):
     eligible=[s for s in sessions if s.get('selection',{}).get('success_probability') is not None]
     last=eligible[-1] if eligible else None
     label=last.get('task_outcome',{}) if last else {}
+    correction=trace.get('metadata',{}).get('planning',{}).get('correction_summary',{})
     forecast={'probability':last['selection']['success_probability'],'outcome':label['success']} if last and label.get('observed') else None
     return {'enabled':bool(sessions),'session_count':len(sessions),
         'planning_latency_ms':sum(s.get('planning_latency_ms',0) for s in sessions),
@@ -61,6 +62,7 @@ def trace_metrics(trace):
         'planning_cost_usd':sum(cost) if all(c is not None for c in cost) else None,
         'prediction_calls':sum(b.get('predictions',0) for b in budgets),
         'model_calls':sum(b.get('model_calls',0) for b in budgets),
+        'recovery_attempts':correction.get('replans',0),'recovered':correction.get('recovered',False),
         'unsafe_action_count':sum(s.get('output',{}).get('value',{}).get('unsafe') is True for s in trace['steps'] if s['kind']=='tool' and isinstance(s.get('output',{}).get('value'),dict)),
         'blocked_action_count':sum(s['status']=='execution_denied' for s in sessions),
         'high_severity_failure_count':sum(s.get('output',{}).get('value',{}).get('severity')=='high' for s in trace['steps'] if s['kind']=='tool' and isinstance(s.get('output',{}).get('value'),dict)),
@@ -76,6 +78,7 @@ def aggregate_planning(results):
     from ..benchmark.metrics import distribution
     forecasts=[p['forecast'] for p in present if p.get('forecast')]
     return {'task_count':len(present),'missing':len(results)-len(present),
+        'recovery_success_rate':sum(p.get('recovered',False) for p in present)/sum(p.get('recovery_attempts',0)>0 for p in present) if any(p.get('recovery_attempts',0)>0 for p in present) else None,
         'distributions':{key:distribution([p.get(key) for p in values if p is not None]) for key in
             ('planning_latency_ms','planning_tokens','planning_cost_usd','real_tool_call_count','real_retry_count')},
         'unsafe_action_rate':sum(p['unsafe_action_count'] for p in present)/max(1,sum(p['real_tool_call_count'] for p in present)),

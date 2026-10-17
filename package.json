@@ -1,9 +1,11 @@
 {
   "name": "agent-replay-debugger-web",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
-  "engines": {"node": ">=24.15.0"},
+  "engines": {
+    "node": ">=24.15.0"
+  },
   "scripts": {
     "start": "node saas/server.mjs",
     "start:env": "node --env-file=.env saas/server.mjs",

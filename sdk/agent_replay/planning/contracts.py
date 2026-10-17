@@ -39,8 +39,19 @@ class PlanningConfig:
     lambda_cost: float = 1
     lambda_risk: float = 2
     lambda_uncertainty: float = .25
+    mode: str = 'active'
+    self_correction: bool = False
+    max_replans: int = 2
+    stop_on_policy_violation: bool = True
+    max_uncertainty: float = 1
+    value_weight: float = 1
 
     def __post_init__(self):
+        if self.mode not in ('disabled','shadow','active','fallback'): raise ValueError('Invalid planning mode')
+        if type(self.self_correction) is not bool or type(self.stop_on_policy_violation) is not bool or type(self.max_replans) is not int or not 0<=self.max_replans<=20: raise ValueError('Invalid correction policy')
+        finite(self.max_uncertainty,'uncertainty ceiling',0,1)
+        finite(self.value_weight,'value weight')
+        if self.mode=='fallback': self.fallback='baseline'
         if type(self.enabled) is not bool or self.fallback not in ('abort', 'baseline'): raise ValueError('Invalid planning policy')
         for key, maximum in [('candidates',8),('horizon',8),('rollouts_per_candidate',8),('max_predictions',512),('max_real_steps',100),('max_planning_tokens',1000000)]:
             if type(getattr(self,key)) is not int or not 1 <= getattr(self,key) <= maximum: raise ValueError('Invalid ' + key)
@@ -70,10 +81,11 @@ class AgentContext:
     @property
     def state_digest(self): return digest([self.environment_version,self.state_version,self.state])
 
-    def branch(self, delta, observation):
+    def branch(self, delta, observation, action=None):
         if not isinstance(delta,dict) or not isinstance(observation,dict): raise ValueError('Structured prediction required')
+        event={'action':asdict(action),'observation':data(observation)} if action is not None else data(observation)
         return AgentContext(self.task_id,self.task_group,self.goal,{**self.state,**data(delta)},self.state_version+1,
-            self.environment_version,(self.history+[data(observation)])[-8:],self.trajectory_id,self.benchmark_run_id)
+            self.environment_version,(self.history+[event])[-8:],self.trajectory_id,self.benchmark_run_id)
 
 
 @dataclass

@@ -3,7 +3,8 @@ import asyncio
 import copy
 from dataclasses import asdict
 import random
-from statistics import mean
+from statistics import mean, pvariance
+import math
 import time
 from .contracts import (PlanningConfig, AgentContext, CandidateAction, PredictionConfig,
     PredictionDistribution, ImaginedTrajectory, TrajectoryScore, ident, data)
@@ -50,7 +51,7 @@ class TrajectoryScorer:
         reward=last.get('reward',0)
         risk=1-probability if probability is not None else 1
         cost=sum(s['sampled_outcome'].get('cost_usd',0) for s in trajectory.simulated_steps)
-        value=reward-self.config.lambda_cost*cost-self.config.lambda_risk*risk-self.config.lambda_uncertainty*trajectory.uncertainty
+        value=self.config.value_weight*reward-self.config.lambda_cost*cost-self.config.lambda_risk*risk-self.config.lambda_uncertainty*trajectory.uncertainty
         return TrajectoryScore(trajectory.imagination_id,trajectory.candidate_id,reward,cost,risk,
             trajectory.uncertainty,len(trajectory.simulated_steps),probability,value)
 
@@ -62,7 +63,12 @@ class ActionSelector:
             matched=[s for s in scores if s['candidate_id']==action.candidate_id]
             if not matched: raise PlanningFailure('Incomplete candidate evidence')
             probabilities=[s['estimated_success_probability'] for s in matched]
+            roots=[r['simulated_steps'][0]['prediction']['outcomes'] for r in rollouts if r['candidate_id']==action.candidate_id]
+            entropies=[-sum(o['probability']*math.log2(o['probability']) for o in root if o['probability']>0) for root in roots if all(o.get('probability') is not None for o in root)]
             alternatives.append({'candidate_id':action.candidate_id,'score':mean(s['score'] for s in matched),
+                'outcome_entropy_bits':mean(entropies) if len(entropies)==len(roots) and roots else None,
+                'score_variance':pvariance(s['score'] for s in matched),'uncertainty':mean(s['uncertainty'] for s in matched),
+                'expected_reward':mean(s['expected_task_reward'] for s in matched),'expected_cost':mean(s['expected_execution_cost'] for s in matched),
                 'risk':mean(s['predicted_failure_risk'] for s in matched),
                 'success_probability':mean(probabilities) if all(p is not None for p in probabilities) else None})
         chosen=max(alternatives,key=lambda a:a['score'])
@@ -151,7 +157,7 @@ class Planner:
                         uncertainty=1-(1-uncertainty)*(1-chosen.get('uncertainty',1))
                         steps.append({'simulation_depth':depth,'action':asdict(current),'context':asdict(branch),
                             'prediction':asdict(prediction),'sampled_outcome':copy.deepcopy(chosen),'simulated':True})
-                        branch=branch.branch(chosen['state_delta'],chosen['observation'])
+                        branch=branch.branch(chosen['state_delta'],chosen['observation'],current)
                         if chosen['terminal']: reason='terminal'; break
                         if depth+1<self.config.horizon:
                             current=(await bounded(self.generator.generate(branch,1)))[0]
@@ -181,10 +187,10 @@ class PlanningAgent:
     def __init__(self, baseline, planner): self.baseline,self.planner=baseline,planner
 
     async def run(self, task, environment, capture):
-        if not self.planner.config.enabled: return await self.baseline.run(task,environment,capture)
+        if not self.planner.config.enabled or self.planner.config.mode=='disabled': return await self.baseline.run(task,environment,capture)
         from .evaluation import evaluate_prediction
-        sessions=[]
-        capture.trace['metadata']['planning']={'schema_version':'planning-records.v1','sessions':sessions,'mode':'planning',
+        sessions=[];replans=0;irreversible=set();settings=self.planner.config
+        capture.trace['metadata']['planning']={'schema_version':'planning-records.v1','sessions':sessions,'mode':settings.mode,
             'limitations':['Hypotheses are not observations; probabilities are uncalibrated until held-out validation']}
         for _ in range(self.planner.config.max_real_steps):
             snapshot=environment.snapshot()
@@ -198,7 +204,14 @@ class PlanningAgent:
                 capture.trace['metadata']['planning']['termination_reason']='trajectory_planning_record_budget'
                 break
             sessions.append(session)
-            if session['status']=='selected': action=CandidateAction(**session['selection']['selected_action'])
+            if settings.mode=='shadow':
+                if not hasattr(self.baseline,'choose_action'): session.update(reason='Shadow requires an explicit baseline action');break
+                action=self.baseline.choose_action(context)
+                session['execution_mode']='shadow';session['executed_baseline_action']=asdict(action)
+            elif session['status']=='selected':
+                if max((s['uncertainty'] for s in session['scores']),default=1)>settings.max_uncertainty:
+                    session.update(status='failed',reason='Uncertainty ceiling exceeded');break
+                action=CandidateAction(**session['selection']['selected_action'])
             elif self.planner.config.fallback=='baseline':
                 if not hasattr(self.baseline,'choose_action'): session.update(fallback='abort',reason='No explicit baseline action policy');break
                 action=self.baseline.choose_action(context)
@@ -207,8 +220,10 @@ class PlanningAgent:
                 session['fallback']='abort';break
             # Model-generated permissions and state deltas never reach this boundary.
             self.planner.generator.validate(action)
-            if not environment.authorize(action,context.state_version):
+            effect_key=getattr(environment,'irreversible_key',lambda a:a.key)(action)
+            if effect_key in irreversible or not environment.authorize(action,context.state_version):
                 session.update(status='execution_denied',reason='State changed or execution policy denied the action');break
+            if getattr(environment,'is_irreversible',lambda a:False)(action): irreversible.add(effect_key)
             with capture.span(action.tool_name,kind='tool',input={'action':asdict(action),'state':context.state,
                     'environment_version':context.environment_version,'task_group':context.task_group},
                     planning={'session_id':session['session_id'],'candidate_id':action.candidate_id,'origin_state_digest':context.state_digest}) as span:
@@ -226,8 +241,23 @@ class PlanningAgent:
                         prediction=PredictionDistribution(**rollout['simulated_steps'][0]['prediction'])
                         session['outcomes'].append(evaluate_prediction(prediction,actual,span.event['id']))
                         break
+            mismatch=any(not o['outcome_match'] for o in session['outcomes'])
+            if settings.stop_on_policy_violation and actual.get('error_category')=='policy_violation':
+                session['correction']={'decision':'stop','attempt':replans,'reason':'execution_policy_violation'}
+                break
+            if actual.get('status')=='error' and not settings.self_correction:
+                session['correction']={'decision':'stop','attempt':replans,'reason':'correction_disabled'}
+                break
+            if settings.self_correction and mismatch:
+                terminal=environment.snapshot()['state'].get('terminal',False)
+                decision='accept_terminal' if terminal else 'stop' if replans>=settings.max_replans or settings.stop_on_policy_violation and actual.get('error_category')=='policy_violation' else 'replan'
+                session['correction']={'decision':decision,'attempt':replans,'reason':'prediction_mismatch','observation_ref':span.event['id']}
+                if decision=='stop':break
+                if decision=='replan':replans+=1
+            else:session['correction']={'decision':'accept','attempt':replans,'reason':'no_enabled_correction_trigger'}
         final=environment.snapshot()['state']
         success=final.get('success') if final.get('terminal') else False
         for session in sessions:
             session['task_outcome']={'success':success,'observed':bool(final.get('terminal'))}
+        capture.trace['metadata']['planning']['correction_summary']={'enabled':settings.self_correction,'replans':replans,'recovered':success and replans>0}
         return {'success':success,'terminal':bool(final.get('terminal'))}
