@@ -104,6 +104,16 @@ def make_handler(directory,web_root,project,access=None):
             if not self.local_request():return
             store,project=self.context()
             path=urlsplit(self.path).path
+            if path.startswith('/api/v1/planning/sessions/'):
+                try:
+                    from .planning.store import PlanningStore
+                    parts=path[len('/api/v1/planning/sessions/'):].split('/')
+                    session=PlanningStore(store.directory).get(parts[0])
+                    if len(parts)>1:
+                        if len(parts)!=2 or parts[1] not in ('candidates','rollouts','outcomes'): raise ValueError('Unknown planning resource')
+                        session={'items':session[parts[1]]}
+                    return self.send_json(session)
+                except (ValueError,OSError,KeyError): return self.send_json({'error':'Planning session unavailable'},404)
             if path.startswith('/api/v1/guard/'):
                 guard=self.guard_store(store)
                 try:
@@ -156,14 +166,14 @@ def make_handler(directory,web_root,project,access=None):
                 ident=path.rsplit('/',1)[1]
                 try:uuid.UUID(ident);return self.send_json(read(store.directory/'comparisons'/(ident+'.json')))
                 except (ValueError,OSError):return self.send_json({'error':{'code':'not_found','message':'Unknown comparison'}},404)
-            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/workspace-loader.js','/guard-ui.js','/guard-ui.css','/v2.js','/regression-demo.json','/debugger.html','/rollout.js','/rollout.css','/rollout-demo.json','/benchmark.html','/benchmark.js','/benchmark-results.json','/agent-replay-mvp.zip'}
+            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/workspace-loader.js','/planning-demo.json','/planning.js','/guard-ui.js','/guard-ui.css','/v2.js','/regression-demo.json','/debugger.html','/rollout.js','/rollout.css','/rollout-demo.json','/benchmark.html','/benchmark.js','/benchmark-results.json','/agent-replay-mvp.zip'}
             if path in allowed:
                 from http.server import SimpleHTTPRequestHandler
                 return SimpleHTTPRequestHandler.do_GET(self)
             return super().do_GET()
         def do_HEAD(self):
             if not self.local_request(): return
-            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/workspace-loader.js','/guard-ui.js','/guard-ui.css','/v2.js','/regression-demo.json','/debugger.html','/rollout.js','/rollout.css','/rollout-demo.json','/benchmark.html','/benchmark.js','/benchmark-results.json','/agent-replay-mvp.zip'}
+            allowed={'/','/index.html','/legacy.html','/app.js','/core.js','/demo.js','/styles.css','/dashboard.js','/dashboard.css','/workspace-loader.js','/planning-demo.json','/planning.js','/guard-ui.js','/guard-ui.css','/v2.js','/regression-demo.json','/debugger.html','/rollout.js','/rollout.css','/rollout-demo.json','/benchmark.html','/benchmark.js','/benchmark-results.json','/agent-replay-mvp.zip'}
             if urlsplit(self.path).path not in allowed: return self.send_json({'error':{'code':'not_found','message':'Unknown resource'}},404)
             from http.server import SimpleHTTPRequestHandler
             return SimpleHTTPRequestHandler.do_HEAD(self)
@@ -188,7 +198,10 @@ def make_handler(directory,web_root,project,access=None):
                 if access and not path.startswith('/api/v1/guard/') and path not in ('/api/v1/traces/import','/api/v1/safe-replay','/api/v1/retention'):
                     # Existing artifact-producing routes share the tenant byte cap.
                     self.guard_store(store).ensure_storage(5*1024*1024)
-                if path.startswith('/api/v1/guard/'):
+                if path=='/api/v1/planning/simulate':
+                    from .planning.api import simulate
+                    value=simulate(body,store.directory,access.sensitive_fields if access else ());status=201
+                elif path.startswith('/api/v1/guard/'):
                     guard=self.guard_store(store)
                     if path=='/api/v1/guard/import':
                         value=guard.import_trace(body['trace'],body.get('format','native'));status=201

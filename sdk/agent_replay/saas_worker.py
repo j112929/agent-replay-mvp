@@ -13,6 +13,14 @@ from .security.replay import playback
 
 
 def execute(store, action, body):
+    if action == 'planning_simulate':
+        from .planning.api import simulate
+        store.ensure_storage(1024*1024)
+        return simulate(body,store.root,store.sensitive_fields)
+    if action == 'planning_get':
+        from .planning.store import PlanningStore
+        session=PlanningStore(store.root).get(body['id'])
+        return session if not body.get('part') else {'items':session[body['part']]}
     if action == 'import': return store.import_trace(body['trace'], body.get('format', 'native'))
     if action == 'generate': return store.generate(body['source'], body.get('positive'), body.get('expected'), body.get('case_id'))
     if action == 'approve': return store.approve(body['case_id'], body['reviewer'], body.get('version'))

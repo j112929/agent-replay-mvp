@@ -1,0 +1,30 @@
+name: Predictive planning evidence
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  planning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m unittest tests.test_planning tests.test_planning_data -v
+      - run: agent-replay planning demo --output .replay/planning-evidence --tasks 20 --seed 0
+      - name: Apply planning gate and verify intentional budget failure
+        shell: bash
+        run: |
+          set +e
+          agent-replay benchmark gate --baseline .replay/planning-evidence/baseline --candidate .replay/planning-evidence/planning_with_replay_context --policy examples/benchmarks/predictive-deploy/gate-policy.json --output .replay/planning-evidence/ci-gate.json
+          status=$?
+          set -e
+          test "$status" -eq 1
+          python scripts/check_planning_demo.py .replay/planning-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: predictive-planning-evidence
+          path: .replay/planning-evidence/

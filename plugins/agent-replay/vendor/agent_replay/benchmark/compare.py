@@ -14,10 +14,17 @@ def delta(before, after):
 
 
 def metric_deltas(before, after):
-    return {'success_rate': delta(before['success_rate'], after['success_rate']),
+    result = {'success_rate': delta(before['success_rate'], after['success_rate']),
         **{name: {stat: delta(before['distributions'][name][stat], after['distributions'][name][stat])
             for stat in ('mean', 'median', 'p90', 'p95')}
            for name in ('duration_ms', 'steps', 'tokens', 'cost_usd')}}
+    if before.get('planning') is not None and after.get('planning') is not None:
+        a,b=before['planning'],after['planning']
+        result['planning']={key:delta(a['distributions'][key]['mean'],b['distributions'][key]['mean']) for key in a['distributions']}
+        result['planning'].update(unsafe_action_rate=delta(a['unsafe_action_rate'],b['unsafe_action_rate']),
+            prediction_brier_score=delta(a['calibration']['brier_score'],b['calibration']['brier_score']),
+            calibration_error=delta(a['calibration']['ece'],b['calibration']['ece']))
+    return result
 
 
 def compare_runs(baseline, candidate):

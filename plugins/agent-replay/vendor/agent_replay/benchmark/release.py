@@ -23,7 +23,7 @@ def paired_statistics(comparison):
 def release_gate(baseline, candidate, policy=None):
     policy = dict(policy or {})
     allowed = {'environment','min_tasks','alpha','min_success_rate','max_success_drop','critical_tags',
-               'max_latency_increase','max_cost_increase','require_replay','inconclusive_action'}
+               'max_latency_increase','max_cost_increase','require_replay','inconclusive_action','planning'}
     if set(policy) - allowed:
         raise ValueError('Unknown release policy fields')
     environment = policy.get('environment', 'PRODUCTION')
@@ -99,9 +99,13 @@ def release_gate(baseline, candidate, policy=None):
                 uncertain.append('Trajectory evidence unavailable: '+r.task_id)
     decision='FAIL' if failures else 'INCONCLUSIVE' if uncertain else 'PASS'
     a,_=RunStore(baseline).load();b,_=RunStore(candidate).load()
-    return {'decision':decision,'blocking':decision=='FAIL' or decision=='INCONCLUSIVE' and policy['inconclusive_action']=='block',
+    result={'decision':decision,'blocking':decision=='FAIL' or decision=='INCONCLUSIVE' and policy['inconclusive_action']=='block',
         'reasons':failures+uncertain,'policy':policy,'statistics':statistics,'comparison':comparison,
         'versions':{'baseline':a['agent_config'],'candidate':b['agent_config']}}
+    if 'planning' in policy:
+        from ..planning.gates import apply_gate
+        result=apply_gate(result,baseline,candidate,policy['planning'])
+    return result
 
 
 def failure_analysis(baseline,candidate):

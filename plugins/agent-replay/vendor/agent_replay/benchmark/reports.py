@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from urllib.parse import quote
 import xml.etree.ElementTree as ET
-from ..storage import save, within
+from ..storage import save, within, read
 from .contracts import INFRA_FAILURES
 from .metrics import aggregate
 from .store import RunStore
@@ -43,6 +43,13 @@ def write_reports(run_directory, directory=None, comparison=None):
         if result.trajectory_path:
             target = within(store.directory, result.trajectory_path)
             link = '<a href="' + html.escape(quote(os.path.relpath(target, directory)), quote=True) + '">trajectory JSON</a>'
+            if result.metadata.get('planning',{}).get('enabled'):
+                trace=read(target)
+                for session in trace.get('metadata',{}).get('planning',{}).get('sessions',[]):
+                    selected=session.get('selection',{})
+                    record={'selection':selected,'origin':session['origin'],'world_model':session['world_model'],
+                        'rollouts':session['rollouts'],'actual':session.get('real_execution'),'prediction_errors':session['outcomes']}
+                    link+='<details id="planning-'+escape(session['session_id'])+'"><summary>Planning: '+escape(selected.get('selected_action',{}).get('tool_name',session['status']))+'</summary><pre>'+html.escape(json.dumps(record,indent=2))+'</pre></details>'
         columns = [result.task_id, 'PASS' if result.success else 'FAIL', result.failure_category or '—',
                    result.steps, result.duration_ms, result.tokens, result.cost_usd]
         rows.append('<tr>' + ''.join('<td>' + escape(v) + '</td>' for v in columns) + '<td>' + link + '</td></tr>')
@@ -58,12 +65,17 @@ def write_reports(run_directory, directory=None, comparison=None):
             'added_tasks': comparison['added_tasks'], 'removed_tasks': comparison['removed_tasks'],
             'changed_tasks': comparison['changed_tasks']}, indent=2)) + '</pre>'
     distributions = summary['distributions']
+    planning = '<h2>Predictive planning</h2><pre>'+html.escape(json.dumps(summary['planning'],indent=2))+'</pre>' if summary.get('planning') else ''
+    if summary.get('planning',{}).get('calibration',{}).get('reliability'):
+        bins=summary['planning']['calibration']['reliability']
+        dots=''.join(f'<circle cx="{40+240*b["predicted"]:.2f}" cy="{280-240*b["observed"]:.2f}" r="5"><title>n={b["count"]}</title></circle>' for b in bins)
+        planning+='<figure><svg role="img" aria-label="Reliability diagram: predicted versus observed success" viewBox="0 0 340 330" width="340"><path d="M40 40V280H280M40 280L280 40" fill="none" stroke="#aaa"/>'+dots+'<text x="80" y="315">Predicted success (0–1)</text><text x="45" y="20">Observed success (0–1)</text></svg><figcaption>Reliability bins: descriptive, uncalibrated; sample counts in point titles.</figcaption></figure>'
     body = f'''<!doctype html><html lang="en"><meta charset="utf-8"><title>Agent benchmark report</title>
 <style>body{{font:16px system-ui;max-width:1100px;margin:40px auto;padding:20px}}table{{border-collapse:collapse;width:100%}}td,th{{padding:8px;border-bottom:1px solid #ddd;text-align:left}}pre{{white-space:pre-wrap}}a{{color:#165cba}}</style>
 <h1>{escape(run['benchmark'])} benchmark</h1><p>Run {escape(run['id'])} · Agent {escape(run['agent_config']['name'])}</p>
 <h2>Summary</h2><p>Success: {summary['success_rate'] * 100:.1f}% · Passed: {summary['pass_count']} · Failed: {summary['fail_count']}</p>
 <p>Median latency: {escape(distributions['duration_ms']['median'])} ms · Median steps: {escape(distributions['steps']['median'])} · Cost/task: {escape(distributions['cost_usd']['mean'])} USD ({distributions['cost_usd']['count']}/{summary['task_count']} measured)</p>
-{regression}<h2>By tag</h2><table><tr><th>Tag</th><th>Success rate</th><th>Passed / total</th></tr>{tags}</table>
+{planning}{regression}<h2>By tag</h2><table><tr><th>Tag</th><th>Success rate</th><th>Passed / total</th></tr>{tags}</table>
 <h2>Task results and failures</h2><table><tr><th>Task</th><th>Status</th><th>Failure category</th><th>Steps</th><th>Latency (ms)</th><th>Tokens</th><th>Cost (USD)</th><th>Trajectory</th></tr>{''.join(rows)}</table>
 <p>Import trajectory JSON into the existing replay/debug UI, or use agent-replay inspect and replay. Recorded replay reproduces observations; it does not re-evaluate the task.</p></html>'''
     (directory / 'index.html').write_text(body, encoding='utf-8')

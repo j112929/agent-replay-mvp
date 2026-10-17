@@ -31,6 +31,15 @@ class TenantTests(unittest.TestCase):
                     headers={'Authorization':'Bearer '+tokens[key],'Content-Type':'application/json'})
                 with urlopen(req) as response:return json.load(response)
             try:
+                session=request('/api/v1/planning/simulate',body={'context':{'task_id':'t','task_group':'g','goal':'Deploy',
+                    'state':{'tests_run':False,'compat_checked':False,'remaining_steps':6},'state_version':0,'environment_version':'deployment-memory.v1'},'config':{'enabled':True}})
+                endpoint='/api/v1/planning/sessions/'+session['session_id']
+                self.assertEqual(request(endpoint)['session_id'],session['session_id'])
+                self.assertEqual(len(request(endpoint+'/candidates')['items']),3)
+                with self.assertRaises(HTTPError) as e: request(endpoint,'b')
+                self.assertEqual(e.exception.code,404);e.exception.close()
+                with self.assertRaises(HTTPError) as e: request('/api/v1/planning/simulate','v',{})
+                self.assertEqual(e.exception.code,403);e.exception.close()
                 request('/api/v1/traces/import',body={'trace':trace,'org_id':'beta'})
                 self.assertEqual(len(request('/api/v1/traces','a')['items']),1)
                 self.assertEqual(request('/api/v1/traces','b')['items'],[])

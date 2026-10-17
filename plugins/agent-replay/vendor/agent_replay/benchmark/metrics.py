@@ -29,4 +29,7 @@ def aggregate(results, grouped=True):
     calls = sum(r.tool_call_count for r in results)
     result['failure_rate'] = 1 - result['success_rate'] if results else None
     result['tool_call_failure_rate'] = sum(r.tool_failure_count for r in results) / calls if calls else None
+    if any('planning' in r.metadata for r in results):
+        from ..planning.metrics import aggregate_planning
+        result['planning']=aggregate_planning(results)
     return result

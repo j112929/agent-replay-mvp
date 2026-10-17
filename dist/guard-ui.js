@@ -1,4 +1,5 @@
 import {esc, pretty, compareTraces} from './v2.js';
+import {renderPlanning} from './planning.js';
 
 const state = {page:'overview',org:null,project:null,me:null,traces:[],cases:[],runs:[],suites:[],usage:null,team:null,keys:[],jobs:[],access:[],billing:null};
 const labels = {overview:'Overview',failures:'Failures',tests:'Regression tests',runs:'Test runs',integrations:'Integrations',team:'Team & projects',billing:'Billing'};
@@ -132,7 +133,7 @@ async function click(name,id) {
   }
   if (name==='trace-detail') {
     const trace = await api(projectURL('traces/'+id));
-    modal('Trajectory details',`<h3>${esc(trace.name)}</h3><p>${badge(trace.privacy.status)} · ${number(trace.privacy.redacted_field_count)} fields redacted</p><p class="help">Replay compatibility: ${esc(trace.privacy.replay_compatibility)}. Retention: operator-managed; see the deployment retention policy.</p><div class="notice">${esc((trace.privacy.limitations || []).join(' ') || 'Recorded responses are used. Original secrets are never reconstructed.')}</div>${action('playback','Inspect recorded replay',id)}<pre class="result-detail">${esc(pretty(trace))}</pre>`);return;
+    modal('Trajectory details',`<h3>${esc(trace.name)}</h3><p>${badge(trace.privacy.status)} · ${number(trace.privacy.redacted_field_count)} fields redacted</p><p class="help">Replay compatibility: ${esc(trace.privacy.replay_compatibility)}. Retention: operator-managed; see the deployment retention policy.</p><div class="notice">${esc((trace.privacy.limitations || []).join(' ') || 'Recorded responses are used. Original secrets are never reconstructed.')}</div>${action('playback','Inspect recorded replay',id)}${renderPlanning(trace)}<pre class="result-detail">${esc(pretty(trace))}</pre>`);return;
   }
   if (name==='playback') return showJSON('Recorded replay · zero external operations',await api(projectURL('traces/'+id+'/playback')));
   if (name==='case-detail') {

@@ -59,6 +59,7 @@ test('self-service onboarding and all connected product views',async ({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.screenshot({path:'.replay/ui-results/overview-mobile.png',fullPage:true});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
+  await inspectPlanning(page);
   await page.getByRole('button',{name:'Sign out',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Welcome back'})).toBeVisible();
   expect(errors).toEqual([]);
@@ -87,3 +88,27 @@ test('viewer cannot mutate and imported markup renders as text',async ({page,bro
   await expect(readOnly.getByRole('button',{name:'Choose Team · test mode'})).toBeDisabled();
   await viewer.close();
 });
+
+async function inspectPlanning(page){
+  await page.setViewportSize({width:1440,height:1000});
+  const origin='http://127.0.0.1:32901',post=(path,data)=>page.request.post(origin+path,{headers:{Origin:origin,'Idempotency-Key':crypto.randomUUID()},data});
+  const org=await (await post('/api/auth/organization/create',{name:'Planning Team',slug:'planning-team'})).json();
+  const p=await (await post('/api/saas/organizations/'+org.id+'/projects',{name:'Planning Project'})).json();
+  const trace=await (await page.request.get(origin+'/planning-demo.json')).json();
+  const imported=await post('/api/saas/projects/'+p.id+'/import',{trace,format:'native'});expect(imported.status()).toBe(200);
+  await page.goto('/debugger.html#failures');
+  await page.reload();
+  await page.getByLabel('Organization',{exact:true}).selectOption(org.id);
+  await expect(page.getByLabel('Project',{exact:true})).toHaveValue(p.id);
+  await page.getByRole('button',{name:'Inspect',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Predictive planning decisions'})).toBeVisible();
+  await page.locator('dialog [data-planning-decision]').first().locator('summary').first().click();
+  await expect(page.getByRole('heading',{name:'Actual observation',exact:true}).first()).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Predicted first observation',exact:true}).first()).toBeVisible();
+  await page.locator('[data-planning-filter]').selectOption('errors');
+  const visible=page.locator('[data-planning-decision]:not([hidden])');
+  expect(await visible.count()).toBeGreaterThan(0);
+  if(!await visible.first().evaluate(node=>node.open))await visible.first().locator('summary').first().click();
+  await page.screenshot({path:'.replay/ui-results/planning-decision.png',fullPage:true});
+  await page.getByRole('button',{name:'×'}).click();
+}

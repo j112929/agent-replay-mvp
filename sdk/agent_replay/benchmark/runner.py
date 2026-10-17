@@ -120,10 +120,22 @@ def run_benchmark(adapter, agent, config, output):
             for target, field in (('input_tokens', 'prompt_tokens'), ('output_tokens', 'completion_tokens'), ('tokens', 'total_tokens')):
                 counts = [s.get('usage', {}).get(field) for s in models]
                 setattr(result, target, sum(counts) if all(type(v) is int and v >= 0 for v in counts) else None)
-            result.cost_usd = 0 if not models else result.cost_usd
+            if result.cost_usd is None and not models: result.cost_usd = 0
+            if config.parameters.get('planning_mode') or trajectory.get('metadata',{}).get('planning'):
+                from ..planning.metrics import trace_metrics
+                from ..planning.store import PlanningStore
+                result.metadata['planning']=trace_metrics(trajectory)
+                planning_tokens=result.metadata['planning']['planning_tokens']
+                result.tokens=result.tokens+planning_tokens if result.tokens is not None and planning_tokens is not None else None
+                result.model_call_count+=result.metadata['planning']['model_calls']
+                cost=result.metadata['planning']['planning_cost_usd']
+                result.cost_usd=result.cost_usd+cost if result.cost_usd is not None and cost is not None else None
+                for session in trajectory.get('metadata',{}).get('planning',{}).get('sessions',[]):
+                    PlanningStore(store.directory).put(session)
             result.trajectory_id = trajectory['id']
             result.trajectory_path = str(capture.path.relative_to(store.directory))
             result.metadata['task_digest'] = digest(asdict(task))
+            if 'task_group' in task.metadata: result.metadata['task_group']=task.metadata['task_group']
             result.__post_init__()
             results.append(result)
             store.persist(run, results)

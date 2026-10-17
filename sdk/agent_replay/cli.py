@@ -120,6 +120,9 @@ def make_handler(trace_directory, web_root):
 def main(argv=None):
     from .debug_cli import COMMANDS, main as modern_main
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == 'planning':
+        from .planning.cli import main as planning_main
+        return planning_main(argv[1:])
     if argv and argv[0] == 'guard':
         from .guard.cli import main as guard_main
         return guard_main(argv[1:])

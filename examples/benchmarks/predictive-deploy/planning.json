@@ -1,0 +1,1 @@
+{"enabled":true,"candidates":3,"horizon":3,"rollouts_per_candidate":3,"max_planning_latency_ms":10000,"max_planning_tokens":12000,"max_predictions":128,"max_real_steps":6,"fallback":"abort","seed":0,"lambda_cost":1,"lambda_risk":2,"lambda_uncertainty":0.25}

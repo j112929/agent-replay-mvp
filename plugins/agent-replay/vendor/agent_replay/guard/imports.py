@@ -212,6 +212,11 @@ def normalize(payload, format='native', org_id='local', project_id='default', se
         raise ValueError('Import ID must be a portable identifier (max 80 characters)')
     metadata = trace.setdefault('metadata', {})
     if not isinstance(metadata, dict): raise ValueError('Metadata must be an object')
+    if 'planning' in metadata:
+        from ..planning.store import validate_session
+        planning=metadata['planning']
+        if not isinstance(planning,dict) or not isinstance(planning.get('sessions'),list) or len(planning['sessions'])>100: raise ValueError('Invalid planning metadata')
+        for session in planning['sessions']: validate_session(session)
     for key in ('org_id', 'organization_id', 'project_id', 'guard'):
         metadata.pop(key, None)
     for key in ('org_id', 'organization_id', 'project_id'):

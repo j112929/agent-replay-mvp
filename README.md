@@ -57,6 +57,26 @@ Safely reproduce production agent failures from sanitized recorded evidence,
 compare versions, detect regressions and enforce CI release gates—without
 re-executing dangerous real-world operations during default replay.
 
+## Optional predictive planning experiments
+
+Generate candidate actions, simulate bounded hypothetical futures, score reward,
+risk and uncertainty, authorize only the selected real action, then compare
+predictions against actual observations. Planning is disabled by default and never
+executes tools inside simulations. Historical replay transitions support offline
+retrieval/calibration; existing benchmark reports and CI gates compare all modes.
+
+```sh
+agent-replay planning demo --output .replay/planning-demo --tasks 20 --seed 0
+```
+
+The controlled seed-0 experiment measures 5/20 → 10/20 → 11/20 task passes,
+including a new failure in the retrieval mode and increased cost/tool calls.
+Prediction improvement remains statistically inconclusive; the example cost gate
+blocks the candidate. These are synthetic results, not production reliability claims.
+[Setup, SDK/API, replay and limitations](docs/planning/README.md) ·
+[Measured results](docs/planning/results.md) ·
+[Audit and migration plan](docs/plans/predictive-planning-extension.md).
+
 ## Security pilot workflow
 
 ```sh
