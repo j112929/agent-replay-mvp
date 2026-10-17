@@ -39,6 +39,7 @@ class PlanningCoreTests(unittest.TestCase):
         generator=CandidateGenerator(policy,SCHEMAS)
         result=asyncio.run(Planner(generator,Slow(),PlanningConfig(enabled=True,max_planning_latency_ms=5)).plan(context()))
         self.assertEqual(result['status'],'failed')
+        self.assertIsNone(result['budget']['cost_usd']);self.assertFalse(result['budget']['usage_complete'])
         limited=asyncio.run(Planner(generator,MockWorldModel(),PlanningConfig(enabled=True,max_predictions=1)).plan(context()))
         self.assertEqual(limited['status'],'failed');self.assertLessEqual(limited['budget']['predictions'],1)
         class Excess(MockWorldModel):

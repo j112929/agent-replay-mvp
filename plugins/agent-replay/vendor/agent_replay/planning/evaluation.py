@@ -15,6 +15,7 @@ def evaluate_prediction(prediction, actual, step_id=None):
         matches.append({'outcome_match':bool(fields) and all(fields.values()),'fields':fields,'probability':outcome.get('probability'),
             'numeric_errors':errors})
     return {'prediction_id':prediction.prediction_id,'candidate_id':prediction.candidate_id,
+        'model_id':prediction.model_id,'model_version':prediction.model_version,
         'actual_observation_ref':{'step_id':step_id},'evaluator_version':'structured-exact.v1',
         'outcome_match':any(m['outcome_match'] for m in matches),'outcome_comparisons':matches,
         'prediction_error_types':sorted({k for m in matches for k,v in m['fields'].items() if not v}),

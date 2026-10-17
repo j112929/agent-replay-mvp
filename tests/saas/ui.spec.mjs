@@ -60,6 +60,7 @@ test('self-service onboarding and all connected product views',async ({page})=>{
   await page.screenshot({path:'.replay/ui-results/overview-mobile.png',fullPage:true});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
   await inspectPlanning(page);
+  await inspectWorldModel(page);
   await page.getByRole('button',{name:'Sign out',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Welcome back'})).toBeVisible();
   expect(errors).toEqual([]);
@@ -111,4 +112,14 @@ async function inspectPlanning(page){
   if(!await visible.first().evaluate(node=>node.open))await visible.first().locator('summary').first().click();
   await page.screenshot({path:'.replay/ui-results/planning-decision.png',fullPage:true});
   await page.getByRole('button',{name:'×'}).click();
+}
+
+async function inspectWorldModel(page){
+  await page.goto('/world-model.html');
+  await expect(page.getByRole('heading',{name:'Predictive Planning',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Paired planning benchmark'})).toBeVisible();
+  await page.getByRole('button',{name:'World Model Evaluation',exact:true}).click();
+  await expect(page.getByRole('img',{name:'Calibration curve'}).first()).toBeVisible();
+  await page.screenshot({path:'.replay/ui-results/world-model-evaluation.png',fullPage:true});
+  await page.goto('/debugger.html');
 }

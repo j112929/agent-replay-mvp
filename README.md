@@ -57,6 +57,24 @@ Safely reproduce production agent failures from sanitized recorded evidence,
 compare versions, detect regressions and enforce CI release gates—without
 re-executing dangerous real-world operations during default replay.
 
+## v0.5 model-based planning release candidate
+
+The existing planning layer now supports shadow/active modes, bounded prediction-error
+correction, an independent Refund oracle/evaluator, authorized JSONL datasets, actual
+CPU supervised fitting and an optional local HF/LoRA path. Static planning views
+inspect imported evidence; they do not execute hosted agents or training.
+
+```sh
+agent-replay planning benchmark --output .replay/v05 --tasks 20
+```
+
+Controlled Refund results: baseline/shadow 8/20, active 16/20, correcting 20/20.
+A safe-rule policy without a world model also passes 16/20, so incremental world-model benefit is not established. Correction consumes extra calls and cost; this is synthetic evidence, not a production
+reliability claim. CPU LoRA smoke verifies real gradients/checkpoints, not useful
+prediction quality. [Audit](docs/v0.5-repository-audit.md) ·
+[Setup, safety, training and limitations](docs/v0.5-world-model.md) ·
+[Release notes](docs/v0.5-release-notes.md).
+
 ## Optional predictive planning experiments
 
 Generate candidate actions, simulate bounded hypothetical futures, score reward,
