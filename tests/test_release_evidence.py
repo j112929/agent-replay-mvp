@@ -164,3 +164,23 @@ class ReleaseEvidenceTests(unittest.TestCase):
             with self.assertRaises(ValueError): attest(challenge, changed, self.key, self.repo, 'run-123', CONFIG, 0)
         changed = copy.deepcopy(proof['trace']); changed['steps'][0]['output'] = {'present': False, 'replayability': 'unsupported'}
         with self.assertRaises(ValueError): attest(challenge, changed, self.key, self.repo, 'run-123', CONFIG, 0)
+
+    def test_service_bridge_uses_only_operator_project_trust(self):
+        from agent_replay.saas_worker import execute
+        keyfile = self.root / 'private-operator.json'
+        keyfile.write_text(json.dumps({'org-a/project-a': {'runner_id': 'trusted-ci', 'secret': self.key}}))
+        request = {'case_id': self.case['id'], 'baseline': self.good, 'commit': self.commit,
+                   'candidate_version': 'A', 'configuration': CONFIG, 'max_cost_usd': 1,
+                   'runner_id': 'untrusted-request-override', 'secret': '0' * 64}
+        with patch.dict(os.environ, {'GUARD_EVIDENCE_KEYS_FILE': str(keyfile)}):
+            challenge = execute(self.store, 'release_challenge', request)
+            self.assertEqual(challenge['runner_id'], 'trusted-ci')
+            proof = self.bundle(challenge)
+            release = {'case_id': self.case['id'], 'baseline': self.good,
+                       'candidate': proof['manifest']['trace_id'], 'evidence': proof}
+            other = GuardStore(self.store.root, 'org-b', 'project-a')
+            with self.assertRaises(ValueError): execute(other, 'release', release)
+            keyfile.write_text(json.dumps({'org-a/project-a': {'runner_id': 'revoked-runner', 'secret': self.key}}))
+            with self.assertRaises(ValueError): execute(self.store, 'release', release)
+            keyfile.write_text(json.dumps({'org-a/project-a': {'runner_id': 'trusted-ci', 'secret': self.key}}))
+            self.assertTrue(execute(self.store, 'release', release)['release_eligible'])
