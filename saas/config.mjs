@@ -30,6 +30,7 @@ export function configuration(env = process.env) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid server port');
   return { production, origin: origin.origin, secret, host: production ? '0.0.0.0' : '127.0.0.1', port,
     directory: resolve(env.GUARD_DATA_DIR || '.replay/saas'), python: env.GUARD_PYTHON || 'python', plans,
+    evidenceKeysFile: env.GUARD_EVIDENCE_KEYS_FILE ? resolve(env.GUARD_EVIDENCE_KEYS_FILE) : undefined,
     smtp: env.GUARD_SMTP_URL, mailFrom: env.GUARD_MAIL_FROM || 'Agent Regression Guard <guard@localhost>',
     stripeKey: env.STRIPE_SECRET_KEY, stripeWebhook: env.STRIPE_WEBHOOK_SECRET,
     prices: Object.fromEntries(['starter','team','business'].map(p => [p, env[`STRIPE_PRICE_${p.toUpperCase()}`]])),

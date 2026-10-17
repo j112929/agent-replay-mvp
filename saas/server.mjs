@@ -14,7 +14,7 @@ import { controllerLock } from './lock.mjs';
 const publicRoot = fileURLToPath(new URL('../dist/',import.meta.url));
 const types = {'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.zip':'application/zip'};
 const extension = path => path.slice(path.lastIndexOf('.'));
-const actions = {import:'imports',generate:'cases',evaluate:'runs',planning_simulate:'runs'};
+const actions = {import:'imports',generate:'cases',evaluate:'runs',release:'runs',planning_simulate:'runs'};
 const authRoutes = new Set(['sign-up/email','sign-in/email','sign-out','get-session','list-sessions','revoke-session','revoke-sessions','revoke-other-sessions','change-password','update-user','send-verification-email','verify-email','request-password-reset','reset-password','error',
   'organization/create','organization/list','organization/update','organization/get-full-organization','organization/set-active','organization/get-active-member','organization/get-active-member-role','organization/list-members','organization/invite-member','organization/accept-invitation','organization/reject-invitation','organization/cancel-invitation','organization/get-invitation','organization/list-invitations','organization/list-user-invitations','organization/update-member-role','organization/remove-member','organization/leave']);
 
@@ -63,8 +63,8 @@ export async function createApp({config = configuration(), provider, mailer, qui
     const sensitiveFields = JSON.parse(db.prepare('SELECT fields FROM guard_privacy WHERE org_id=?').get(org)?.fields || '[]');
     const cap = {imports:10000,cases:2000,runs:30000,storage_bytes:entitlement.limits.storage_bytes};
     if (!kind) {
-      if (['approve','control'].includes(action)) requireValue(service.stored(org)+2048 <= entitlement.limits.storage_bytes,429,'Organization storage limit reached');
-      if (action === 'approve') requireValue(entitlement.allowed,402,'Subscription inactive');
+      if (['approve','control','release_challenge'].includes(action)) requireValue(service.stored(org)+8192 <= entitlement.limits.storage_bytes,429,'Organization storage limit reached');
+      if (['approve','release_challenge'].includes(action)) requireValue(entitlement.allowed,402,'Subscription inactive');
       const result = await worker.call(project,service.root(org,project.id),action,value,cap,sensitiveFields);
       audit(db,org,actor.user.id,action === 'report' ? 'report.export' : action === 'playback' ? 'replay.execute' : 'artifact.'+action,project.id);
       return result;
@@ -72,7 +72,7 @@ export async function createApp({config = configuration(), provider, mailer, qui
     const key = req.headers['idempotency-key'];
     requireValue(typeof key === 'string' && /^[A-Za-z0-9_-]{8,100}$/.test(key),400,'Provide an Idempotency-Key (8–100 portable characters)');
     const hash = digest(JSON.stringify(value)), month = new Date().toISOString().slice(0,7);
-    const reserve = action === 'evaluate' ? 4*1024*1024 : 3*1024*1024;
+    const reserve = ['evaluate','release'].includes(action) ? 4*1024*1024 : 3*1024*1024;
     const storedBefore = service.stored(org);
     const job = transaction(db,() => {
       // Keep a bounded idempotency ledger, not duplicate trace/fixture bodies in SQLite.
@@ -96,14 +96,14 @@ export async function createApp({config = configuration(), provider, mailer, qui
     if (job.cached) {
       const receipt = JSON.parse(job.result);
       if (action === 'generate') return worker.call(project,service.root(org,project.id),'case',{case_id:receipt.id,version:receipt.version},cap,sensitiveFields);
-      if (action === 'evaluate') return worker.call(project,service.root(org,project.id),'run',{id:receipt.id},cap,sensitiveFields);
+      if (['evaluate','release'].includes(action)) return worker.call(project,service.root(org,project.id),'run',{id:receipt.id},cap,sensitiveFields);
       if (action === 'planning_simulate') return worker.call(project,service.root(org,project.id),'planning_get',{id:receipt.id},cap,sensitiveFields);
       return receipt;
     }
     try {
       let result = await worker.call(project,service.root(org,project.id),action,value,cap,sensitiveFields);
       if (action === 'import') result = {...result,privacy:Object.fromEntries(['status','redacted_field_count','replay_compatibility','limitations'].map(k=>[k,result.privacy[k]]))};
-      const receipt = action === 'generate' ? {id:result.case.id,version:result.case.guard.version} : action === 'evaluate' ? {id:result.id} : action === 'planning_simulate' ? {id:result.session_id} : result;
+      const receipt = action === 'generate' ? {id:result.case.id,version:result.case.guard.version} : ['evaluate','release'].includes(action) ? {id:result.id} : action === 'planning_simulate' ? {id:result.session_id} : result;
       transaction(db,() => {
         db.prepare("UPDATE guard_job SET status='completed',result=?,updated_at=? WHERE id=?").run(JSON.stringify(receipt),Date.now(),job.id);
         if (action === 'import' && result.duplicate) db.prepare('UPDATE guard_usage SET count=count-1 WHERE org_id=? AND month=? AND kind=?').run(org,month,kind);
@@ -215,9 +215,15 @@ export async function createApp({config = configuration(), provider, mailer, qui
     const projectRoute = path.match(/^\/api\/saas\/projects\/([A-Za-z0-9_-]+)\/(.+)$/);
     if (projectRoute) {
       const [,projectId,resource] = projectRoute, mutation = req.method === 'POST';
-      const scope = resource === 'import' ? 'import' : resource === 'evaluate' || resource === 'planning/simulate' || resource.endsWith('/execute') ? 'run' : 'read';
+      const scope = resource === 'import' ? 'import' : ['evaluate','release','release/challenges','planning/simulate'].includes(resource) || resource.endsWith('/execute') ? 'run' : 'read';
       const project = service.project(actor,projectId,mutation ? 1 : 0,scope);
       const org = project.org_id;
+      if (resource === 'release/challenges' && mutation) {
+        requireValue(!actor.key,403,'Release targets require an administrator account session');
+        service.project(actor,projectId,2);
+        return send(res,201,await operation(actor,project,'release_challenge',value,req));
+      }
+      if (resource === 'release' && mutation) return send(res,200,await operation(actor,project,'release',value,req));
       if (resource === 'planning/simulate' && mutation) return send(res,200,await operation(actor,project,'planning_simulate',value,req));
       const planningDetail=resource.match(/^planning\/sessions\/([a-f0-9-]{36})(?:\/(candidates|rollouts|outcomes))?$/);
       if (planningDetail && req.method==='GET') return send(res,200,await operation(actor,project,'planning_get',{id:planningDetail[1],part:planningDetail[2]},req));

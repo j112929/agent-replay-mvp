@@ -17,7 +17,8 @@ export function workers(config) {
       return await new Promise((resolveValue,reject) => {
         const child = spawn(config.python,['-m','agent_replay.saas_worker',root,project.org_id,project.id], {
           cwd:root, detached:true, stdio:['pipe','pipe','pipe'],
-          env:{PATH:process.env.PATH || '/usr/bin:/bin',PYTHONPATH:sdk,PYTHONDONTWRITEBYTECODE:'1',LANG:'C.UTF-8'}
+          env:{PATH:process.env.PATH || '/usr/bin:/bin',PYTHONPATH:sdk,PYTHONDONTWRITEBYTECODE:'1',LANG:'C.UTF-8',
+            ...(['release_challenge','release'].includes(action) && config.evidenceKeysFile ? {GUARD_EVIDENCE_KEYS_FILE:config.evidenceKeysFile} : {})}
         });
         let output = '', bytes = 0, completed = false;
         const decoder = new StringDecoder('utf8');
