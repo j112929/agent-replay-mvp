@@ -14,7 +14,7 @@ import { controllerLock } from './lock.mjs';
 const publicRoot = fileURLToPath(new URL('../dist/',import.meta.url));
 const types = {'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.zip':'application/zip'};
 const extension = path => path.slice(path.lastIndexOf('.'));
-const actions = {import:'imports',generate:'cases',evaluate:'runs'};
+const actions = {import:'imports',generate:'cases',evaluate:'runs',planning_simulate:'runs'};
 const authRoutes = new Set(['sign-up/email','sign-in/email','sign-out','get-session','list-sessions','revoke-session','revoke-sessions','revoke-other-sessions','change-password','update-user','send-verification-email','verify-email','request-password-reset','reset-password','error',
   'organization/create','organization/list','organization/update','organization/get-full-organization','organization/set-active','organization/get-active-member','organization/get-active-member-role','organization/list-members','organization/invite-member','organization/accept-invitation','organization/reject-invitation','organization/cancel-invitation','organization/get-invitation','organization/list-invitations','organization/list-user-invitations','organization/update-member-role','organization/remove-member','organization/leave']);
 
@@ -97,12 +97,13 @@ export async function createApp({config = configuration(), provider, mailer, qui
       const receipt = JSON.parse(job.result);
       if (action === 'generate') return worker.call(project,service.root(org,project.id),'case',{case_id:receipt.id,version:receipt.version},cap,sensitiveFields);
       if (action === 'evaluate') return worker.call(project,service.root(org,project.id),'run',{id:receipt.id},cap,sensitiveFields);
+      if (action === 'planning_simulate') return worker.call(project,service.root(org,project.id),'planning_get',{id:receipt.id},cap,sensitiveFields);
       return receipt;
     }
     try {
       let result = await worker.call(project,service.root(org,project.id),action,value,cap,sensitiveFields);
       if (action === 'import') result = {...result,privacy:Object.fromEntries(['status','redacted_field_count','replay_compatibility','limitations'].map(k=>[k,result.privacy[k]]))};
-      const receipt = action === 'generate' ? {id:result.case.id,version:result.case.guard.version} : action === 'evaluate' ? {id:result.id} : result;
+      const receipt = action === 'generate' ? {id:result.case.id,version:result.case.guard.version} : action === 'evaluate' ? {id:result.id} : action === 'planning_simulate' ? {id:result.session_id} : result;
       transaction(db,() => {
         db.prepare("UPDATE guard_job SET status='completed',result=?,updated_at=? WHERE id=?").run(JSON.stringify(receipt),Date.now(),job.id);
         if (action === 'import' && result.duplicate) db.prepare('UPDATE guard_usage SET count=count-1 WHERE org_id=? AND month=? AND kind=?').run(org,month,kind);
@@ -214,9 +215,12 @@ export async function createApp({config = configuration(), provider, mailer, qui
     const projectRoute = path.match(/^\/api\/saas\/projects\/([A-Za-z0-9_-]+)\/(.+)$/);
     if (projectRoute) {
       const [,projectId,resource] = projectRoute, mutation = req.method === 'POST';
-      const scope = resource === 'import' ? 'import' : resource === 'evaluate' || resource.endsWith('/execute') ? 'run' : 'read';
+      const scope = resource === 'import' ? 'import' : resource === 'evaluate' || resource === 'planning/simulate' || resource.endsWith('/execute') ? 'run' : 'read';
       const project = service.project(actor,projectId,mutation ? 1 : 0,scope);
       const org = project.org_id;
+      if (resource === 'planning/simulate' && mutation) return send(res,200,await operation(actor,project,'planning_simulate',value,req));
+      const planningDetail=resource.match(/^planning\/sessions\/([a-f0-9-]{36})(?:\/(candidates|rollouts|outcomes))?$/);
+      if (planningDetail && req.method==='GET') return send(res,200,await operation(actor,project,'planning_get',{id:planningDetail[1],part:planningDetail[2]},req));
       if (resource === 'access' && req.method === 'GET') {
         requireValue(!actor.key,403,'Account session required');
         return send(res,200,{items:db.prepare('SELECT user_id FROM guard_access WHERE project_id=?').all(projectId)});

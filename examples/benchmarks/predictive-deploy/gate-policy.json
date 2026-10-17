@@ -1,0 +1,1 @@
+{"environment":"PRODUCTION","min_tasks":20,"critical_tags":[],"require_replay":true,"planning":{"max_total_cost_increase":0.25,"max_tool_call_increase":0.25}}

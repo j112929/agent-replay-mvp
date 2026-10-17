@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/planning-session.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "planning-session.v1"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "planner_version": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "object"
+    },
+    "origin_state_digest": {
+      "type": "string"
+    },
+    "planning_config": {
+      "type": "object"
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "maxItems": 8
+    },
+    "rollouts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "synthetic": {
+            "const": true
+          }
+        },
+        "required": [
+          "synthetic"
+        ]
+      },
+      "maxItems": 64
+    },
+    "scores": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "outcomes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "status": {
+      "enum": [
+        "planning",
+        "selected",
+        "failed",
+        "execution_denied",
+        "execution_error"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "session_id",
+    "planner_version",
+    "origin",
+    "origin_state_digest",
+    "planning_config",
+    "candidates",
+    "rollouts",
+    "scores",
+    "outcomes",
+    "status"
+  ]
+}

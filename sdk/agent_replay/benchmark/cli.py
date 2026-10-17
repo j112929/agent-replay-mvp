@@ -43,8 +43,13 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog='agent-replay benchmark')
     commands = parser.add_subparsers(dest='command', required=True)
     run = commands.add_parser('run')
-    run.add_argument('--benchmark', choices=['local'], default='local')
-    run.add_argument('--suite', required=True)
+    run.add_argument('--benchmark', choices=['local','predictive-deploy'], default='local')
+    run.add_argument('--suite')
+    run.add_argument('--mode',choices=['baseline','planning','planning_with_replay_context'],default='baseline')
+    run.add_argument('--planning-config')
+    run.add_argument('--replay-dataset')
+    run.add_argument('--seed',type=int,default=0)
+    run.add_argument('--tasks',type=int,default=20)
     run.add_argument('--agent', choices=['demo', 'demo-v2', 'openai'], default='demo')
     run.add_argument('--model')
     run.add_argument('--base-url')
@@ -73,10 +78,25 @@ def main(argv=None):
             from .runner import run_benchmark
             if not 1 <= args.max_model_calls <= 100:
                 raise ValueError('--max-model-calls must be between 1 and 100')
-            config = AgentConfig(args.agent, args.model, {'base_url': args.base_url, 'max_model_calls': args.max_model_calls})
-            agent = OpenAICompatibleAgent(config) if args.agent == 'openai' else DemoAgent(args.agent)
+            if args.benchmark=='predictive-deploy':
+                from ..planning.benchmark import DeploymentAdapter,tasks,agent as planning_agent
+                from ..planning.contracts import PlanningConfig
+                from ..storage import read
+                if not 1<=args.tasks<=100: raise ValueError('Use 1–100 deployment tasks')
+                if args.mode=='planning_with_replay_context' and not args.replay_dataset: raise ValueError('--replay-dataset required for replay-context mode')
+                pc=PlanningConfig(**read(args.planning_config)) if args.planning_config else PlanningConfig(enabled=args.mode!='baseline',seed=args.seed)
+                if args.mode!='baseline' and not pc.enabled: raise ValueError('Planning mode requires enabled config')
+                config=AgentConfig('deployment-agent',parameters={'planning_mode':args.mode,'seed':args.seed,'planning_config':asdict(pc)})
+                agent=planning_agent(args.mode,pc,read(args.replay_dataset) if args.replay_dataset else None)
+                adapter=DeploymentAdapter(tasks(args.tasks,seed=args.seed))
+            else:
+                if not args.suite: raise ValueError('--suite is required for local benchmark')
+                if args.mode!='baseline' or args.planning_config or args.replay_dataset: raise ValueError('Local shell tasks have no trusted planning execution adapter')
+                config = AgentConfig(args.agent, args.model, {'base_url': args.base_url, 'max_model_calls': args.max_model_calls})
+                agent = OpenAICompatibleAgent(config) if args.agent == 'openai' else DemoAgent(args.agent)
+                adapter=LocalAdapter(args.suite)
             output = args.output or str(Path('.replay/benchmarks') / str(uuid.uuid4()))
-            run, results = run_benchmark(LocalAdapter(args.suite), agent, config, output)
+            run, results = run_benchmark(adapter, agent, config, output)
             value = {'run': asdict(run), 'output': str(Path(output).resolve()), 'reports': write_reports(output)}
             text = 'Benchmark completed\n' + summary_text(run.summary) + '\nOutput: ' + value['output']
             code = 2 if any(r.failure_category in INFRA_FAILURES for r in results) else 0
