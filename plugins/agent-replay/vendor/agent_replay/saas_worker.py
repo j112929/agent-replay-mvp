@@ -13,6 +13,19 @@ from .security.replay import playback
 
 
 def execute(store, action, body):
+    if action == 'release_challenge':
+        from .guard.evidence import issue, trusted_runner
+        trusted = trusted_runner(store)
+        return issue(store, body['case_id'], body['baseline'], body['commit'], body['candidate_version'],
+            body['configuration'], trusted['runner_id'], body['max_cost_usd'], body.get('ttl_seconds', 900), body.get('version'))
+    if action == 'release':
+        from .guard.evidence import trusted_runner
+        trusted = trusted_runner(store)
+        proof = body.get('evidence')
+        if not isinstance(proof, dict) or not isinstance(proof.get('manifest'), dict) or proof['manifest'].get('runner_id') != trusted['runner_id']:
+            raise ValueError('Release runner is no longer trusted')
+        return run(store, body['case_id'], body.get('baseline'), body.get('candidate'), body.get('version'),
+            require_evidence=True, release_evidence=proof, evidence_key=trusted['secret'])
     if action == 'planning_simulate':
         from .planning.api import simulate
         store.ensure_storage(1024*1024)

@@ -7,6 +7,13 @@ The first commercial prototype imports sanitized native/generic/OTLP JSON, gener
 recorded fixtures and declarative verifiers, validates them on positive/negative
 examples, requires explicit approval, and evaluates candidate evidence with CI gates.
 
+Release protection now has an explicit trusted-evidence path: an administrator pins
+the commit, approved case/fixtures, configuration and budget before a fresh CI
+capture; a project-scoped signer authenticates that run; the release gate rejects
+stale, tampered or reused evidence. Ordinary captured-record evaluation remains
+available and is explicitly **not release eligible**. See the
+[CLI/API setup and trust boundary](docs/productization/trusted-release-evidence.md).
+
 ```sh
 pip install -e .
 agent-replay guard demo --directory .replay/guard-demo
@@ -159,7 +166,7 @@ See [rollout architecture, API, workers and scope](docs/rollout-infrastructure.m
 
 **Turn a production agent failure into a regression test.**
 
-Capture the input and model/tool boundaries, rerun trusted agent code with controlled observations, compare model/tool/code changes, and verify business assertions in CI. Python 3.10+, MIT, no runtime dependencies. Package version 0.4.0; the package has not been published to PyPI.
+Capture the input and model/tool boundaries, compare evidence and verify business assertions in CI. Python 3.10+, MIT, no runtime dependencies. Package version 0.5.0; the package has not been published to PyPI. Executable replay is disabled; trusted CI captures candidate executions separately.
 
 ## Hosted workspace: 中文 / English
 
@@ -216,9 +223,13 @@ with capture("refund-agent", input={"order_id": "1042"}, durability="sync") as r
 
 A completed execution can still violate a business rule. v2 captures persist journals at boundaries; `recover` reads a valid prefix after interruption. v1 capture and the original `replay_step`/`replay_agent` SDK APIs remain compatible. New `async_replay_agent` is awaitable in an active event loop.
 
-## Run, compare, and test
+## Historical rerun interface and current comparison
 
-Register a trusted `agent(run)` entrypoint in `agent-replay.json`; see the [configuration guide](docs/implementation.md).
+The executable rerun commands below describe the historical debugger and are
+disabled by the current security controller. Use the Guard workflow for captured
+candidate evaluation, and the trusted-evidence release path for release decisions.
+Recorded inspection and comparison remain available. The
+[configuration guide](docs/implementation.md) retains the historical API details.
 
 ```bash
 agent-replay inspect failure.json

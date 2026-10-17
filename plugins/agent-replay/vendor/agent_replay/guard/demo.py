@@ -13,7 +13,7 @@ CANARY = 'sk-syntheticGuardDemoToken012345678901'
 TASK = {'instruction': 'Repair add(a,b) so it returns a+b', 'test_input': {'a': 2, 'b': 3}}
 
 
-def capture_candidate(version, directory):
+def capture_candidate(version, directory, metadata=None):
     """Trusted bundled toy code; every tool only returns an explicit observation."""
     expression = 'a + b' if version == 'A' else 'a * b'
     def mocked(capture, name, arguments, response, effect):
@@ -27,7 +27,7 @@ def capture_candidate(version, directory):
                  durability='sync', metadata={'agent_id': 'coding-demo', 'agent_version': version,
                      'candidate_entrypoint': 'coding-demo', 'model': 'synthetic-no-model',
                      'prompt_version': 'coding-task.v1', 'environment_version': 'memory-only.v1',
-                     'environment': {'Authorization': 'Bearer ' + CANARY}}) as capture:
+                     'environment': {'Authorization': 'Bearer ' + CANARY}, **(metadata or {})}) as capture:
         mocked(capture, 'repo.read_file', {'path': 'math.py'}, {'source': 'return a - b'}, 'read')
         mocked(capture, 'repo.apply_patch', {'path': 'math.py', 'expression': expression},
                {'applied': True, 'simulated': True}, 'write')

@@ -25,8 +25,15 @@ export async function ci(args, env = process.env) {
     const imported = await request('import',{trace,format:trace.schema_version ? 'native' : 'generic'},'ci-import-'+hash);
     evidence.push(imported.id);
   }
-  const gate = await request('evaluate',{case_id:flag('case'),baseline:evidence[0],candidate:evidence[1]},'ci-run-'+randomUUID());
-  const summary = Object.fromEntries(['id','case_id','case_version','decision','classification','blocking','versions','reasons','exit_code','external_operations','model_calls'].map(k=>[k,gate[k]]));
+  let proof;
+  if (args.includes('--release-evidence')) {
+    const raw = await readFile(flag('release-evidence'));
+    if (raw.length > 1048576) throw new Error('Release evidence exceeds 1 MiB');
+    proof = JSON.parse(raw);
+  }
+  const gate = await request(proof ? 'release' : 'evaluate',{case_id:flag('case'),baseline:evidence[0],candidate:evidence[1],...(proof ? {evidence:proof} : {})},'ci-run-'+randomUUID());
+  const summary = Object.fromEntries(['id','case_id','case_version','decision','classification','blocking','versions','reasons','exit_code','external_operations','model_calls','release_eligible'].map(k=>[k,gate[k]]));
+  if (proof && (gate.decision !== 'PASS' || gate.release_eligible !== true) && !gate.exit_code) summary.exit_code = 3;
   summary.report_url = origin.origin+'/debugger.html#runs';
   if (args.includes('--output')) await writeFile(flag('output'),JSON.stringify(summary,null,2)+'\n',{mode:0o600});
   return summary;

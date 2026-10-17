@@ -42,7 +42,8 @@ def candidate_compatible(case, trace):
     return version
 
 
-def run(store, case_id, baseline_id=None, candidate_id=None, version=None):
+def run(store, case_id, baseline_id=None, candidate_id=None, version=None, *,
+        require_evidence=False, release_evidence=None, evidence_key=None):
     start = time.monotonic(); run_id = str(uuid.uuid4())
     with store.locked():
         path = store.case_path(case_id, version); case = read(path)
@@ -51,18 +52,27 @@ def run(store, case_id, baseline_id=None, candidate_id=None, version=None):
         parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix='.pending-', dir=parent) as staged:
             directory = Path(staged)
-            gate = evaluate_to_directory(store, path, case, directory, run_id, start, baseline_id, candidate_id)
+            validation = None
+            if require_evidence:
+                from .evidence import verify
+                try:
+                    validation = verify(store, case, baseline_id, candidate_id, release_evidence, evidence_key)
+                except (ValueError, OSError, KeyError, TypeError, ReplayDenied):
+                    validation = {'verified': False, 'reason': 'Release evidence rejected: check signing trust, target, freshness, integrity and approval'}
+            gate = evaluate_to_directory(store, path, case, directory, run_id, start, baseline_id, candidate_id, validation)
             store.ensure_storage(0)
             os.replace(directory, parent / run_id)
         return gate
 
 
-def evaluate_to_directory(store, path, case, directory, run_id, start, baseline_id, candidate_id):
+def evaluate_to_directory(store, path, case, directory, run_id, start, baseline_id, candidate_id, release_validation=None):
     case_id = case['id']
     results = []
     versions = {}; reasons = []
     for role, ident in (('baseline', baseline_id), ('candidate', candidate_id)):
         try:
+            if role == 'candidate' and release_validation is not None and not release_validation['verified']:
+                raise ValueError(release_validation['reason'])
             require_approval(case, path, store.root)
             if not case['guard'].get('enabled'): raise ValueError('Required regression case is disabled')
             if not ident: raise ValueError('Required ' + role + ' trajectory is missing')
@@ -83,14 +93,20 @@ def evaluate_to_directory(store, path, case, directory, run_id, start, baseline_
                       else 'improvement' if before == 'fail' and after == 'pass'
                       else 'unchanged_pass' if after == 'pass' else 'unchanged_fail')
     decision = 'INCONCLUSIVE' if reasons else 'FAIL' if after == 'fail' else 'PASS'
+    if release_validation and release_validation['verified'] and release_validation['cost_usd'] > release_validation['max_cost_usd']:
+        reasons.append('Candidate cost exceeds the approved release budget')
+        if decision == 'PASS': classification = 'cost_regression'
+        if decision != 'INCONCLUSIVE': decision = 'FAIL'
     gate = {'schema_version': '1.0', 'id': run_id, 'case_id': case_id,
         'case_version': case['guard']['version'], 'case_digest': case_digest(case),
         'decision': decision, 'blocking': decision != 'PASS', 'classification': classification,
         'versions': versions, 'reasons': reasons or (['Approved critical verifier failed'] if decision == 'FAIL' else []),
+        'release_eligible': decision == 'PASS' and release_validation is not None and release_validation['verified'],
+        'release_evidence': release_validation or {'verified': False, 'reason': 'Captured-evidence evaluation only; no release attestation'},
         'replay_mode': 'RECORDED_REPLAY', 'execution_kind': 'CAPTURED_CANDIDATE_EVALUATION',
         'external_operations': 0, 'model_calls': 0, 'fixture_digest': case['guard']['fixture_digest'],
         'duration_ms': (time.monotonic() - start) * 1000,
-        'limitations': ['Evaluates customer-supplied captured evidence; does not execute or attest arbitrary agent code',
+        'limitations': ['Does not execute arbitrary agent code; release signatures trust the operator-controlled CI signer',
                         'Verifier discrimination is validated only on the supplied positive/negative pair'],
         'results': results, 'exit_code': {'PASS': 0, 'FAIL': 1, 'INCONCLUSIVE': 3}[decision]}
     # Replay source separately for inspection; it never becomes candidate evidence.
@@ -104,7 +120,7 @@ def evaluate_to_directory(store, path, case, directory, run_id, start, baseline_
     write_reports(results, directory / 'reports')
     # Extend the existing report with gate context; trace bodies stay in its evidence.
     context = {k: gate[k] for k in ('decision', 'classification', 'versions', 'replay_mode',
-        'execution_kind', 'reasons', 'limitations')}
+        'execution_kind', 'release_eligible', 'release_evidence', 'reasons', 'limitations')}
     header = '<h1>Agent Regression Guard: ' + decision + '</h1><pre>' + html.escape(json.dumps(context, indent=2)) + '</pre>'
     header += '<p><a href="gate.json">Machine-readable gate</a></p>'
     if gate['playback_path']: header += '<p><a href="../playback.json">Simulated recorded playback</a></p>'

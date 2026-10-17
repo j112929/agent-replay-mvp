@@ -1,0 +1,24 @@
+name: Trusted candidate release evidence
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m unittest discover -s tests -p 'test_release_evidence.py' -v
+      - name: Fresh captures, signatures, budget and replay protection
+        run: python scripts/release_evidence_smoke.py .replay/release-evidence-ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthetic-release-evidence
+          path: .replay/release-evidence-ci/
+          include-hidden-files: true
+          retention-days: 7
