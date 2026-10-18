@@ -14,12 +14,30 @@ from agent_replay.probabilistic.planning.risk_metrics import cvar, candidate_met
 from agent_replay.probabilistic.planning.rollout_sampler import SamplingConfig, MonteCarloSampler
 from agent_replay.probabilistic.planning.risk_aware_planner import RiskAwarePlanner
 from agent_replay.probabilistic.experiments.domain import (WorkflowAdapter,WorkflowWorldModel,WorkflowEnvironment,
-    make_tasks,continuation,SCHEMAS,ENVIRONMENT,action)
+    make_tasks,continuation,policy,forecast_builder,SCHEMAS,ENVIRONMENT,action)
 from agent_replay.probabilistic.calibration.collector import join_outcomes
 from agent_replay.storage import read
 
 
 class RiskPlanningTests(unittest.TestCase):
+    def test_planner_reuses_arbitrary_world_model_and_action_schemas(self):
+        class CounterModel:
+            model_id='counter';version='counter.v1'
+            async def predict(self,c,a,conf):
+                return PredictionDistribution('prediction-'+a.candidate_id,a.candidate_id,[{
+                    'observation':{'status':'completed'},'state_delta':{'position':1,'terminal':True,'success':True},
+                    'terminal':True,'success':True,'probability':1,'reward':1,'uncertainty':0}],self.model_id,self.version)
+        a=CandidateAction('increment','tool',{'delta':1},'counter.add')
+        schema={'counter.add':{'type':'object','properties':{'delta':{'type':'integer'}},'required':['delta'],'additionalProperties':False}}
+        with tempfile.TemporaryDirectory() as tmp:
+            planner=RiskAwarePlanner(CounterModel(),SamplingConfig(candidates=2,samples=2,horizon=1),Path(tmp),
+                generator=CandidateGenerator(lambda c:[a],schema),error_fields=('position',))
+            context=AgentContext('task','group','Increment counter',{'position':0,'terminal':False},0,'counter-env.v1')
+            session=asyncio.run(planner.plan(context))
+            self.assertEqual(session['status'],'selected')
+            self.assertEqual(session['selection']['selected_action']['tool_name'],'counter.add')
+            self.assertEqual(session['research']['forecasts'],[])
+
     def test_fractional_cvar_exact_tail(self):
         self.assertEqual(cvar([0,1,2,3],.5),2.5)
         self.assertAlmostEqual(cvar([0,1,2,3],.625),(3+.5*2)/1.5)
@@ -85,7 +103,10 @@ class RiskPlanningTests(unittest.TestCase):
         from agent_replay.security.replay import playback
         with tempfile.TemporaryDirectory() as tmp:
             output=Path(tmp)/'run'
-            planner=RiskAwarePlanner(WorkflowWorldModel(),SamplingConfig(candidates=2,samples=8,horizon=1),output,'cvar')
+            model=WorkflowWorldModel()
+            planner=RiskAwarePlanner(model,SamplingConfig(candidates=2,samples=8,horizon=1),output,'cvar',
+                generator=CandidateGenerator(policy,SCHEMAS),continuation_generator=CandidateGenerator(continuation,SCHEMAS),
+                forecast_builder=forecast_builder(model,'cvar',1))
             run,results=run_benchmark(WorkflowAdapter(make_tasks(4,seeds=(0,),length=1)),PlanningAgent(None,planner),
                 AgentConfig('research',parameters={'planning_mode':'active'}),output)
             self.assertEqual(run.status,'completed')

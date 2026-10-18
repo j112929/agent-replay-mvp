@@ -162,5 +162,24 @@ class SDKTests(unittest.TestCase):
                 replay_step(run.trace,run.trace['steps'][0]['id'],mode='live',model='y')
         self.assertEqual(run.trace['steps'][0]['status'],'success')
 
+class InterruptedCaptureTests(unittest.TestCase):
+    def test_unwound_capture_finalizes_pending_child_and_late_cleanup(self):
+        from agent_replay.capture import Capture
+        from agent_replay.storage import read
+        with tempfile.TemporaryDirectory() as tmp:
+            run=Capture('interrupted child',tmp,input={},durability='sync')
+            with self.assertRaises(TimeoutError):
+                with run:
+                    pending=run.span('cancelled child',input={})
+                    pending.__enter__()
+                    raise TimeoutError('Synthetic deadline')
+            trace=read(run.path)
+            self.assertEqual(trace['steps'][0]['execution']['status'],'error')
+            self.assertEqual(trace['capture_health']['state'],'partial')
+            self.assertEqual(replay_step(trace,trace['steps'][0]['id'])['status'],'error')
+            self.assertFalse(pending.__exit__(None,None,None))
+            with Capture('next capture',tmp,input={},durability='sync') as following:
+                self.assertIsNone(following._current_event)
+
 if __name__=='__main__':
     unittest.main()

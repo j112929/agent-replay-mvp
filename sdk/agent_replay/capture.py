@@ -57,6 +57,11 @@ class Span:
         return output
 
     def __exit__(self, exc_type, exc, tb):
+        if self.run._closed and self.event['id'] in self.run._interrupted_steps:
+            # A cancelled async task can unwind after its enclosing capture ended.
+            # The persisted interruption is authoritative; do not reopen the journal
+            # or reset context tokens from a task that has already been detached.
+            return False
         self.event["duration_ms"] = round((time.perf_counter()-self.started)*1000, 3)
         self.event["status"] = "error" if exc is not None else "success"
         if exc is not None:
@@ -85,6 +90,7 @@ class Capture:
         self.redactor = redactor
         self.journal = None
         self._counts = {}
+        self._interrupted_steps = set()
         self._span_lock = threading.Lock()
         self.random = random.Random()
         self.clock = time.time
@@ -149,18 +155,31 @@ class Capture:
                 warnings.warn('Agent Replay journal unavailable', RuntimeWarning)
         self._token = _active.set(self)
         self._parent_token = _parent.set(None)
+        self._event_token = _event.set(None)
         return self
 
     def __exit__(self, exc_type, exc, tb):
         if exc is not None: self.on_capture_error = "warn"
         self.trace["duration_ms"] = round((time.perf_counter()-self._start)*1000, 3)
         self.trace["status"] = "error" if exc is not None else "success"
+        # Signals/cancelled event loops can leave a child context manager pending.
+        # A closed capture must not persist that child as still executing.
+        for step in self.trace['steps']:
+            if step['status'] != 'running': continue
+            self._interrupted_steps.add(step['id'])
+            step.update(status='error',duration_ms=max(0,self.trace['duration_ms']-step.get('start_ms',0)),
+                error={'type':type(exc).__name__ if exc is not None else 'IncompleteSpan',
+                       'message':self._clean(str(exc)) if exc is not None else 'Capture ended before the span completed'})
+            self.trace['status']='error'
+            if 'capture_health' in self.trace:self.trace['capture_health']['state']='partial'
+            self._record('step_failed',step)
         if exc is not None:
             self.trace["error"] = {"type": type(exc).__name__, "message": self._clean(str(exc))}
         self.trace["privacy"] = self.sanitizer.metadata()
         self._closed = True
         _active.reset(self._token)
         _parent.reset(self._parent_token)
+        _event.reset(self._event_token)
         if self.modern:
             if exc is not None: self.fail(str(exc), category='exception')
             self._record('run_finished', self.trace)

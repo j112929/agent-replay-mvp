@@ -10,6 +10,8 @@ from ...benchmark.contracts import BenchmarkTask, BenchmarkResult
 from ...planning.contracts import CandidateAction, PredictionDistribution, ident
 from ...regression.predicates import schema_matches
 from ..calibration.schemas import VerifiedOutcome, now
+from ..calibration.schemas import SuccessForecast
+from ...serialization import digest
 
 ENVIRONMENT = 'reliability-workflow.v1'
 TOOL_VERSION = 'workflow-tools.v1'
@@ -35,6 +37,20 @@ def policy(context):
 def continuation(context):
     # Fixed continuation prevents future hidden-state feedback in an open-loop plan.
     return [action(context.state['route'] or 0)]
+
+
+def forecast_builder(model,method,horizon):
+    """Domain-specific heuristic forecasts stay outside the generic planner."""
+    def build(c,a,metrics,cutoff):
+        confidence=max(.5,min(.99,.98-.015*c.state['family']-.01*a.action_payload.get('route',0)))
+        values=[('raw_agent',confidence)]
+        if metrics['success_probability'] is not None:values.append(('world_model_mc',metrics['success_probability']))
+        return [asdict(SuccessForecast(ident(),c.benchmark_run_id,c.task_id,c.trajectory_id,c.task_group,
+            'probabilistic-planner.v1:'+method,model.version,BENCHMARK_VERSION,c.environment_version,TOOL_VERSION,p,now(),cutoff,
+            source=source,prediction_horizon=horizon,epistemic_uncertainty=metrics['epistemic_uncertainty'],
+            provenance={'synthetic':True,'scenario_fingerprint':digest([c.task_group,c.state['domain'],c.state['family']]),
+                'action_key':a.key,'source':'before_first_real_action'})) for source,p in values]
+    return build
 
 
 class WorkflowEnvironment:

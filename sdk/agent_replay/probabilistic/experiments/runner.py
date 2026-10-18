@@ -13,11 +13,12 @@ from ...benchmark.runner import run_benchmark
 from ...benchmark.contracts import AgentConfig
 from ...benchmark.reports import write_reports
 from ...benchmark.compare import compare_runs
-from ...planning.core import PlanningAgent
+from ...planning.core import PlanningAgent, CandidateGenerator
 from ...serialization import digest
 from ...storage import save, read
 from .config import ExperimentConfig, from_dict
-from .domain import WorkflowAdapter, WorkflowWorldModel, make_tasks, BENCHMARK_VERSION, ENVIRONMENT, TOOL_VERSION
+from .domain import (WorkflowAdapter, WorkflowWorldModel, make_tasks, BENCHMARK_VERSION, ENVIRONMENT, TOOL_VERSION,
+    policy,continuation,SCHEMAS,forecast_builder)
 from .statistics import paired_effect, holm
 from ..planning.rollout_sampler import SamplingConfig, ResearchBudget
 from ..planning.risk_aware_planner import RiskAwarePlanner
@@ -44,7 +45,9 @@ def _run(root,name,tasks,config,method='expected_value',horizon=None,strategy='p
     sampling=SamplingConfig(config.candidate_count,config.samples,horizon or config.horizon,config.seed)
     replan=ReplanningPolicy(strategy,config.replan_interval,config.error_threshold,config.uncertainty_threshold)
     model=WorkflowWorldModel(config.rare_failure_scale)
-    planner=RiskAwarePlanner(model,sampling,target,method,config.risk_weight,config.alpha,config.uncertainty_weight,replan,budget)
+    planner=RiskAwarePlanner(model,sampling,target,method,config.risk_weight,config.alpha,config.uncertainty_weight,replan,budget,
+        generator=CandidateGenerator(policy,SCHEMAS),continuation_generator=CandidateGenerator(continuation,SCHEMAS),
+        forecast_builder=forecast_builder(model,method,sampling.horizon))
     run,results=run_benchmark(WorkflowAdapter(tasks),PlanningAgent(None,planner),
         AgentConfig('research-'+method,model=model.model_id,parameters={'planning_mode':'active',
             'research':asdict(config),'sampling':asdict(sampling),'replanning':asdict(replan)}),target)
@@ -145,7 +148,11 @@ def _run_experiment(experiment,output,config=None):
                 'lambda0':replace(config,risk_weight=0),'lambda01':replace(config,risk_weight=.1),'lambda1':replace(config,risk_weight=1),
                 'alpha08':replace(config,alpha=.8),'alpha095':replace(config,alpha=.95),
                 'underestimated_tail':replace(config,rare_failure_scale=.1)}
-            for name,cfg in variants.items():execute('screen-'+name,tasks,cfg,method='cvar',horizon=cfg.horizon)
+            for name,cfg in variants.items():
+                result,_=execute('screen-'+name,tasks,cfg,method='cvar',horizon=cfg.horizon)
+                for field in ('success','severe_failure','cumulative_reward','cost_usd','duration_ms'):
+                    comparisons.append({'candidate':'screen-'+name,'baseline':'cvar','metric':field,
+                        **compare_metric(runs['cvar']['rows'],result['rows'],field,config.seed,config.min_groups)})
         for name in runs:
             if name!='expected_value':
                 comparison=compare_runs(root/'expected_value',root/name)

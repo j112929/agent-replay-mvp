@@ -85,7 +85,8 @@ def write_report(root,experiment):
     artifact=public_artifact([experiment]);save(Path(root)/'public-summary.json',artifact)
     esc=lambda v:html.escape(str(v),quote=True)
     rows=''.join('<tr><td>'+esc(name)+'</td>'+''.join('<td>'+esc(r['summary'].get(field))+'</td>' for field in SUMMARY_FIELDS)+'</tr>' for name,r in experiment['runs'].items())
-    links=''.join('<li><a href="'+esc(name)+'/reports/index.html">'+esc(name)+' benchmark and real trajectories</a></li>' for name in experiment['runs'] if _valid_run(name))
+    from urllib.parse import quote
+    links=''.join('<li><a href="'+esc(quote(r.get('path',name)+'/reports/index.html',safe='/.-'))+'">'+esc(name)+' benchmark and real trajectories</a></li>' for name,r in experiment['runs'].items() if _valid_run(name))
     body='''<!doctype html><html lang="en"><meta charset="utf-8"><title>Reliability research report</title>
 <style>body{font:16px system-ui;margin:32px}table{border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #ddd}pre{white-space:pre-wrap}.scroll{overflow:auto}</style>'''
     body+='<h1>'+esc(experiment['experiment'])+'</h1><p>Synthetic CPU research. Predictions are simulated; task outcomes come from real in-memory benchmark execution.</p><p>No production improvement is inferred.</p>'

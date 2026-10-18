@@ -43,6 +43,7 @@ class CalibrationTests(unittest.TestCase):
         with self.assertRaises(ValueError): join_outcomes([forecast()],[outcome(),outcome()])
         with self.assertRaises(ValueError): outcome(source='simulated')
         with self.assertRaises(ValueError): join_outcomes([forecast(scope='action_outcome')],[outcome()])
+        with self.assertRaises(ValueError): join_outcomes([forecast(scope='world_model_confidence')],[outcome()],scope='world_model_confidence')
 
     def test_probability_timestamp_validation(self):
         for p in (-.1,1.1,float('nan'),True):

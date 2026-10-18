@@ -4,6 +4,8 @@ from .schemas import SuccessForecast, VerifiedOutcome, timestamp
 
 
 def join_outcomes(forecasts, outcomes, scope='task_success'):
+    if scope!='task_success':
+        raise ValueError('Task outcomes cannot label action or world-model-confidence forecasts')
     labels = {}
     for item in outcomes:
         label = item if isinstance(item, VerifiedOutcome) else VerifiedOutcome(**item)

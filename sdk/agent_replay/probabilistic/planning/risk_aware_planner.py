@@ -5,27 +5,31 @@ from pathlib import Path
 from statistics import mean
 import time
 from ...planning.contracts import PlanningConfig, CandidateAction, PredictionDistribution, ident
-from ...planning.core import CandidateGenerator, PlanningFailure
 from ...serialization import digest
 from ...storage import save
 from .risk_metrics import candidate_metrics, selection_score
 from .rollout_sampler import MonteCarloSampler
-from ..calibration.schemas import SuccessForecast, now
+from ..calibration.schemas import now
 from ..horizon.replanning_policy import ReplanningPolicy
 from ..horizon.prediction_error import state_error
-from ..experiments.domain import policy, continuation, SCHEMAS, BENCHMARK_VERSION, TOOL_VERSION
 
 
 class RiskAwarePlanner:
     version='probabilistic-planner.v1'
-    def __init__(self,model,sampling,output,method='expected_value',risk_weight=.5,alpha=.9,uncertainty_weight=.2,replanning=None,budget=None):
+    def __init__(self,model,sampling,output,method='expected_value',risk_weight=.5,alpha=.9,uncertainty_weight=.2,replanning=None,budget=None,
+                 generator=None,continuation_generator=None,forecast_builder=None,error_fields=('health',)):
         from ...planning.contracts import finite
         finite(risk_weight,'risk weight');finite(uncertainty_weight,'uncertainty weight');finite(alpha,'CVaR alpha',0,.999999)
         selection_score({'immediate_reward':0,'expected_reward':0,'return_variance':0,'loss_cvar':0,'epistemic_uncertainty':0},method)
         self.model,self.sampling,self.output=model,sampling,Path(output)
         self.method,self.risk_weight,self.alpha,self.uncertainty_weight=method,risk_weight,alpha,uncertainty_weight
-        self.generator=CandidateGenerator(policy,SCHEMAS)
-        self.continuation=CandidateGenerator(continuation,SCHEMAS)
+        if generator is None:raise ValueError('An explicit candidate generator is required')
+        self.generator=generator
+        self.continuation=continuation_generator or generator
+        self.forecast_builder=forecast_builder
+        if not isinstance(error_fields,(tuple,list)) or not 1<=len(error_fields)<=10 or any(not isinstance(f,str) or not f for f in error_fields):
+            raise ValueError('Explicit numeric prediction error fields required')
+        self.error_fields=tuple(error_fields)
         self.replanning=replanning or ReplanningPolicy()
         self.config=PlanningConfig(enabled=True,mode='active',self_correction=False,max_real_steps=68,max_uncertainty=1)
         self.cache={}
@@ -38,7 +42,7 @@ class RiskAwarePlanner:
         if cache:
             prior=cache['last_prediction']
             observed=context.state
-            numeric=state_error(prior,observed,('health',))
+            numeric=state_error(prior,observed,self.error_fields)
             error=max((v['absolute_error'] for v in numeric.values()),default=None)
         reason=self.replanning.trigger(cache['used'] if cache else 0,error,cache['uncertainty'] if cache else 0,
             bool(cache and cache['used']<len(cache['actions'])))
@@ -98,8 +102,8 @@ class RiskAwarePlanner:
                         'predicted_failure_risk':1-m['success_probability'] if m['success_probability'] is not None else 1,
                         'uncertainty':m['epistemic_uncertainty'],'estimated_remaining_steps':self.sampling.horizon,
                         'estimated_success_probability':m['success_probability'],'score':m['score']})
-                if context.state_version==0:
-                    session['research']['forecasts']=self._forecasts(context,a,selected,cutoff)
+                if context.state_version==0 and self.forecast_builder:
+                    session['research']['forecasts']=self.forecast_builder(context,a,selected,cutoff)
                 alternatives=[{'candidate_id':m['candidate_id'],'score':m['score'],'risk':m['severe_failure_probability'],
                                'expected_reward':m['expected_reward'],'loss_cvar':m['loss_cvar'],'uncertainty':m['epistemic_uncertainty']} for m in metrics]
             else:
@@ -143,14 +147,3 @@ class RiskAwarePlanner:
                 'simulated_steps':[{'action':asdict(a),'prediction':prediction,'sampled_outcome':first,'simulation_depth':0,'simulated':True}],
                 'predicted_terminal_state':{**context.state,**first['state_delta']},'uncertainty':first.get('uncertainty',1),
                 'termination_reason':'root_summary_full_futures_in_sidecar','synthetic':True}
-
-    def _forecasts(self,c,a,metrics,cutoff):
-        # The raw policy confidence is a declared uncalibrated heuristic, not an oracle.
-        confidence=max(.5,min(.99,.98-.015*c.state['family']-.01*(a.action_payload.get('route',0))))
-        values=[('raw_agent',confidence)]
-        if metrics['success_probability'] is not None:values.append(('world_model_mc',metrics['success_probability']))
-        return [asdict(SuccessForecast(ident(),c.benchmark_run_id,c.task_id,c.trajectory_id,c.task_group,
-            self.version+':'+self.method,self.model.version,BENCHMARK_VERSION,c.environment_version,TOOL_VERSION,p,now(),cutoff,
-            source=source,prediction_horizon=self.sampling.horizon,epistemic_uncertainty=metrics['epistemic_uncertainty'],
-            provenance={'synthetic':True,'scenario_fingerprint':digest([c.task_group,c.state['domain'],c.state['family']]),
-                'action_key':a.key,'source':'before_first_real_action'})) for source,p in values]
