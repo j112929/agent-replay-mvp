@@ -57,6 +57,32 @@ Safely reproduce production agent failures from sanitized recorded evidence,
 compare versions, detect regressions and enforce CI release gates—without
 re-executing dangerous real-world operations during default replay.
 
+## v0.6 probabilistic reliability research
+
+An optional CPU research layer adds pre-outcome success forecasts, held-out Platt/
+isotonic calibration, four risk-planning baselines plus uncertainty-CVaR, and matched
+open-loop/feedback experiments across horizons 1–32. It reuses BenchmarkRunner,
+PlanningAgent, trajectory v2, recorded replay and the existing three-state release
+gate. Speculative rollouts have no tool execution capability.
+
+```sh
+agent-replay probabilistic run --experiment calibration \
+  --config examples/probabilistic/calibration.json --output .replay/research/calibration
+agent-replay probabilistic run --experiment risk_planning \
+  --config examples/probabilistic/risk_planning.json --output .replay/research/risk
+agent-replay probabilistic run --experiment horizon_reliability \
+  --config examples/probabilistic/horizon.json --output .replay/research/horizon
+```
+
+Start with `examples/probabilistic/smoke.json` for quick offline CI validation.
+Import published aggregate results into the existing Predictive Planning workspace:
+**Calibration Lab / Risk Planning Lab / Horizon Reliability Lab**. Small samples,
+missing labels or uncertain regression evidence produce INCONCLUSIVE. Results are
+synthetic research, not a production reliability claim or guaranteed improvement.
+
+[Repository audit](docs/v0.6-repository-audit.md) ·
+[Methods, commands, gate policy and limitations](docs/v0.6-probabilistic-research.md)
+
 ## v0.5 model-based planning release candidate
 
 The existing planning layer now supports shadow/active modes, bounded prediction-error

@@ -1,17 +1,21 @@
 import {esc,pretty} from './v2.js';
 import {renderPlanning} from './planning.js';
-let artifact=null,trace=null,tab='benchmark';
+import {validateResearch,renderResearch} from './reliability.js';
+let artifact=null,trace=null,research=null,tab='benchmark',researchOptions={};
 const numeric=v=>typeof v==='number'&&Number.isFinite(v)?v:null;
 const number=v=>numeric(v)===null?'unknown':v.toFixed(4);
 const panel=(name,body)=>`<section class="panel section-space"><div class="panel-head"><h2>${esc(name)}</h2></div><div class="panel-body">${body}</div></section>`;
 export function validateArtifact(value){
   if(!value||typeof value!=='object')throw Error('JSON object required');
+  if(value.schema_version==='reliability-public.v1')return validateResearch(value);
   if(value.schema_version==='2.0'&&Array.isArray(value.metadata?.planning?.sessions))return value;
   if(value.schema_version!=='world-model-public.v1'||!value.modes||!value.evaluations||Object.keys(value.modes).length>20)throw Error('Import a v2 planning trajectory or aggregate world-model-public.v1 artifact');
   return value;
 }
 export function renderWorld(value,view='benchmark'){
   validateArtifact(value);
+  if(value.schema_version==='reliability-public.v1')return renderResearch(value,view,researchOptions);
+  if(['calibration','risk','horizon'].includes(view))return panel('Research artifact required','Import public-summary.json from a completed probabilistic experiment.');
   if(value.schema_version==='2.0'){
     if(['explorer','inspector'].includes(view))return renderPlanning(value);
     return panel('Evaluation artifact required','Import the aggregate experiment report to view benchmark and calibration results.');
@@ -24,14 +28,25 @@ export function renderWorld(value,view='benchmark'){
   }).join('');
   return panel('Paired planning benchmark',`<p>${esc(value.task_count)} matched synthetic tasks per mode. Costs are synthetic tool charges; latency includes capture and planning.</p><div class="table-scroll"><table><thead><tr><th>Mode</th><th>Passed / tasks</th><th>Success rate</th><th>Latency (ms)</th><th>Cost/task</th><th>Tool calls</th><th>Recovery rate</th></tr></thead><tbody>${Object.entries(value.modes).map(([name,s])=>`<tr><td>${esc(name)}</td><td>${esc(s.pass_count)} / ${esc(s.task_count)}</td><td>${number(s.success_rate)}</td><td>${number(s.distributions?.duration_ms?.mean)}</td><td>${number(s.distributions?.cost_usd?.mean)}</td><td>${number(s.distributions?.tool_call_count?.mean)}</td><td>${number(s.planning?.recovery_success_rate)}</td></tr>`).join('')}</tbody></table></div><p>${esc((value.limitations||[]).join(' · '))}</p><p>Quality gate: ${esc(value.quality_gate?.decision||'unavailable')} · ${esc((value.quality_gate?.reasons||[]).join(' · '))}</p><p>Online correction is replanning from real observations, not online model training.</p>`);
 }
-function render(){document.querySelector('#world-content').innerHTML=renderWorld(['explorer','inspector'].includes(tab)&&trace?trace:artifact||trace,tab);}
+function render(){
+  const value=['calibration','risk','horizon'].includes(tab)&&research?research:['explorer','inspector'].includes(tab)&&trace?trace:artifact||trace;
+  if(!value)return;
+  document.querySelector('#world-content').innerHTML=renderWorld(value,tab);
+  document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===tab)));
+}
 if(typeof document!=='undefined'){
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;render();}));
   document.querySelector('#world-import').addEventListener('change',async event=>{
     try{const file=event.target.files[0];if(!file||file.size>5*1024*1024)throw Error('Use a JSON artifact no larger than 5 MiB');
-      const value=validateArtifact(JSON.parse(await file.text()));if(value.schema_version==='2.0'){trace=value;tab='explorer';}else artifact=value;
+      const value=validateArtifact(JSON.parse(await file.text()));if(value.schema_version==='2.0'){trace=value;tab='explorer';}else if(value.schema_version==='reliability-public.v1'){research=value;tab=Object.hasOwn(value.experiments,'calibration')?'calibration':Object.hasOwn(value.experiments,'risk_planning')?'risk':'horizon';}else artifact=value;
       document.querySelector('#world-status').textContent='Loaded locally. No data was uploaded.';render();
     }catch(error){document.querySelector('#world-status').textContent='Import rejected: '+error.message;}
   });
+  document.querySelector('#world-content').addEventListener('change',event=>{
+    if(event.target.id==='research-split')researchOptions.split=event.target.value;
+    if(event.target.id==='research-run')researchOptions.run=event.target.value;
+    render();
+  });
+  fetch('/reliability-summary.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{research=validateResearch(v);if(['calibration','risk','horizon'].includes(tab))render();}).catch(()=>{});
   fetch('/world-model-summary.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{artifact=validateArtifact(v);render();}).catch(()=>{document.querySelector('#world-status').textContent='Import an evaluation artifact to begin.';});
 }

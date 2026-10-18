@@ -121,5 +121,13 @@ async function inspectWorldModel(page){
   await page.getByRole('button',{name:'World Model Evaluation',exact:true}).click();
   await expect(page.getByRole('img',{name:'Calibration curve'}).first()).toBeVisible();
   await page.screenshot({path:'.replay/ui-results/world-model-evaluation.png',fullPage:true});
+  for(const [button,heading] of [['Calibration Lab','Calibration Lab'],['Risk Planning Lab','Risk Planning Lab'],['Horizon Reliability Lab','Horizon Reliability Lab']]){
+    await page.getByRole('button',{name:button,exact:true}).click();
+    await expect(page.getByRole('heading',{name:heading,exact:true})).toBeVisible();
+  }
+  await page.screenshot({path:'.replay/ui-results/horizon-reliability.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:'.replay/ui-results/horizon-mobile.png',fullPage:true});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
   await page.goto('/debugger.html');
 }

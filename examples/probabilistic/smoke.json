@@ -1,0 +1,16 @@
+{
+  "tasks": 2,
+  "seeds": [
+    0,
+    1
+  ],
+  "candidate_count": 2,
+  "samples": 2,
+  "horizon": 2,
+  "horizons": [
+    1,
+    2
+  ],
+  "min_groups": 2,
+  "seed": 17
+}

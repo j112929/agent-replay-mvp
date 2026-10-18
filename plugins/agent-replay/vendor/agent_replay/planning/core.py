@@ -15,6 +15,13 @@ from ..serialization import digest, canonical
 class PlanningFailure(ValueError): pass
 
 
+def sample_prediction(prediction, rng):
+    """Data-only draw shared by online imagination and bounded research sampling."""
+    probabilities = [o.get('probability') for o in prediction.outcomes]
+    return copy.deepcopy(rng.choices(prediction.outcomes,
+        weights=probabilities if all(p is not None for p in probabilities) else None,k=1)[0])
+
+
 class CandidateGenerator:
     def __init__(self, policy, schemas):
         self.policy, self.schemas = policy, copy.deepcopy(schemas)
@@ -157,7 +164,7 @@ class Planner:
                         elif counts['cost_usd'] is not None: counts['cost_usd']+=prediction.cost_usd
                         if counts['tokens']+counts['reserved_tokens']>self.config.max_planning_tokens: raise PlanningFailure('Model exceeded token budget')
                         probabilities=[o.get('probability') for o in prediction.outcomes]
-                        chosen=rng.choices(prediction.outcomes,weights=probabilities if all(p is not None for p in probabilities) else None,k=1)[0]
+                        chosen=sample_prediction(prediction,rng)
                         # Unknown weights are samples for exploration, never a calibrated distribution.
                         uncertainty=1-(1-uncertainty)*(1-chosen.get('uncertainty',1))
                         steps.append({'simulation_depth':depth,'action':asdict(current),'context':asdict(branch),
