@@ -58,6 +58,8 @@ class ExperimentTests(unittest.TestCase):
             self.assertEqual(result['summary']['label_coverage'],0)
             self.assertTrue(all(r['success'] is None for r in result['rows']))
             self.assertEqual(compare_metric(result['rows'],result['rows'],'success',0,2)['decision'],'INCONCLUSIVE')
+            known_label=[{'task_group':'g','trial_seed':0,'label_status':'verified','cost_usd':None}]
+            self.assertEqual(compare_metric(known_label,known_label,'cost_usd',0,2)['decision'],'INCONCLUSIVE')
 
     def test_gate_statistical_pass_fail_and_inconclusive(self):
         from agent_replay.probabilistic.gates import apply_gate
@@ -84,7 +86,7 @@ class ExperimentTests(unittest.TestCase):
             self.assertTrue(all(r['metadata']['probabilistic']['outcome']['success'] is None for r in results))
 
     def test_configuration_limits(self):
-        for value in ({'tasks':10001},{'samples':33},{'seeds':[1,1]},{'horizons':[0]},{'provider':'arbitrary'},{'alpha':1}):
+        for value in ({'tasks':10001},{'samples':33},{'seeds':[1,1]},{'horizons':[0]},{'provider':'arbitrary'},{'alpha':1},{'evaluation_alpha':1}):
             with self.assertRaises(ValueError):from_dict(value)
 
     def test_risk_runner_existing_gate_inconclusive_and_leakage(self):

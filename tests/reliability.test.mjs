@@ -24,3 +24,8 @@ test('research viewer escapes imported labels and excludes malformed chart coord
  assert.throws(()=>validateResearch({...a,experiments:{unknown:{}}}));
  assert.match(renderResearch({...a,experiments:{}},'risk'),/artifact required/);
 });
+test('censored runs cannot appear as fully verified success curves',()=>{
+ const a=artifact();a.experiments.horizon_reliability.runs['h4-open_loop']={success_rate:1,task_count:20,labeled_count:3,label_coverage:.15};
+ const html=renderResearch(a,'horizon');assert.match(html,/incomplete/);assert.match(html,/3 \/ 20/);assert.match(html,/partial telemetry/);
+ assert.ok(!html.includes('Verified success vs horizon (matched tasks and trial seeds)'));
+});

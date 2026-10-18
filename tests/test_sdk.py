@@ -174,6 +174,8 @@ class InterruptedCaptureTests(unittest.TestCase):
                     pending.__enter__()
                     raise TimeoutError('Synthetic deadline')
             trace=read(run.path)
+            from agent_replay import __version__
+            self.assertEqual(trace['provenance']['sdk_version'],__version__)
             self.assertEqual(trace['steps'][0]['execution']['status'],'error')
             self.assertEqual(trace['capture_health']['state'],'partial')
             self.assertEqual(replay_step(trace,trace['steps'][0]['id'])['status'],'error')

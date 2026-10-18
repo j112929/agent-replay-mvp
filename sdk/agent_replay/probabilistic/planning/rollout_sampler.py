@@ -5,7 +5,7 @@ from dataclasses import dataclass, asdict
 import random
 import time
 from ...planning.contracts import PredictionConfig, PredictionDistribution, finite, ident
-from ...planning.core import sample_prediction, PlanningFailure
+from ...planning.core import sample_prediction, PlanningFailure, record_generation_cost
 from ...serialization import canonical
 
 
@@ -117,7 +117,10 @@ class MonteCarloSampler:
                     terminal,success=chosen['terminal'],chosen.get('success')
                     if terminal:break
                     if depth+1<self.config.horizon:
-                        current=(await bounded(self.generator.generate(branch,1)))[0]
+                        generated=await bounded(self.generator.generate(branch,1))
+                        record_generation_cost(self.generator,generated,budget)
+                        if hasattr(self.generator,'last_generation_cost') or any(a.generation_model!='existing-policy' for a in generated):budget['usage_complete']=False
+                        current=generated[0]
                 rollouts.append({'imagination_id':ident(),'candidate_id':candidate.candidate_id,'origin_state_digest':context.state_digest,
                     'steps':steps,'final_state':branch.state,'terminal':terminal,'success':success,'complete':True,
                     'epistemic_uncertainty':uncertainty,'termination_reason':'terminal' if terminal else 'horizon',

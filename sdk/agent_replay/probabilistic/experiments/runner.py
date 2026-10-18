@@ -34,9 +34,9 @@ STRATEGIES=('open_loop','periodic','error_triggered','uncertainty_triggered')
 
 
 def compare_metric(baseline,candidate,field,seed,min_groups):
-    if any(r.get('label_status')!='verified' for r in baseline+candidate):
+    if any(r.get('label_status')!='verified' or r.get(field) is None for r in baseline+candidate):
         return {'decision':'INCONCLUSIVE','effect':None,'confidence_interval':None,'p_value':1.,
-                'paired_samples':0,'independent_groups':0,'reason':'Required tasks are censored or missing verified labels'}
+                'paired_samples':0,'independent_groups':0,'reason':'Required tasks or metrics are censored, missing or unverified'}
     return paired_effect(baseline,candidate,field,seed,min_groups)
 
 
@@ -80,7 +80,8 @@ def _run(root,name,tasks,config,method='expected_value',horizon=None,strategy='p
     summary={'success_rate':mean(r['success'] for r in verified) if verified else None,'task_count':len(rows),
         'labeled_count':len(verified),'label_coverage':len(verified)/len(rows),
         'severe_failure_rate':mean(r['severe_failure'] for r in verified) if verified else None,
-        'empirical_loss_cvar':cvar([-r['cumulative_reward'] for r in verified],config.alpha) if verified else None,
+        'empirical_loss_cvar':cvar([-r['cumulative_reward'] for r in verified],config.evaluation_alpha) if verified else None,
+        'evaluation_loss_alpha':config.evaluation_alpha,
         **{name:mean(r[name] for r in rows) if all(r[name] is not None for r in rows) else None for name in
             ('cumulative_reward','cost_usd','tool_calls','duration_ms','planning_latency_ms','planning_tokens','prediction_calls','replans')}}
     evidence={'schema_version':'research-evidence.v1','run_id':run.id,'benchmark_version':BENCHMARK_VERSION,
@@ -104,12 +105,15 @@ def _run_experiment(experiment,output,config=None):
     config=config or ExperimentConfig()
     root=Path(output);root.mkdir(parents=True,exist_ok=False)
     started=time.perf_counter()
-    try:sha=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True,timeout=2,check=True).stdout.strip()
-    except (OSError,subprocess.SubprocessError):sha='unavailable'
+    from ...provenance import collect
+    try:environment=collect()
+    except (OSError,subprocess.SubprocessError):environment={'code':{}}
+    code=environment['code'];sha=code.get('commit') or 'unavailable'
     import hashlib
     package_root=Path(__file__).resolve().parents[2]
     code_hash=digest({p.relative_to(package_root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(package_root.rglob('*.py'))})
     provenance={'experiment_id':str(uuid.uuid4()),'experiment':experiment,'created_at':now(),'git_commit_sha':sha,
+        'git_tree_sha':code.get('tree'),'git_dirty':code.get('dirty'),'environment_provenance':environment,
         'benchmark_version':BENCHMARK_VERSION,'environment_version':ENVIRONMENT,'tool_version':TOOL_VERSION,
         'agent_version':'probabilistic-planner.v1','model_version':WorkflowWorldModel(config.rare_failure_scale).version,
         'config':asdict(config),'config_digest':digest(asdict(config)),'python_source_digest':code_hash,

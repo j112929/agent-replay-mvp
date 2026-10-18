@@ -20,6 +20,32 @@ from agent_replay.storage import read
 
 
 class RiskPlanningTests(unittest.TestCase):
+    def test_generation_fees_include_root_and_every_hypothetical_continuation(self):
+        a=CandidateAction('increment','tool',{'delta':1},'counter.add')
+        schema={'counter.add':{'type':'object','properties':{'delta':{'type':'integer'}},'required':['delta'],'additionalProperties':False}}
+        class Fees(CandidateGenerator):
+            def __init__(self,fee):
+                super().__init__(lambda c:[a],schema);self.last_generation_cost=fee
+        class Counter:
+            model_id='counter';version='v1'
+            async def predict(self,c,a,conf):
+                p=c.state['position']+1;terminal=p==3
+                return PredictionDistribution('prediction-'+str(p),a.candidate_id,[{'observation':{'status':'completed'},
+                    'state_delta':{'position':p,'terminal':terminal,'success':True if terminal else None},
+                    'terminal':terminal,'success':True if terminal else None,'probability':1,'reward':1,'uncertainty':0}],self.model_id,self.version)
+        context=AgentContext('task','group','Increment',{'position':0,'terminal':False},0,'counter-env.v1')
+        with tempfile.TemporaryDirectory() as tmp:
+            root,continuing=Fees(.3),Fees(.2)
+            planner=RiskAwarePlanner(Counter(),SamplingConfig(candidates=2,samples=2,horizon=3),Path(tmp),
+                generator=root,continuation_generator=continuing,error_fields=('position',))
+            result=asyncio.run(planner.plan(context))
+            self.assertEqual(result['status'],'selected')
+            self.assertAlmostEqual(result['budget']['cost_usd'],.3+2*2*.2)
+            self.assertFalse(result['budget']['usage_complete'])
+            root.last_generation_cost=None
+            unknown=asyncio.run(planner.plan(context))
+            self.assertIsNone(unknown['budget']['cost_usd'])
+
     def test_planner_reuses_arbitrary_world_model_and_action_schemas(self):
         class CounterModel:
             model_id='counter';version='counter.v1'

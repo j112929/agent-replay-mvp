@@ -13,6 +13,7 @@ class ExperimentConfig:
     horizons: list = field(default_factory=lambda:[1,2,4,8,16,32])
     risk_weight: float = .5
     alpha: float = .9
+    evaluation_alpha: float = .9
     uncertainty_weight: float = .2
     min_groups: int = 20
     seed: int = 17
@@ -34,6 +35,7 @@ class ExperimentConfig:
         if type(self.screening) is not bool or type(self.rare_failure_scale) not in (float,int) or self.rare_failure_scale not in (1.,.1):raise ValueError('Invalid screening/model version')
         for name in ('risk_weight','uncertainty_weight','error_threshold'):finite(getattr(self,name),name)
         finite(self.alpha,'CVaR confidence',0,.999999)
+        finite(self.evaluation_alpha,'evaluation tail confidence',0,.999999)
         finite(self.uncertainty_threshold,'uncertainty threshold',0,1)
 
 

@@ -6,7 +6,7 @@ import re
 from ...storage import save
 
 SUMMARY_FIELDS=('success_rate','task_count','severe_failure_rate','empirical_loss_cvar','cumulative_reward',
-    'cost_usd','tool_calls','duration_ms','planning_latency_ms','planning_tokens','prediction_calls','replans','labeled_count','label_coverage')
+    'cost_usd','tool_calls','duration_ms','planning_latency_ms','planning_tokens','prediction_calls','replans','labeled_count','label_coverage','evaluation_loss_alpha')
 METRIC_FIELDS=('brier_score','log_loss','ece','sample_count','independent_groups','adaptive_ece','calibration_slope',
                'calibration_intercept','roc_auc','average_precision','positive_count','negative_count')
 METHODS=('raw_agent','world_model_mc','platt','isotonic')
@@ -36,6 +36,11 @@ def public_artifact(experiments):
         if name in result['experiments']:raise ValueError('Duplicate public experiment kind')
         out={'runs':{name:_numbers(r['summary'],SUMMARY_FIELDS) for name,r in e['runs'].items() if _valid_run(name)},
              'performance':_numbers(e['performance'],('elapsed_seconds','peak_rss_kib','artifact_bytes','task_executions','provider_cost_usd'))}
+        for run,r in e['runs'].items():
+            if run not in out['runs']:continue
+            out['runs'][run]['confidence_intervals']={k:[_number(x) for x in v] if isinstance(v,list) and len(v)==2 else None
+                for k,v in r['summary'].get('confidence_intervals',{}).items()
+                if k in ('success','severe_failure','cumulative_reward','planning_latency_ms','cost_usd','empirical_loss_cvar')}
         out['candidate_examples']={}
         for run,r in e['runs'].items():
             example=r.get('candidate_example')

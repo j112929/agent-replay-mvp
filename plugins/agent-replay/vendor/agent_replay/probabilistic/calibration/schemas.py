@@ -11,7 +11,7 @@ def now():
 
 def timestamp(value):
     try:
-        result = datetime.fromisoformat(value) if isinstance(value, str) else value
+        result = datetime.fromisoformat(value[:-1]+'+00:00' if value.endswith('Z') else value) if isinstance(value, str) else value
         if not isinstance(result, datetime) or result.tzinfo is None or result.utcoffset() is None:
             raise ValueError()
         return result
@@ -57,6 +57,8 @@ class SuccessForecast:
             if not isinstance(getattr(self, name), str) or not 1 <= len(getattr(self, name)) <= 200:
                 raise ValueError('Missing forecast identity/version: ' + name)
         probability(self.probability)
+        self.forecast_timestamp=timestamp(self.forecast_timestamp).isoformat()
+        self.information_cutoff=timestamp(self.information_cutoff).isoformat()
         if timestamp(self.information_cutoff) > timestamp(self.forecast_timestamp):
             raise ValueError('Information cutoff cannot follow forecast')
         if self.scope not in ('task_success', 'action_outcome', 'world_model_confidence'):
@@ -92,7 +94,7 @@ class VerifiedOutcome:
     schema_version: str = 'verified-outcome.v1'
 
     def __post_init__(self):
-        timestamp(self.outcome_timestamp)
+        self.outcome_timestamp=timestamp(self.outcome_timestamp).isoformat()
         if self.source != 'real_execution_verifier' or self.schema_version != 'verified-outcome.v1':
             raise ValueError('Verified real execution outcome required')
         if self.status not in ('verified', 'missing', 'censored', 'infrastructure_error'):

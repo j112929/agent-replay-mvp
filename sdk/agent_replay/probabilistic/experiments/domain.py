@@ -166,7 +166,7 @@ class WorkflowAdapter:
             ENVIRONMENT+('-shift' if task.metadata['distribution']=='shift' else ''),TOOL_VERSION,
             status='verified' if final_state['state']['terminal'] else 'censored')
         return BenchmarkResult(task.id,success,score=float(success),cost_usd=final_state['cost_usd'],
-            failure_category=None if success else 'wrong_answer',metadata={'synthetic':True,
+            failure_category=None if success else 'wrong_answer' if final_state['state']['terminal'] else 'agent_error',metadata={'synthetic':True,
                 'probabilistic':{'schema_version':'research-evidence.v1','forecasts':forecasts,'outcome':asdict(label),
                     'trial_seed':task.metadata['trial_seed'],'split':task.metadata['split'],
                     'task_family':task.metadata['task_family'],'distribution':task.metadata['distribution'],

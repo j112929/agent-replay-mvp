@@ -4,7 +4,8 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from statistics import mean
 import time
-from ...planning.contracts import PlanningConfig, CandidateAction, PredictionDistribution, ident
+from ...planning.contracts import PlanningConfig, CandidateAction, PredictionDistribution, TrajectoryScore, ident
+from ...planning.core import record_generation_cost
 from ...serialization import digest
 from ...storage import save
 from .risk_metrics import candidate_metrics, selection_score
@@ -56,8 +57,13 @@ class RiskAwarePlanner:
             if reason:
                 previous_planning_id=cache['planning_id'] if cache else None
                 candidates=await self.generator.generate(context,self.sampling.candidates)
+                record_generation_cost(self.generator,candidates,session['budget'])
+                root_generation_cost=session['budget']['cost_usd']
                 effective_sampling=replace(self.sampling,seed=(self.sampling.seed+context.state_version*104729)%2**31)
                 sampled=await MonteCarloSampler(self.continuation,self.model,effective_sampling,self.shared_budget).sample(context,candidates)
+                if root_generation_cost is None or sampled['budget']['cost_usd'] is None:sampled['budget']['cost_usd']=None
+                else:sampled['budget']['cost_usd']+=root_generation_cost
+                if hasattr(self.generator,'last_generation_cost') or any(a.generation_model!='existing-policy' for a in candidates):sampled['budget']['usage_complete']=False
                 metrics=[]
                 for candidate in candidates:
                     rr=[r for r in sampled['rollouts'] if r['candidate_id']==candidate.candidate_id]
@@ -97,11 +103,12 @@ class RiskAwarePlanner:
                     session['rollouts'].append(self._compact(context,candidate,root))
                 session['candidates']=[asdict(a) for a in candidates]
                 for m,r in zip(metrics,session['rollouts']):
-                    session['scores'].append({'imagination_id':r['imagination_id'],'candidate_id':m['candidate_id'],
-                        'expected_task_reward':max(-100,min(100,m['expected_reward'])),'expected_execution_cost':m['expected_execution_cost'],
-                        'predicted_failure_risk':1-m['success_probability'] if m['success_probability'] is not None else 1,
-                        'uncertainty':m['epistemic_uncertainty'],'estimated_remaining_steps':self.sampling.horizon,
-                        'estimated_success_probability':m['success_probability'],'score':m['score']})
+                    # Validate the existing normalized score contract before any
+                    # execution. Unsupported reward scales must not be clipped.
+                    session['scores'].append(asdict(TrajectoryScore(r['imagination_id'],m['candidate_id'],
+                        m['expected_reward'],m['expected_execution_cost'],
+                        1-m['success_probability'] if m['success_probability'] is not None else 1,
+                        m['epistemic_uncertainty'],self.sampling.horizon,m['success_probability'],m['score'])))
                 if context.state_version==0 and self.forecast_builder:
                     session['research']['forecasts']=self.forecast_builder(context,a,selected,cutoff)
                 alternatives=[{'candidate_id':m['candidate_id'],'score':m['score'],'risk':m['severe_failure_probability'],

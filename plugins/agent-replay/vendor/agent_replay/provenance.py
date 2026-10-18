@@ -10,10 +10,12 @@ def collect(root='.'):
         p = subprocess.run(['git', '-C', str(root), *args], capture_output=True, text=True, timeout=5)
         return p.stdout.strip() if p.returncode == 0 else None
     commit = git('rev-parse', 'HEAD')
+    tree = git('rev-parse', 'HEAD^{tree}')
     status = git('status', '--porcelain')
     patch = git('diff', 'HEAD', '--binary') if commit else None
     patch_digest = hashlib.sha256(patch.encode()).hexdigest() if patch else None
     locks = {name: hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ('uv.lock','requirements.txt','poetry.lock','pyproject.toml') if (root/name).is_file()}
-    return {'sdk_version': '0.2.0', 'python_version': platform.python_version(), 'platform': platform.system(),
-            'code': {'commit': commit, 'dirty': bool(status) if status is not None else None, 'source_available': commit is not None, 'dirty_diff_digest': patch_digest},
+    from . import __version__
+    return {'sdk_version': __version__, 'python_version': platform.python_version(), 'platform': platform.system(),
+            'code': {'commit': commit, 'tree': tree, 'dirty': bool(status) if status is not None else None, 'source_available': commit is not None, 'dirty_diff_digest': patch_digest},
             'dependencies': {'lockfile_digests': locks}, 'capture_profile': 'explicit-python-boundaries'}

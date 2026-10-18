@@ -22,6 +22,17 @@ def sample_prediction(prediction, rng):
         weights=probabilities if all(p is not None for p in probabilities) else None,k=1)[0])
 
 
+def record_generation_cost(generator, actions, counts):
+    """Include charged duplicate samples via the generator's aggregate when present."""
+    values=[generator.last_generation_cost] if hasattr(generator,'last_generation_cost') else [a.generation_cost for a in actions]
+    for value in values:
+        if value is None:counts['cost_usd']=None
+        else:
+            from .contracts import finite
+            finite(value,'candidate generation cost')
+            if counts['cost_usd'] is not None:counts['cost_usd']+=value
+
+
 class CandidateGenerator:
     def __init__(self, policy, schemas):
         self.policy, self.schemas = policy, copy.deepcopy(schemas)
@@ -111,14 +122,7 @@ class Planner:
         start=time.monotonic(); deadline=start+self.config.max_planning_latency_ms/1000
         counts={'predictions':0,'model_calls':0,'tokens':0,'reserved_tokens':0,'cost_usd':0,'usage_complete':True}
         def generation_cost(actions):
-            if hasattr(self.generator,'last_generation_cost'):
-                value=self.generator.last_generation_cost
-                if value is None:counts['cost_usd']=None
-                elif counts['cost_usd'] is not None:counts['cost_usd']+=value
-                return
-            for action in actions:
-                if action.generation_cost is None: counts['cost_usd']=None
-                elif counts['cost_usd'] is not None: counts['cost_usd']+=action.generation_cost
+            record_generation_cost(self.generator,actions,counts)
         session={'schema_version':'planning-session.v1','session_id':ident(),'planner_version':self.version,
             'created_at':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),
             'benchmark_run_id':context.benchmark_run_id,'trajectory_id':context.trajectory_id,

@@ -71,7 +71,7 @@ agent-replay probabilistic run --experiment calibration \
 agent-replay probabilistic run --experiment risk_planning \
   --config examples/probabilistic/risk_planning.json --output .replay/research/risk
 agent-replay probabilistic run --experiment horizon_reliability \
-  --config examples/probabilistic/horizon.json --output .replay/research/horizon
+  --config examples/probabilistic/horizon-screen.json --output .replay/research/horizon
 ```
 
 Start with `examples/probabilistic/smoke.json` for quick offline CI validation.
@@ -81,7 +81,9 @@ missing labels or uncertain regression evidence produce INCONCLUSIVE. Results ar
 synthetic research, not a production reliability claim or guaranteed improvement.
 
 [Repository audit](docs/v0.6-repository-audit.md) ·
-[Methods, commands, gate policy and limitations](docs/v0.6-probabilistic-research.md)
+[Methods, commands, gate policy and limitations](docs/v0.6-probabilistic-research.md) ·
+[Actual experiment and test results](docs/v0.6-validation-report.md) ·
+[v0.6 release notes](docs/v0.6-release-notes.md)
 
 ## v0.5 model-based planning release candidate
 

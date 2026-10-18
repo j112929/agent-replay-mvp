@@ -46,6 +46,8 @@ class CalibrationTests(unittest.TestCase):
         with self.assertRaises(ValueError): join_outcomes([forecast(scope='world_model_confidence')],[outcome()],scope='world_model_confidence')
 
     def test_probability_timestamp_validation(self):
+        self.assertIsInstance(forecast(forecast_timestamp=datetime(2026,1,1,tzinfo=timezone.utc)).to_dict()['forecast_timestamp'],str)
+        self.assertEqual(forecast(forecast_timestamp='2026-01-01T00:00:00Z').forecast_timestamp,'2026-01-01T00:00:00+00:00')
         for p in (-.1,1.1,float('nan'),True):
             with self.assertRaises(ValueError): forecast(probability=p)
         with self.assertRaises(ValueError): forecast(forecast_timestamp='2026-01-01')
