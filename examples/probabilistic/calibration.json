@@ -1,0 +1,13 @@
+{
+  "tasks": 60,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "candidate_count": 4,
+  "samples": 16,
+  "horizon": 1,
+  "min_groups": 20,
+  "seed": 17
+}

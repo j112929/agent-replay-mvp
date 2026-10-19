@@ -7,6 +7,19 @@ from ..comparison import compare as compare_trajectories
 
 
 def paired_statistics(comparison):
+    rows=comparison.get('tasks',[])
+    groups=[r['candidate']['metadata'].get('task_group',r['task_id']) for r in rows]
+    if len(set(groups))!=len(groups):
+        from ..probabilistic.experiments.statistics import paired_effect
+        def records(which):
+            return [{'task_group':row[which]['metadata'].get('task_group',row['task_id']),
+                'trial_seed':row[which]['metadata'].get('probabilistic',{}).get('trial_seed',row['task_id']),
+                'success':row[which]['success']} for row in rows]
+        effect=paired_effect(records('baseline'),records('candidate'),'success')
+        return {'paired_tasks':len(rows),'independent_groups':effect['independent_groups'],
+            'one_sided_p_value':effect['p_value'],  # conservative two-sided cluster test
+            'success_delta':effect['effect'],'approximate_95_percent_interval':effect['confidence_interval'],
+            'limitations':effect['method']+'; conservative two-sided p-value for release regression'}
     improvements, regressions = len(comparison['newly_passing']), len(comparison['newly_failing'])
     discordant = improvements + regressions
     # One-sided exact McNemar/binomial: candidate failures exceed improvements.
@@ -23,7 +36,7 @@ def paired_statistics(comparison):
 def release_gate(baseline, candidate, policy=None):
     policy = dict(policy or {})
     allowed = {'environment','min_tasks','alpha','min_success_rate','max_success_drop','critical_tags',
-               'max_latency_increase','max_cost_increase','require_replay','inconclusive_action','planning'}
+               'max_latency_increase','max_cost_increase','require_replay','inconclusive_action','planning','probabilistic'}
     if set(policy) - allowed:
         raise ValueError('Unknown release policy fields')
     environment = policy.get('environment', 'PRODUCTION')
@@ -53,6 +66,16 @@ def release_gate(baseline, candidate, policy=None):
         return {'decision':'INCONCLUSIVE','blocking':policy['inconclusive_action']=='block','policy':policy,
                 'reasons':['Missing, invalid or incomplete benchmark evidence'], 'comparison':None}
     statistics = paired_statistics(comparison)
+    probabilistic_coverage=True
+    if 'probabilistic' in policy:
+        pp=policy['probabilistic']
+        if not isinstance(pp,dict):raise ValueError('Invalid probabilistic policy')
+        required_samples,required_groups=pp.get('min_labeled_samples',200),pp.get('min_groups',20)
+        if type(required_samples) is not int or type(required_groups) is not int or min(required_samples,required_groups)<2:
+            raise ValueError('Invalid probabilistic coverage threshold')
+        groups={r['candidate']['metadata'].get('task_group',r['task_id']) for r in comparison['tasks']}
+        probabilistic_coverage=comparison['matched_count']>=required_samples and len(groups)>=required_groups
+        if not probabilistic_coverage:uncertain.append('Insufficient probabilistic coverage; performance release decisions deferred')
     if comparison['matched_count'] < policy['min_tasks']:
         uncertain.append('Insufficient matched task count')
     if any(comparison[k] for k in ('added_tasks','removed_tasks','changed_tasks')):
@@ -62,10 +85,16 @@ def release_gate(baseline, candidate, policy=None):
     rate=comparison['candidate']['success_rate']
     if rate is None:
         uncertain.append('Task success rate unavailable')
-    elif comparison['matched_count'] >= policy['min_tasks']:
+    elif comparison['matched_count'] >= policy['min_tasks'] and probabilistic_coverage:
         # Wilson upper bound: do not fail a minimum-rate SLO solely on sampling noise.
         n=comparison['matched_count'];z=1.96
-        upper=(rate+z*z/(2*n)+z*math.sqrt(rate*(1-rate)/n+z*z/(4*n*n)))/(1+z*z/n)
+        if 'independent_groups' in statistics:
+            from ..probabilistic.experiments.statistics import bootstrap
+            grouped=[{'task_group':r['candidate']['metadata'].get('task_group',r['task_id']),'success':r['candidate']['success']} for r in comparison['tasks']]
+            ci=bootstrap(grouped,lambda rr:sum(r['success'] for r in rr)/len(rr))
+            upper=ci[1] if ci else 1
+        else:
+            upper=(rate+z*z/(2*n)+z*math.sqrt(rate*(1-rate)/n+z*z/(4*n*n)))/(1+z*z/n)
         if rate < policy['min_success_rate']:
             (failures if upper < policy['min_success_rate'] else uncertain).append('Minimum task success rate not established')
         drop = comparison['metrics']['success_rate']['delta']
@@ -77,6 +106,8 @@ def release_gate(baseline, candidate, policy=None):
             failures.append('Critical task failed: '+r.task_id)
     for metric, threshold in (('duration_ms','max_latency_increase'),('cost_usd','max_cost_increase')):
         if threshold not in policy or policy[threshold] is None: continue
+        if not probabilistic_coverage:
+            uncertain.append('Insufficient probabilistic coverage: '+metric);continue
         a,b=(comparison[k]['distributions'][metric] for k in ('baseline','candidate'))
         change=comparison['metrics'][metric]['mean']
         if a['missing'] or b['missing'] or not a['count'] or not b['count']:
@@ -86,7 +117,11 @@ def release_gate(baseline, candidate, policy=None):
             rows=comparison['tasks']; differences=[r['candidate'][metric]-(1+policy[threshold])*r['baseline'][metric] for r in rows]
             n=len(differences);avg=sum(differences)/n
             variance=sum((x-avg)**2 for x in differences)/(n-1) if n>1 else None
-            lower=avg-1.96*math.sqrt(variance/n) if variance is not None else None
+            if 'independent_groups' in statistics:
+                from ..probabilistic.experiments.statistics import bootstrap
+                grouped=[{'task_group':r['candidate']['metadata'].get('task_group',r['task_id']),'difference':d} for r,d in zip(rows,differences)]
+                ci=bootstrap(grouped,lambda rr:sum(r['difference'] for r in rr)/len(rr));lower=ci[0] if ci else None
+            else:lower=avg-1.96*math.sqrt(variance/n) if variance is not None else None
             (failures if n>=policy['min_tasks'] and lower is not None and lower>0 else uncertain).append(metric+' regression exceeds policy')
     if policy['require_replay']:
         for r in candidates:
@@ -105,6 +140,9 @@ def release_gate(baseline, candidate, policy=None):
     if 'planning' in policy:
         from ..planning.gates import apply_gate
         result=apply_gate(result,baseline,candidate,policy['planning'])
+    if 'probabilistic' in policy:
+        from ..probabilistic.gates import apply_gate
+        result=apply_gate(result,baseline,candidate,policy['probabilistic'])
     return result
 
 

@@ -120,6 +120,9 @@ def make_handler(trace_directory, web_root):
 def main(argv=None):
     from .debug_cli import COMMANDS, main as modern_main
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == 'probabilistic':
+        from .probabilistic.cli import main as probabilistic_main
+        return probabilistic_main(argv[1:])
     if argv and argv[0] == 'world-model':
         from .world_model.cli import main as world_model_main
         return world_model_main(argv[1:])

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "SuccessForecast v1 (temporal constraints additionally enforced in Python)",
+  "properties": {
+    "forecast_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "trajectory_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "task_group": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "benchmark_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "environment_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "tool_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "schema_version": {
+      "const": "success-forecast.v1"
+    },
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "forecast_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "information_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scope": {
+      "enum": [
+        "task_success",
+        "action_outcome",
+        "world_model_confidence"
+      ]
+    },
+    "prediction_horizon": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "maximum": 32
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "confidence_status": {
+      "enum": [
+        "uncalibrated",
+        "empirical_uncalibrated",
+        "fitted_unvalidated"
+      ]
+    },
+    "epistemic_uncertainty": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "aleatoric_uncertainty": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "required": [
+    "forecast_id",
+    "run_id",
+    "task_id",
+    "trajectory_id",
+    "task_group",
+    "policy_version",
+    "model_version",
+    "benchmark_version",
+    "environment_version",
+    "tool_version",
+    "source",
+    "schema_version",
+    "probability",
+    "forecast_timestamp",
+    "information_cutoff"
+  ],
+  "additionalProperties": false
+}

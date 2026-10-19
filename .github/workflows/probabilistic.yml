@@ -1,0 +1,25 @@
+name: Probabilistic reliability research
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  offline-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m unittest tests.test_probabilistic_calibration tests.test_probabilistic_planning tests.test_probabilistic_experiments -v
+      - run: python -m agent_replay.cli probabilistic run --experiment calibration --config examples/probabilistic/smoke.json --output .replay/probabilistic-ci/calibration
+      - run: python -m agent_replay.cli probabilistic run --experiment risk_planning --config examples/probabilistic/smoke.json --output .replay/probabilistic-ci/risk
+      - run: python -m agent_replay.cli probabilistic run --experiment horizon_reliability --config examples/probabilistic/smoke.json --output .replay/probabilistic-ci/horizon
+      - run: python scripts/check_probabilistic_demo.py .replay/probabilistic-ci
+      - run: python -m agent_replay.cli probabilistic publish .replay/probabilistic-ci/calibration/experiment.json .replay/probabilistic-ci/risk/experiment.json .replay/probabilistic-ci/horizon/experiment.json --output .replay/probabilistic-ci/public-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: probabilistic-reliability-evidence
+          path: .replay/probabilistic-ci/

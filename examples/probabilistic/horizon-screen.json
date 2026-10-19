@@ -1,0 +1,21 @@
+{
+  "tasks": 2,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "candidate_count": 2,
+  "samples": 4,
+  "horizons": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "min_groups": 20,
+  "seed": 17,
+  "max_experiment_seconds": 1800
+}

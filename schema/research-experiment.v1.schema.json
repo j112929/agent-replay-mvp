@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "Associated research experiment v1; trajectories stay v2",
+  "properties": {
+    "schema_version": {
+      "const": "research-experiment.v1"
+    },
+    "experiment": {
+      "enum": [
+        "calibration",
+        "risk_planning",
+        "horizon_reliability"
+      ]
+    },
+    "experiment_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "completed",
+        "interrupted"
+      ]
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "git_commit_sha": {
+      "type": "string"
+    },
+    "config": {
+      "type": "object"
+    },
+    "runs": {
+      "type": "object"
+    },
+    "comparisons": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "experiment",
+    "experiment_id",
+    "status",
+    "config",
+    "git_commit_sha"
+  ]
+}
