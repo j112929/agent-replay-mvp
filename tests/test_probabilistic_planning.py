@@ -20,6 +20,32 @@ from agent_replay.storage import read
 
 
 class RiskPlanningTests(unittest.TestCase):
+    def test_initial_generation_obeys_deadline_and_cannot_mutate_real_context(self):
+        class SlowGenerator:
+            async def generate(self,c,k):
+                c.state['terminal']=True
+                await asyncio.sleep(.1)
+                return [action(0)]
+        task=make_tasks(1,seeds=(0,))[0];env=WorkflowEnvironment(task);snap=env.snapshot()
+        context=AgentContext(task.id,task.metadata['task_group'],task.instruction,snap['state'],0,ENVIRONMENT)
+        with tempfile.TemporaryDirectory() as tmp:
+            planner=RiskAwarePlanner(WorkflowWorldModel(),SamplingConfig(candidates=2,samples=2,max_latency_ms=1),tmp,
+                generator=SlowGenerator())
+            result=asyncio.run(planner.plan(context))
+            self.assertEqual(result['status'],'failed')
+            self.assertIsNone(result['budget']['cost_usd'])
+            self.assertFalse(context.state['terminal'])
+            self.assertEqual(env.calls,0)
+            import time
+            planner=RiskAwarePlanner(WorkflowWorldModel(),SamplingConfig(candidates=2,samples=2,horizon=1,max_latency_ms=500),tmp,
+                generator=CandidateGenerator(policy,SCHEMAS))
+            def slow_save(*args,**kwargs):time.sleep(.6)
+            with patch('agent_replay.probabilistic.planning.risk_aware_planner.save',side_effect=slow_save) as saved:
+                result=asyncio.run(planner.plan(context))
+            self.assertTrue(saved.called)
+            self.assertEqual(result['status'],'failed')
+            self.assertEqual(planner.cache,{})
+
     def test_generation_fees_include_root_and_every_hypothetical_continuation(self):
         a=CandidateAction('increment','tool',{'delta':1},'counter.add')
         schema={'counter.add':{'type':'object','properties':{'delta':{'type':'integer'}},'required':['delta'],'additionalProperties':False}}

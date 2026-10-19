@@ -1,5 +1,6 @@
 """Research selection adapter for the existing PlanningAgent execution loop."""
 import copy
+import asyncio
 from dataclasses import asdict, replace
 from pathlib import Path
 from statistics import mean
@@ -56,10 +57,14 @@ class RiskAwarePlanner:
         try:
             if reason:
                 previous_planning_id=cache['planning_id'] if cache else None
-                candidates=await self.generator.generate(context,self.sampling.candidates)
+                candidates=await asyncio.wait_for(self.generator.generate(copy.deepcopy(context),self.sampling.candidates),
+                    self.sampling.max_latency_ms/1000)
                 record_generation_cost(self.generator,candidates,session['budget'])
                 root_generation_cost=session['budget']['cost_usd']
-                effective_sampling=replace(self.sampling,seed=(self.sampling.seed+context.state_version*104729)%2**31)
+                remaining_ms=int(self.sampling.max_latency_ms-(time.monotonic()-started)*1000)
+                if remaining_ms<1:raise TimeoutError('Planning deadline exhausted')
+                effective_sampling=replace(self.sampling,seed=(self.sampling.seed+context.state_version*104729)%2**31,
+                    max_latency_ms=remaining_ms)
                 sampled=await MonteCarloSampler(self.continuation,self.model,effective_sampling,self.shared_budget).sample(context,candidates)
                 if root_generation_cost is None or sampled['budget']['cost_usd'] is None:sampled['budget']['cost_usd']=None
                 else:sampled['budget']['cost_usd']+=root_generation_cost
@@ -126,6 +131,8 @@ class RiskAwarePlanner:
                 session['rollouts']=[self._compact(context,a,asdict(root))];session['candidates']=[asdict(a)]
                 selected=cache['metrics'];alternatives=[{'candidate_id':a.candidate_id,'score':selected['score'],'risk':selected['severe_failure_probability']}]
                 session['research']={'cached_plan_id':cache['planning_id'],'planner':self.method,'replanning_event':None,'forecasts':[]}
+            if (time.monotonic()-started)*1000>self.sampling.max_latency_ms:
+                raise TimeoutError('Planning deadline exhausted')
             cache['last_prediction']=copy.deepcopy(cache['states'][cache['used']]);cache['used']+=1
             self.generator.validate(a)
             session['selection']={'selected_candidate_id':a.candidate_id,'selected_action':asdict(a),'selection_score':selected['score'],
@@ -134,6 +141,7 @@ class RiskAwarePlanner:
                 'success_probability':selected['success_probability'] if reason else None,'calibration_status':'uncalibrated'}
             session['status']='selected'
         except Exception as exc:
+            self.cache.pop(context.trajectory_id,None)
             session.update(status='failed',reason=type(exc).__name__)
             if hasattr(exc,'budget'):session['budget']=copy.deepcopy(exc.budget)
             session['budget'].update(cost_usd=None,usage_complete=False)
