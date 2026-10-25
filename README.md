@@ -118,6 +118,27 @@ agent-replay experience cluster .replay/failures.json --labels examples/experien
 The sample is synthetic; the optional accuracy gate measures supplied labels.
 See the [contracts, interfaces, quality metrics and scope](docs/failure-to-experience.md).
 
+## Install the Codex plugin from GitHub
+
+Requires Codex and Python 3.10+ for local execution. Add this repository as a
+marketplace and install the bundled plugin:
+
+```bash
+codex plugin marketplace add j112929/agent-replay-mvp --ref main
+codex plugin add agent-replay@agent-replay-marketplace
+```
+
+Start a new local task after installation. To update after a new release:
+
+```bash
+codex plugin marketplace upgrade agent-replay-marketplace
+codex plugin add agent-replay@agent-replay-marketplace
+```
+
+This is a GitHub marketplace installation, separate from the official public
+plugin directory. Recorded and fixture replays run without model credentials;
+live model replay requires your own configured provider credentials.
+
 ## Development and packaging
 
 ```bash

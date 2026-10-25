@@ -1,0 +1,20 @@
+{
+  "name": "agent-replay-marketplace",
+  "interface": {
+    "displayName": "Agent Replay"
+  },
+  "plugins": [
+    {
+      "name": "agent-replay",
+      "source": {
+        "source": "local",
+        "path": "./plugins/agent-replay"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

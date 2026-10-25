@@ -1,6 +1,6 @@
 {
   "name": "agent-replay",
-  "version": "0.4.0+codex.20261025065905",
+  "version": "0.4.1",
   "description": "Capture production failures, compare controlled reruns, and turn fixes into regression CI.",
   "author": {
     "name": "Joe Ji",
@@ -9,8 +9,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Agent Regression Debugger",
-    "shortDescription": "Production failures to regression tests.",
-    "longDescription": "Local-first Python capture, crash-recoverable evidence, cross-model/tool/code experiments, structural diff, and business assertion CI.",
+    "shortDescription": "Replay failures, prevent bugs",
+    "longDescription": "Debug Python agents locally: capture execution trajectories, inspect failed model and tool steps, compare recorded or fixture replays, and turn fixes into regression checks. Includes a bundled Python SDK and local reports. Requires Python 3.10+ and local desktop execution. Live model replay is optional and requires your own provider credentials; selected captured request data is sent to that provider. Recorded and fixture replay do not call a model provider. Historical replay alone does not prove that downstream agent behavior is fixed.",
     "developerName": "Joe Ji",
     "category": "Productivity",
     "capabilities": [
@@ -22,7 +22,12 @@
       "Add trajectory capture to my Python agent.",
       "Replay the failed tool with a JSON fixture and compare."
     ],
-    "brandColor": "#D7FA75"
+    "brandColor": "#426B24",
+    "logo": "./assets/icon.svg",
+    "composerIcon": "./assets/icon.svg",
+    "brandColorDark": "#D7FA75",
+    "websiteURL": "https://agent-replay-debugger.vercel.app",
+    "supportURL": "https://github.com/j112929/agent-replay-mvp/issues"
   },
   "repository": "https://github.com/j112929/agent-replay-mvp",
   "homepage": "https://agent-replay-debugger.vercel.app",
@@ -32,5 +37,13 @@
     "debugging",
     "trajectory",
     "replay"
-  ]
+  ],
+  "requires_local_executor": true,
+  "extensions": {
+    "com.openai": {
+      "publication": {
+        "release_notes": "Adds failure-to-experience extraction, clustering, qualified refund scenarios, portable evaluated-experience exports, and bilingual evaluation reports. Includes local execution metadata and listing icons."
+      }
+    }
+  }
 }

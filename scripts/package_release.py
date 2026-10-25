@@ -29,7 +29,7 @@ for folder in ('sdk','dist','examples','tests','schema','scripts','docs','plugin
     for p in (root/folder).rglob('*'):
         if p.is_file() and not any(part in excluded or part.endswith('.egg-info') for part in p.relative_to(root).parts) and p.suffix not in ('.pyc','.zip','.whl'):
             paths.append(p)
-for name in ('README.md','LICENSE','pyproject.toml','package.json','vercel.json','.gitignore','.dockerignore'):
+for name in ('.agents/plugins/marketplace.json','README.md','LICENSE','pyproject.toml','package.json','vercel.json','.gitignore','.dockerignore'):
     paths.append(root/name)
 buffer=io.BytesIO()
 with zipfile.ZipFile(buffer,'w',zipfile.ZIP_DEFLATED) as z:
