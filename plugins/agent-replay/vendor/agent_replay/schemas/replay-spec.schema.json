@@ -18,6 +18,7 @@
     "entrypoint_id": {
       "type": "string"
     },
+    "input_override": {},
     "limits": {
       "type": "object",
       "properties": {

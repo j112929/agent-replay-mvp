@@ -1,6 +1,7 @@
 """Publish the JSON contracts used by capture, experiments and regression CI."""
 import json
 from pathlib import Path
+import sys
 root=Path(__file__).resolve().parents[1]/'schema'
 def obj(properties,required=None):return {'type':'object','properties':properties,'required':list(properties) if required is None else required}
 def enum(*values):return {'enum':list(values)}
@@ -12,9 +13,12 @@ trace=obj({'schema_version':{'const':'2.0'},'id':s,'name':s,'started_at':{'type'
 selector=obj({'boundary_id':s,'name':s,'kind':enum('llm','tool','agent'),'scope_path':array(s),'lane_id':{'type':['string','null']},'occurrence':integer,'input_digest':s},[])
 fixture=obj({'id':s,'selector':selector,'consume':enum('once','sequence','repeat'),'response':obj({'kind':enum('return','raise'),'value':{},'error':{'type':'object'}},['kind']),'responses':array({'type':'object'}),'expected_calls':integer},['id','selector','consume'])
 limits=obj({'timeout_seconds':{'type':'number','exclusiveMinimum':0,'maximum':3600},'max_steps':integer,'max_model_calls':integer,'max_tokens':integer},[])
-spec=obj({'schema_version':{'const':'1.0'},'scope':{'const':'agent'},'policy':enum('frozen','hybrid'),'entrypoint_id':s,'limits':limits,'fixtures':array(fixture),'model_rules':array({'type':'object'}),'tool_rules':array({'type':'object'}),'code_ref':s,'determinism':{'type':'object'}},['entrypoint_id'])
+spec=obj({'schema_version':{'const':'1.0'},'scope':{'const':'agent'},'policy':enum('frozen','hybrid'),'entrypoint_id':s,'input_override':{},'limits':limits,'fixtures':array(fixture),'model_rules':array({'type':'object'}),'tool_rules':array({'type':'object'}),'code_ref':s,'determinism':{'type':'object'}},['entrypoint_id'])
 assertion=obj({'id':s,'op':enum('equals','not_equals','exists','lte','gte','contains','count','forbidden','execution_completed','no_unhandled_error'),'select':selector,'path':s,'expected':{},'quantifier':enum('all','any')},['id','op'])
 case=obj({'schema_version':{'const':'1.0'},'id':s,'title':s,'entrypoint_id':s,'source':obj({'trace_path':s,'sha256':s}),'replay_spec':{'type':'object'},'assertions':array(assertion),'baseline':{'type':'object'},'live_policy':{'type':'object'}},['schema_version','id','entrypoint_id','source','replay_spec','assertions'])
 result=obj({'schema_version':{'const':'1.0'},'id':s,'case_id':s,'verdict':enum('pass','fail','error','inconclusive','not_evaluated'),'assertions':array({'type':'object'}),'fidelity':{'type':'object'}},['schema_version','id','case_id','verdict','assertions'])
 contracts={'trajectory-v2':trace,'replay-spec':spec,'regression-case':case,'regression-result':result,'fixture-set':obj({'schema_version':{'const':'1.0'},'fixtures':array(fixture)}),'project':obj({'schema_version':{'const':'1.0'},'project_id':s,'entrypoints':{'type':'object'},'providers':{'type':'object'},'tools':{'type':'object'},'suites':{'type':'object'}},['schema_version','entrypoints']),'comparison':obj({'schema_version':{'const':'1.0'},'source_trace_id':s,'candidate_trace_id':s,'aligned_pairs':array({'type':'object'}),'added_steps':array(s),'removed_steps':array(s),'ambiguous_groups':array({'type':'object'})}),'bundle-manifest':obj({'schema_version':{'const':'1.0'},'source_trace_id':s,'files':array(obj({'path':s,'size':integer,'sha256':s}))}),'journal-event':obj({'schema_version':{'const':'1.0'},'seq':integer,'type':enum('run_started','step_started','step_completed','step_failed','run_output','failure_observed','run_finished'),'payload':{},'checksum':s})}
+sys.path.insert(0, str(root.parent / 'sdk'))
+from agent_replay.experience.contracts import SCHEMAS
+contracts.update(SCHEMAS)
 for name,contract in contracts.items():(root/(name+'.schema.json')).write_text(json.dumps({'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'https://github.com/j112929/agent-replay-mvp/schema/'+name+'.schema.json',**contract},indent=2)+'\n')

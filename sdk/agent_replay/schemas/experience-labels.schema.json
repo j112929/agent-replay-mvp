@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-labels.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.labels.v1"
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "reviewer",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "enum": [
+        "synthetic",
+        "adjudicated"
+      ]
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "failure_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "mode": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "failure_id",
+          "mode"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 2
+    }
+  },
+  "required": [
+    "schema_version",
+    "review",
+    "scope",
+    "labels"
+  ],
+  "additionalProperties": false
+}

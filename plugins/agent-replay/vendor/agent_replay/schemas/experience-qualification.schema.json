@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-qualification.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.qualification.v1"
+    },
+    "scenario_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "environment_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "verifier_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "requirement_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "implementation_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "state": {
+      "enum": [
+        "qualified",
+        "rejected"
+      ]
+    },
+    "repeats": {
+      "const": 100
+    },
+    "stable": {
+      "type": "boolean"
+    },
+    "witnesses": {
+      "type": "object"
+    },
+    "evidence_digests": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "scenario_digest",
+    "environment_digest",
+    "verifier_digest",
+    "requirement_digest",
+    "implementation_digest",
+    "source_digest",
+    "state",
+    "repeats",
+    "stable",
+    "witnesses",
+    "evidence_digests"
+  ],
+  "additionalProperties": false
+}

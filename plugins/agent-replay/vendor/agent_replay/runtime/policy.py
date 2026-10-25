@@ -35,6 +35,16 @@ class Policy:
         return copy.deepcopy(source['output'])
     def resolve_llm(self,request):
         event=self.run._current_event
+        if len(self.run.trace['steps'])>self.spec.get('limits',{}).get('max_steps',2000):raise ReplayMismatch('Step budget exceeded')
+        response=self.fixtures.resolve(event)
+        if response is not None:
+            event['replay_mode']='fixture'
+            if response.get('kind')=='raise':self.raise_recorded(response['error'])
+            if response.get('kind')!='return' or not isinstance(response.get('value'),dict):raise ValueError('Model fixture requires a full response object')
+            value=response['value']
+            choices=value.get('choices')
+            if not isinstance(choices,list) or not choices or not isinstance(choices[0],dict) or not isinstance(choices[0].get('message'),dict):raise ValueError('Model fixture requires choices/message in a full response')
+            return copy.deepcopy(value)
         rules=[r for r in self.spec.get('model_rules',[]) if matches(r['selector'],event)]
         if len(rules)>1: raise ReplayMismatch('Conflicting model rules')
         if rules and rules[0]['mode']=='live':

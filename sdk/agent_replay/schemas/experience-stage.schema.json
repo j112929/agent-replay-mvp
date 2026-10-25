@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-stage.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.stage.v1"
+    },
+    "key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "stage": {
+      "enum": [
+        "ingest",
+        "cluster",
+        "mutate"
+      ]
+    },
+    "implementation_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_digests": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "config": {
+      "type": "object"
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "state": {
+      "enum": [
+        "running",
+        "completed",
+        "failed"
+      ]
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "output_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "key",
+    "stage",
+    "implementation_version",
+    "input_digests",
+    "config",
+    "seed",
+    "state",
+    "attempt"
+  ],
+  "additionalProperties": false
+}

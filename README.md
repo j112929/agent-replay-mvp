@@ -19,7 +19,32 @@ See [rollout architecture, API, workers and scope](docs/rollout-infrastructure.m
 
 **Turn a production agent failure into a regression test.**
 
-Capture the input and model/tool boundaries, rerun trusted agent code with controlled observations, compare model/tool/code changes, and verify business assertions in CI. Python 3.10+, MIT, no runtime dependencies. Package version 0.2.0; the package has not been published to PyPI.
+Capture the input and model/tool boundaries, rerun trusted agent code with controlled observations, compare model/tool/code changes, and verify business assertions in CI. Python 3.10+, MIT, no runtime dependencies. Package version 0.4.0; the package has not been published to PyPI.
+
+## Hosted workspace: 中文 / English
+
+[Overview](https://agent-replay-debugger.vercel.app/) · [Replay & regression](https://agent-replay-debugger.vercel.app/debugger.html) · [Benchmarks](https://agent-replay-debugger.vercel.app/benchmark.html) · [Refund evaluation](https://agent-replay-debugger.vercel.app/refund/evaluation.html)
+
+The four pages share grouped navigation and a persistent language preference. Overview, Replay and Benchmarks translate product copy, controls, dialogs and known validation messages. Refund offers Chinese and English aggregate reports. Switching language preserves the active Replay view, selected captures, imported snapshots/reports, and open dialog drafts. Language preference is browser-local; imported evidence is not uploaded by the static viewer.
+
+中文：四个页面共用分组导航和语言选择。首页、Replay、Benchmarks 的正文、按钮、弹窗和已知校验提示支持中英切换；Refund 提供双语汇总报告。切换语言不会清空当前视图、选中记录、导入数据或弹窗草稿。语言偏好保存在当前浏览器，静态查看器不会上传导入的执行证据。
+
+Raw JSON, code, trajectory names, identifiers, hardware/provider diagnostics and execution evidence remain literal. Unknown service errors have a translated explanation followed by unchanged diagnostic details. The legacy step debugger at `/legacy.html` retains its original interface and is outside the four-page bilingual workspace.
+
+### Refund live evaluation
+
+The hosted report contains **12 synthetic task families, 24 executable scenarios and 72 evaluated records**, split by related provenance groups. Validation and test each contain 2 scenarios. Qualified verifier evidence and complete model executions remain local.
+
+Two pinned OpenAI models were evaluated with 3 repetitions per scenario, producing 24 real responses and no provider errors:
+
+| Model | Validation successes / runs | Test successes / runs |
+|---|---:|---:|
+| `gpt-4.1-mini-2025-04-14` | 6/6 | 0/6 |
+| `gpt-4o-mini-2024-07-18` | 0/6 | 0/6 |
+
+Stable cross-model failure reproduction was **2/4 scenarios (50%)**. Eleven of the eighteen failed runs violated the plain-JSON protocol through Markdown code fences; JSON response mode and automatic fence stripping were not enabled. These results measure end-to-end behavior on four synthetic held-out scenarios, not production generalization, an intrinsic model ranking or RL training gains.
+
+Only the static website and aggregate reports are publicly deployed. **Source and full dataset ZIP files remain local**, with no public download endpoints. No model API key or complete trajectory dataset is published with the website.
 
 ## A working failure → fix → regression story
 
@@ -77,7 +102,21 @@ Cross-model experiments support non-streaming OpenAI-compatible Chat Completions
 - Checksummed data bundles, best-effort credential redaction, and user redactors. Not complete PII detection.
 - Same-origin loopback API with a session token, one worker, persisted jobs and cancellation.
 - Static hosted UI does not run Python, receive local traces automatically, or store API keys.
-- Provider tests use local mock servers; real paid-provider integration and production workload overhead need environment-specific validation.
+- Provider unit tests use local mock servers. The hosted refund report also includes a small live-model evaluation; production workload overhead and broader provider integration still need environment-specific validation.
+
+## Failure-to-Experience: extraction and clustering
+
+Phase A/B adds versioned sidecars, resumable local ingestion, deterministic
+failure-event clustering, reviewed merge/split controls, and JSON/HTML evidence
+reports. Existing replay and regression execution stays in place.
+
+```bash
+agent-replay experience ingest examples/experience/traces --output .replay/failures.json
+agent-replay experience cluster .replay/failures.json --labels examples/experience/labels.json --quality-gate
+```
+
+The sample is synthetic; the optional accuracy gate measures supplied labels.
+See the [contracts, interfaces, quality metrics and scope](docs/failure-to-experience.md).
 
 ## Development and packaging
 
@@ -92,3 +131,25 @@ python scripts/package_release.py --check
 `dist/` is the canonical web source. Packaging synchronizes `sdk/agent_replay/web`, public schemas, and the self-contained plugin vendor. Do not edit generated copies. The deterministic source ZIP excludes user traces, credentials, environments, and recursive archives. GitHub workflows run SDK/web tests, the fail/pass/fail story, regression reports, and wheel/plugin smoke checks.
 
 Vercel serves `dist/` as a static site using `vercel.json`. Backend execution stays in the local runner.
+
+Refund Failure-to-Experience acceptance (offline, synthetic):
+
+```sh
+agent-replay experience refund-demo --directory .replay/refund
+```
+
+This generates and qualifies eleven mutated refund scenarios and verifies the
+existing regression runner produces fail → pass → fail. See
+[Phases A–F](docs/failure-to-experience.md) for interfaces and scope.
+
+Evaluate and export the refund evidence with source and verifier qualification:
+
+```sh
+agent-replay experience evaluate .replay/refund/scenarios.json --report .replay/refund/report.json --directory .replay/refund
+agent-replay experience export .replay/refund/scenarios.json --report .replay/refund/report.json --directory .replay/refund --destination .replay/refund-export
+agent-replay experience verify-export .replay/refund-export
+```
+
+The export contains qualified evaluated experiences, binary rewards and portable
+source/witness evidence. Related refund scenarios stay in one split; the single
+synthetic family cannot establish held-out or RL training improvement.

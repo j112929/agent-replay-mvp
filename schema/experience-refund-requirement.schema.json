@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-refund-requirement.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.refund-requirement.v1"
+    },
+    "authority": {
+      "type": "string",
+      "minLength": 1
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_minor": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 1000000000
+    },
+    "paid_minor": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 1000000000
+    },
+    "refunded_minor": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "requested_minor": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 1000000000
+    },
+    "require_exactly_one": {
+      "const": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "authority",
+    "order_id",
+    "currency",
+    "approved_minor",
+    "paid_minor",
+    "refunded_minor",
+    "requested_minor",
+    "require_exactly_one"
+  ],
+  "additionalProperties": false
+}

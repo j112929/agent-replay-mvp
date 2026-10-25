@@ -1,0 +1,58 @@
+name: Failure-to-Experience offline acceptance
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  offline-experience:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
+      - name: Extract immutable source evidence
+        run: >-
+          agent-replay experience ingest examples/experience/traces
+          --directory .replay/experience --output .replay/failures.json
+      - name: Check clustering against synthetic fixture labels
+        run: >-
+          agent-replay experience cluster .replay/failures.json
+          --directory .replay/experience --config examples/experience/config.json
+          --labels examples/experience/labels.json --quality-gate
+      - name: Qualify refund verifiers and check fail-pass-fail
+        run: agent-replay experience refund-demo --directory .replay/refund --seed 0
+      - name: Evaluate qualified refund evidence
+        run: >-
+          agent-replay experience evaluate .replay/refund/scenarios.json
+          --report .replay/refund/report.json --directory .replay/refund
+          --output .replay/refund/evaluation.json
+      - name: Export portable evaluated experiences
+        run: >-
+          agent-replay experience export .replay/refund/scenarios.json
+          --report .replay/refund/report.json --directory .replay/refund
+          --destination .replay/refund-export --profile evaluated-experience
+      - name: Verify export with its own evidence store
+        run: agent-replay experience verify-export .replay/refund-export
+      - name: Execute independent families and require nonempty lineage splits
+        run: >-
+          agent-replay experience refund-families --family-count 3 --budget 1
+          --directory .replay/refund-families --destination .replay/refund-curriculum
+      - name: Verify portable multi-family evidence
+        run: agent-replay experience verify-collection .replay/refund-curriculum
+      - name: Compare held-out registered candidates
+        run: agent-replay experience held-out .replay/refund-curriculum --output .replay/held-out.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: failure-clustering-evidence
+          path: |
+            .replay/experience
+            .replay/failures.json
+            .replay/refund
+            .replay/refund-export
+            .replay/refund-families
+            .replay/refund-curriculum
+            .replay/held-out.json
+          include-hidden-files: true
+          retention-days: 14

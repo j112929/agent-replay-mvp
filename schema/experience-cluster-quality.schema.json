@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-cluster-quality.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.cluster-quality.v1"
+    },
+    "labels_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "reviewer",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "enum": [
+        "synthetic",
+        "adjudicated"
+      ]
+    },
+    "labeled_records": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unlabeled_records": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "true_positive_pairs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "false_positive_pairs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "false_negative_pairs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "pairwise_precision": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pairwise_recall": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "targets": {
+      "type": "object",
+      "properties": {
+        "pairwise_precision": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "pairwise_recall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "pairwise_precision",
+        "pairwise_recall"
+      ],
+      "additionalProperties": false
+    },
+    "gate": {
+      "enum": [
+        "pass",
+        "fail",
+        "not_evaluated"
+      ]
+    },
+    "uncertainty": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "labels_digest",
+    "review",
+    "scope",
+    "labeled_records",
+    "unlabeled_records",
+    "true_positive_pairs",
+    "false_positive_pairs",
+    "false_negative_pairs",
+    "pairwise_precision",
+    "pairwise_recall",
+    "targets",
+    "gate",
+    "uncertainty"
+  ],
+  "additionalProperties": false
+}

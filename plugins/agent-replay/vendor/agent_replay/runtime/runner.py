@@ -1,4 +1,5 @@
 import asyncio
+import copy
 import inspect
 from pathlib import Path
 from ..capture import Capture
@@ -13,7 +14,7 @@ async def async_run(trace,spec,project,directory):
     preflight=doctor(trace,project,spec['entrypoint_id'])
     if not preflight['ready']: raise ValueError('; '.join(preflight['gaps']))
     source=legacy(trace); policy=Policy(source,spec,project)
-    run=Capture(source['name'],directory,input=source['input'],entrypoint_id=spec['entrypoint_id'],durability='sync',on_capture_error='raise',_policy=policy)
+    run=Capture(source['name'],directory,input=copy.deepcopy(spec.get('input_override',source['input'])),entrypoint_id=spec['entrypoint_id'],durability='sync',on_capture_error='raise',_policy=policy)
     policy.run=run
     d=spec.get('determinism',{})
     if 'rng_seed' in d: run.random.seed(d['rng_seed'])
@@ -23,10 +24,20 @@ async def async_run(trace,spec,project,directory):
         with run:
             if d.get('state_adapter_id'):
                 run.state = callable_for(project,'state_adapters',d['state_adapter_id'])(run.input)
-            value=callable_for(project,'entrypoints',spec['entrypoint_id'])(run)
-            if inspect.isawaitable(value): value=await value
-            run.set_output(value)
-            policy.fixtures.verify()
+            try:
+                value=callable_for(project,'entrypoints',spec['entrypoint_id'])(run)
+                if inspect.isawaitable(value): value=await value
+                run.set_output(value)
+                policy.fixtures.verify()
+            finally:
+                try:
+                    if d.get('state_snapshot_adapter_id'):
+                        snapshot=callable_for(project,'state_adapters',d['state_snapshot_adapter_id'])(run.state)
+                        digest(snapshot)  # Reject non-JSON evidence before persisting it.
+                        run.trace['metadata']['environment_state']=copy.deepcopy(snapshot)
+                finally:
+                    if d.get('state_cleanup_adapter_id'):
+                        callable_for(project,'state_adapters',d['state_cleanup_adapter_id'])(run.state)
     except Exception:
         if run.path is None: raise
     result=to_v2(run.trace)

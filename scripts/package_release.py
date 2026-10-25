@@ -7,10 +7,11 @@ import zipfile
 from sync_plugin import sync
 
 root=Path(__file__).resolve().parents[1];check='--check' in sys.argv
-assets=[p for p in (root/'dist').iterdir() if p.suffix in ('.html','.css','.js','.json')]
+assets=[p for p in (root/'dist').rglob('*') if p.suffix in ('.html','.css','.js','.json')]
 web=root/'sdk'/'agent_replay'/'web';web.mkdir(exist_ok=True)
 for p in assets:
-    target=web/p.name
+    target=web/p.relative_to(root/'dist')
+    if not check:target.parent.mkdir(parents=True,exist_ok=True)
     if check:
         if not target.exists() or target.read_bytes()!=p.read_bytes():raise SystemExit('Web drift: '+p.name)
     else:shutil.copyfile(p,target)

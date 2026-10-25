@@ -1,0 +1,11 @@
+{
+  "schema_version": "experience.refund-requirement.v1",
+  "authority": "synthetic-refund-policy.v1",
+  "order_id": "o_1042",
+  "currency": "USD",
+  "approved_minor": 3000,
+  "paid_minor": 29900,
+  "refunded_minor": 0,
+  "requested_minor": 3100,
+  "require_exactly_one": true
+}

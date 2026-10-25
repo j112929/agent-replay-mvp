@@ -1,0 +1,705 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-report.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.report.v1"
+    },
+    "dataset_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "cluster_set_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "traces": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "clusters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outliers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rejections": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "domains": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "traces",
+        "failures",
+        "clusters",
+        "outliers",
+        "rejections",
+        "domains"
+      ],
+      "additionalProperties": false
+    },
+    "dataset": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "experience.failures.v1"
+        },
+        "extractor_version": {
+          "const": "failure-extractor.v1"
+        },
+        "input_digests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "schema_version": {
+                "const": "experience.failure.v1"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "source": {
+                "type": "object",
+                "properties": {
+                  "trace_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "trace_digest": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "normalized_digest": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "trace_id",
+                  "trace_digest",
+                  "normalized_digest"
+                ],
+                "additionalProperties": false
+              },
+              "family_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "origin": {
+                "enum": [
+                  "captured_failure",
+                  "step_error",
+                  "execution_error",
+                  "regression_assertion",
+                  "regression_result",
+                  "capture_gap"
+                ]
+              },
+              "category": {
+                "type": "string",
+                "minLength": 1
+              },
+              "domain": {
+                "enum": [
+                  "application",
+                  "infrastructure",
+                  "unknown"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "error_type": {
+                "type": "string"
+              },
+              "assertion_id": {
+                "type": "string"
+              },
+              "step_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              },
+              "boundary_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              },
+              "tool_sequence": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              },
+              "eligibility": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "eligible",
+                      "blocked",
+                      "unknown"
+                    ]
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 0,
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "state",
+                  "reasons"
+                ],
+                "additionalProperties": false
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "artifact_digest": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "pointer": {
+                      "type": "string",
+                      "pattern": "^(/.*)?$"
+                    }
+                  },
+                  "required": [
+                    "artifact_digest",
+                    "pointer"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "signature": {
+                "type": "object",
+                "properties": {
+                  "normalization_version": {
+                    "const": "failure-signature.v1"
+                  },
+                  "family_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "domain": {
+                    "enum": [
+                      "application",
+                      "infrastructure",
+                      "unknown"
+                    ]
+                  },
+                  "category": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "error_type": {
+                    "type": "string"
+                  },
+                  "assertion_id": {
+                    "type": "string"
+                  },
+                  "boundary_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 0,
+                    "uniqueItems": true
+                  },
+                  "tool_sequence": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 0
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "normalization_version",
+                  "family_id",
+                  "domain",
+                  "category",
+                  "error_type",
+                  "assertion_id",
+                  "boundary_ids",
+                  "tool_sequence",
+                  "message"
+                ],
+                "additionalProperties": false
+              },
+              "signature_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "schema_version",
+              "id",
+              "source",
+              "family_id",
+              "origin",
+              "category",
+              "domain",
+              "message",
+              "error_type",
+              "assertion_id",
+              "step_ids",
+              "boundary_ids",
+              "tool_sequence",
+              "eligibility",
+              "evidence",
+              "signature",
+              "signature_digest"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "rejections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "artifact_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "artifact_digest",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "trace_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "result_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "schema_version",
+        "extractor_version",
+        "input_digests",
+        "records",
+        "rejections",
+        "trace_count",
+        "result_count"
+      ],
+      "additionalProperties": false
+    },
+    "cluster_set": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "experience.cluster-set.v1"
+        },
+        "records_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "config": {
+          "type": "object",
+          "properties": {
+            "algorithm_version": {
+              "const": "deterministic.v1"
+            },
+            "similarity_threshold": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 1
+            },
+            "min_cluster_size": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            }
+          },
+          "required": [
+            "algorithm_version",
+            "similarity_threshold",
+            "min_cluster_size"
+          ],
+          "additionalProperties": false
+        },
+        "config_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "member_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "reviewer": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "reviewer",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "member_ids",
+              "label",
+              "review"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "clusters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "schema_version": {
+                "const": "experience.cluster.v1"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "domain": {
+                "enum": [
+                  "application",
+                  "infrastructure",
+                  "unknown"
+                ]
+              },
+              "family_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "member_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "representative_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "method": {
+                "enum": [
+                  "automatic",
+                  "reviewed"
+                ]
+              },
+              "config_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "review": {
+                "type": "object",
+                "properties": {
+                  "reviewer": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "reviewer",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schema_version",
+              "id",
+              "label",
+              "domain",
+              "family_id",
+              "member_ids",
+              "representative_ids",
+              "confidence",
+              "method",
+              "config_digest"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "outliers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "failure_id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "failure_id",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "schema_version",
+        "records_digest",
+        "config",
+        "config_digest",
+        "overrides",
+        "clusters",
+        "outliers"
+      ],
+      "additionalProperties": false
+    },
+    "quality": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "schema_version": {
+              "const": "experience.cluster-quality.v1"
+            },
+            "labels_digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "review": {
+              "type": "object",
+              "properties": {
+                "reviewer": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "reviewer",
+                "reason"
+              ],
+              "additionalProperties": false
+            },
+            "scope": {
+              "enum": [
+                "synthetic",
+                "adjudicated"
+              ]
+            },
+            "labeled_records": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unlabeled_records": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "true_positive_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "false_positive_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "false_negative_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "pairwise_precision": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "pairwise_recall": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "targets": {
+              "type": "object",
+              "properties": {
+                "pairwise_precision": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "pairwise_recall": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "pairwise_precision",
+                "pairwise_recall"
+              ],
+              "additionalProperties": false
+            },
+            "gate": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_evaluated"
+              ]
+            },
+            "uncertainty": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "schema_version",
+            "labels_digest",
+            "review",
+            "scope",
+            "labeled_records",
+            "unlabeled_records",
+            "true_positive_pairs",
+            "false_positive_pairs",
+            "false_negative_pairs",
+            "pairwise_precision",
+            "pairwise_recall",
+            "targets",
+            "gate",
+            "uncertainty"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "dataset_digest",
+    "cluster_set_digest",
+    "summary",
+    "dataset",
+    "cluster_set",
+    "quality"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-scenario.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.scenario.v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "parent_failure_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "parent_cluster_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "family_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input": {},
+    "mutation": {
+      "type": "object",
+      "properties": {
+        "operator_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parameters": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "operator_id",
+        "parameters"
+      ],
+      "additionalProperties": false
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "difficulty": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "verifier_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "parent_failure_ids",
+    "parent_cluster_id",
+    "family_id",
+    "input",
+    "mutation",
+    "seed",
+    "difficulty",
+    "environment_digest",
+    "verifier_digest"
+  ],
+  "additionalProperties": false
+}

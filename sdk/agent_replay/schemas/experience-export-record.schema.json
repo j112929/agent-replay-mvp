@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-export-record.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.export-record.v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "profile": {
+      "enum": [
+        "scenario",
+        "evaluated-experience"
+      ]
+    },
+    "scenario_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "environment_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "verifier_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "qualification_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "requirement_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_trace_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "parent_failure_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "parent_cluster_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "family_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input": {},
+    "seed": {
+      "type": "integer"
+    },
+    "split": {
+      "enum": [
+        "train",
+        "validation",
+        "test"
+      ]
+    },
+    "group_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "result_digest": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "trace_digest": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "candidate": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "version"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "fail",
+        null
+      ]
+    },
+    "reward": {
+      "enum": [
+        0,
+        1,
+        null
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "profile",
+    "scenario_digest",
+    "environment_digest",
+    "verifier_digest",
+    "qualification_digest",
+    "requirement_digest",
+    "source_trace_digest",
+    "parent_failure_ids",
+    "parent_cluster_id",
+    "family_id",
+    "input",
+    "seed",
+    "split",
+    "group_id",
+    "result_digest",
+    "trace_digest",
+    "candidate",
+    "verdict",
+    "reward"
+  ],
+  "additionalProperties": false
+}

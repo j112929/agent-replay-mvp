@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-collection.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "refund-collection.v1"
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "ratios": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "minItems": 3
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "minItems": 3,
+      "uniqueItems": true
+    },
+    "splits": {
+      "type": "object",
+      "properties": {
+        "train": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "validation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "test": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "train",
+        "validation",
+        "test"
+      ],
+      "additionalProperties": false
+    },
+    "record_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "split_group_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "split_policy": {
+      "const": "connected-source-family-parent-equivalent-task.v2"
+    },
+    "policy_rollout_ready": {
+      "const": false
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "seed",
+    "ratios",
+    "children",
+    "splits",
+    "record_count",
+    "split_group_count",
+    "split_policy",
+    "policy_rollout_ready",
+    "artifacts"
+  ],
+  "additionalProperties": false
+}

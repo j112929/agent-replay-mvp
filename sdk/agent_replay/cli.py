@@ -119,6 +119,9 @@ def make_handler(trace_directory, web_root):
 def main(argv=None):
     from .debug_cli import COMMANDS, main as modern_main
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == 'experience':
+        from .experience.cli import main as experience_main
+        return experience_main(argv[1:])
     if argv and argv[0] == 'rollout':
         from .rollout.cli import main as rollout_main
         return rollout_main(argv[1:])
@@ -126,6 +129,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="agent-replay", description="Capture, inspect, and replay agent failures locally.")
     parser.add_argument("--version", action="version", version=__version__)
     commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("experience", help="Extract and cluster failure evidence")
     server_cmd = commands.add_parser("serve", help="Serve the debugger on loopback")
     server_cmd.add_argument("--project")
     server_cmd.add_argument("--port", type=int, default=8765)

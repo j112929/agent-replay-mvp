@@ -1,0 +1,364 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-scenario-set.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.scenario-set.v1"
+    },
+    "implementation_version": {
+      "const": "refund-mutation.v1"
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "parent_cluster_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "failure_dataset_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "type": "object",
+            "properties": {
+              "schema_version": {
+                "const": "experience.scenario.v1"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "parent_failure_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "parent_cluster_id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "family_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "input": {},
+              "mutation": {
+                "type": "object",
+                "properties": {
+                  "operator_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "parameters": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "operator_id",
+                  "parameters"
+                ],
+                "additionalProperties": false
+              },
+              "seed": {
+                "type": "integer"
+              },
+              "difficulty": {
+                "type": "string",
+                "minLength": 1
+              },
+              "environment_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "verifier_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "schema_version",
+              "id",
+              "parent_failure_ids",
+              "parent_cluster_id",
+              "family_id",
+              "input",
+              "mutation",
+              "seed",
+              "difficulty",
+              "environment_digest",
+              "verifier_digest"
+            ],
+            "additionalProperties": false
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "schema_version": {
+                "const": "experience.environment.v1"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "adapter_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "initial_state": {
+                "type": "object"
+              },
+              "fixture_digests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              },
+              "asset_digests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              },
+              "dependency_versions": {
+                "type": "object"
+              },
+              "reset_adapter_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "limits": {
+                "type": "object",
+                "properties": {
+                  "timeout_seconds": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 3600
+                  },
+                  "max_steps": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "max_model_calls": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "timeout_seconds",
+                  "max_steps",
+                  "max_model_calls"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schema_version",
+              "id",
+              "adapter_id",
+              "initial_state",
+              "fixture_digests",
+              "asset_digests",
+              "dependency_versions",
+              "reset_adapter_id",
+              "limits"
+            ],
+            "additionalProperties": false
+          },
+          "verifier": {
+            "type": "object",
+            "properties": {
+              "schema_version": {
+                "const": "experience.verifier.v1"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "evaluator_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assertions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "op": {
+                      "enum": [
+                        "equals",
+                        "not_equals",
+                        "exists",
+                        "lte",
+                        "gte",
+                        "contains",
+                        "count",
+                        "forbidden",
+                        "execution_completed",
+                        "no_unhandled_error"
+                      ]
+                    },
+                    "select": {
+                      "type": "object"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "expected": {},
+                    "quantifier": {
+                      "enum": [
+                        "all",
+                        "any"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "op"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "requirement_digests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "qualification": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "draft",
+                      "qualified",
+                      "rejected"
+                    ]
+                  },
+                  "evidence_digests": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "minItems": 0,
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "state",
+                  "evidence_digests"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schema_version",
+              "id",
+              "evaluator_id",
+              "assertions",
+              "requirement_digests",
+              "qualification"
+            ],
+            "additionalProperties": false
+          },
+          "requirement": {
+            "type": "object",
+            "properties": {
+              "schema_version": {
+                "const": "experience.refund-requirement.v1"
+              },
+              "authority": {
+                "type": "string",
+                "minLength": 1
+              },
+              "order_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "currency": {
+                "type": "string",
+                "minLength": 1
+              },
+              "approved_minor": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 1000000000
+              },
+              "paid_minor": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 1000000000
+              },
+              "refunded_minor": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "requested_minor": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 1000000000
+              },
+              "require_exactly_one": {
+                "const": true
+              }
+            },
+            "required": [
+              "schema_version",
+              "authority",
+              "order_id",
+              "currency",
+              "approved_minor",
+              "paid_minor",
+              "refunded_minor",
+              "requested_minor",
+              "require_exactly_one"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "scenario",
+          "environment",
+          "verifier",
+          "requirement"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "implementation_version",
+    "seed",
+    "parent_cluster_digest",
+    "failure_dataset_digest",
+    "entries"
+  ],
+  "additionalProperties": false
+}

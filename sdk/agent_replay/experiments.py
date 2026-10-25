@@ -17,8 +17,13 @@ class Cancelled(RuntimeError): pass
 
 def resolve_spec(spec,project,base=None):
     spec=dict(spec)
-    allowed={'schema_version','id','source_trace_id','source_digest','scope','policy','entrypoint_id','limits','fixtures','fixture_set','fixture_set_digest','model_rules','tool_rules','code_ref','determinism','environment_profile'}
+    allowed={'schema_version','id','source_trace_id','source_digest','scope','policy','entrypoint_id','limits','fixtures','fixture_set','fixture_set_digest','model_rules','tool_rules','code_ref','determinism','environment_profile','input_override'}
     if set(spec)-allowed:raise ValueError('Unsupported replay spec fields: '+', '.join(sorted(set(spec)-allowed)))
+    if 'input_override' in spec:
+        from .serialization import canonical
+        import copy
+        if len(canonical(spec['input_override']).encode()) > 5 * 1024 * 1024:raise ValueError('Input override exceeds 5 MB')
+        spec['input_override']=copy.deepcopy(spec['input_override'])
     if spec.get('environment_profile') and spec['environment_profile'] not in project.get('environment_profiles',{}):raise ValueError('Unknown environment profile')
     if spec.get('scope','agent')!='agent':raise ValueError('Use replay --step for single-step experiments')
     if spec.get('policy','frozen') not in ('frozen','hybrid'):raise ValueError('Invalid replay policy')
@@ -33,7 +38,12 @@ def resolve_spec(spec,project,base=None):
     for k in ('max_steps','max_model_calls','max_tokens'):
         if k in limits and type(limits[k]) is not int:raise ValueError('Budget must be integer: '+k)
     for k in spec.get('determinism',{}):
-        if k not in ('clock_fixture','rng_seed','state_adapter_id'):raise ValueError('Unsupported determinism control: '+k)
+        if k not in ('clock_fixture','rng_seed','state_adapter_id','state_snapshot_adapter_id','state_cleanup_adapter_id'):raise ValueError('Unsupported determinism control: '+k)
+    for key in ('state_adapter_id','state_snapshot_adapter_id','state_cleanup_adapter_id'):
+        adapter=spec.get('determinism',{}).get(key)
+        if adapter and adapter not in project.get('state_adapters',{}):raise ValueError('Unregistered state adapter: '+str(adapter))
+    if any(spec.get('determinism',{}).get(k) for k in ('state_snapshot_adapter_id','state_cleanup_adapter_id')) and not spec.get('determinism',{}).get('state_adapter_id'):
+        raise ValueError('State lifecycle requires a reset adapter')
     if spec.get('fixture_set'):
         path=(Path(base or project['_root'])/spec.pop('fixture_set')).resolve()
         if not path.is_relative_to(Path(project['_root']).resolve()):raise ValueError('Fixture path escapes project')

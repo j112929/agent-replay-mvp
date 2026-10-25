@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-scenario-result.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.scenario-result.v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "scenario_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "environment_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "verifier_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "trace_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "fail",
+        "inconclusive",
+        "error"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "artifact_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "pointer": {
+            "type": "string",
+            "pattern": "^(/.*)?$"
+          }
+        },
+        "required": [
+          "artifact_digest",
+          "pointer"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "fidelity": {
+      "type": "object"
+    },
+    "duration_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "usage": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "scenario_digest",
+    "environment_digest",
+    "verifier_digest",
+    "candidate",
+    "seed",
+    "trace_digest",
+    "verdict",
+    "evidence",
+    "fidelity",
+    "duration_ms",
+    "usage"
+  ],
+  "additionalProperties": false
+}

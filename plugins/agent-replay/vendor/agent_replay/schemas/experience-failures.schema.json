@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/j112929/agent-replay-mvp/schema/experience-failures.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "experience.failures.v1"
+    },
+    "extractor_version": {
+      "const": "failure-extractor.v1"
+    },
+    "input_digests": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "const": "experience.failure.v1"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "trace_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "trace_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "normalized_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "trace_id",
+              "trace_digest",
+              "normalized_digest"
+            ],
+            "additionalProperties": false
+          },
+          "family_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "origin": {
+            "enum": [
+              "captured_failure",
+              "step_error",
+              "execution_error",
+              "regression_assertion",
+              "regression_result",
+              "capture_gap"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "enum": [
+              "application",
+              "infrastructure",
+              "unknown"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "error_type": {
+            "type": "string"
+          },
+          "assertion_id": {
+            "type": "string"
+          },
+          "step_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "boundary_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "tool_sequence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          },
+          "eligibility": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "enum": [
+                  "eligible",
+                  "blocked",
+                  "unknown"
+                ]
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "state",
+              "reasons"
+            ],
+            "additionalProperties": false
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "artifact_digest": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "pointer": {
+                  "type": "string",
+                  "pattern": "^(/.*)?$"
+                }
+              },
+              "required": [
+                "artifact_digest",
+                "pointer"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "signature": {
+            "type": "object",
+            "properties": {
+              "normalization_version": {
+                "const": "failure-signature.v1"
+              },
+              "family_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "domain": {
+                "enum": [
+                  "application",
+                  "infrastructure",
+                  "unknown"
+                ]
+              },
+              "category": {
+                "type": "string",
+                "minLength": 1
+              },
+              "error_type": {
+                "type": "string"
+              },
+              "assertion_id": {
+                "type": "string"
+              },
+              "boundary_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              },
+              "tool_sequence": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "normalization_version",
+              "family_id",
+              "domain",
+              "category",
+              "error_type",
+              "assertion_id",
+              "boundary_ids",
+              "tool_sequence",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "signature_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "schema_version",
+          "id",
+          "source",
+          "family_id",
+          "origin",
+          "category",
+          "domain",
+          "message",
+          "error_type",
+          "assertion_id",
+          "step_ids",
+          "boundary_ids",
+          "tool_sequence",
+          "eligibility",
+          "evidence",
+          "signature",
+          "signature_digest"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "rejections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "artifact_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "artifact_digest",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "trace_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "result_count": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "extractor_version",
+    "input_digests",
+    "records",
+    "rejections",
+    "trace_count",
+    "result_count"
+  ],
+  "additionalProperties": false
+}
