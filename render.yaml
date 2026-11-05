@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: agent-replay-debugger
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: AGENT_REPLAY_DATA
+        value: /data
+    disk:
+      name: agent-replay-data
+      mountPath: /data
+      sizeGB: 1
