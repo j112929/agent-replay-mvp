@@ -9,9 +9,22 @@ import signal
 import shutil
 import subprocess
 import sys
+import threading
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "sdk"))
+
+
+def stream_log(path, stop):
+    """Mirror the retained driver log into container logs without changing its pipes."""
+    with path.open(errors="replace") as source:
+        while True:
+            chunk = source.read(8192)
+            if chunk:
+                print(chunk, end="", flush=True)
+            elif stop.wait(0.2):
+                print(source.read(), end="", flush=True)
+                return
 
 
 def preflight(gpus):
@@ -106,7 +119,7 @@ def main():
     (directory / "hardware.json").write_text(json.dumps(hardware, indent=2) + "\n")
     env = dict(os.environ, ROLLOUT_LLM_CONFIG=str(paths["llm"]),
                TOKENIZERS_PARALLELISM="false", OMP_NUM_THREADS="1",
-               VLLM_NO_USAGE_STATS="1", DO_NOT_TRACK="1")
+               VLLM_NO_USAGE_STATS="1", DO_NOT_TRACK="1", PYTHONUNBUFFERED="1")
     result_path = directory / "acceptance.json"
     try:
         with (directory / "run.log").open("w") as log:
@@ -115,6 +128,10 @@ def main():
                  "--config", str(paths["profile"]), "--directory", str(directory / "run")],
                 stdout=log, stderr=subprocess.STDOUT, env=env, start_new_session=True,
             )
+            stop_stream = threading.Event()
+            stream = threading.Thread(target=stream_log,
+                                      args=(directory / "run.log", stop_stream), daemon=True)
+            stream.start()
             try:
                 returncode = process.wait(timeout=args.timeout_seconds + 180)
             except BaseException:
@@ -126,6 +143,9 @@ def main():
                     os.killpg(process.pid, signal.SIGKILL)
                     process.wait()
                 raise
+            finally:
+                stop_stream.set()
+                stream.join(timeout=5)
             if returncode:
                 raise RuntimeError(f"GPU driver exited with status {returncode}; inspect run.log")
         report = json.loads((directory / "run/benchmark.json").read_text())
