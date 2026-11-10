@@ -20,6 +20,22 @@ has not been validated until the target run produces `acceptance.json` with
 
 ## Run after connecting over SSH
 
+On 2026-11-10 the pinned image failed `pip check` because `pygobject` lacked
+`pycairo`, and `nixl==1.3.1` was paired with `nixl-cu13==1.3.2`. The Vast
+on-start template repairs that base-image state before running the bootstrap:
+
+```sh
+apt-get update
+apt-get install -y libcairo2-dev pkg-config python3-dev
+python3 -m pip install --no-cache-dir pycairo nixl-cu13==1.3.1
+```
+
+This repair passed `pip check` and the four-GPU CUDA preflight on RTX A5000.
+It is environment validation, not evidence of successful training; inspect
+the final acceptance file separately. Keep bootstrap output in the instance
+logs, and stream `run.log` while the driver runs when using an unattended
+on-start script.
+
 Clone this deployment branch, then run from its root:
 
 ```sh
