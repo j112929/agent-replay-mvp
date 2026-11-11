@@ -7,9 +7,9 @@ pip install -e .
 agent-replay rollout demo --actors 3 --rounds 8
 ```
 
-New in v0.4: [DDP/GRPO, vLLM, async scheduling, storage, recovery and benchmark guide](docs/distributed-training.md). GPU execution and Kubernetes deployment remain unvalidated without a GPU environment.
+New in v0.4: [DDP/GRPO, vLLM, async scheduling, storage, recovery and benchmark guide](docs/distributed-training.md). A [single-host four-RTX-4090 smoke test](docs/vastai-gpu-smoke-2026-11-10.md) passed two policy updates with a two-GPU DDP learner on 2026-11-10. This is correctness validation only; training improvement, representative performance, multi-host execution and Kubernetes deployment remain unvalidated.
 
-See [rollout architecture, API, workers and scope](docs/rollout-infrastructure.md). The Vercel site displays recorded/imported evidence; the controller and workers run on your infrastructure. This release uses one SQLite controller. Ray GPU reservations and a GRPO learner are implemented; GPU execution and controller high availability are not validated.
+See [rollout architecture, API, workers and scope](docs/rollout-infrastructure.md). The Vercel site displays recorded/imported evidence; the controller and workers run on your infrastructure. This release uses one SQLite controller. Ray GPU reservations and a GRPO learner are implemented; the linked smoke test validates one four-GPU configuration. Controller high availability remains unvalidated.
 
 ---
 
