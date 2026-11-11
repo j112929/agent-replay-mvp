@@ -21,13 +21,11 @@ See [rollout architecture, API, workers and scope](docs/rollout-infrastructure.m
 
 Capture the input and model/tool boundaries, rerun trusted agent code with controlled observations, compare model/tool/code changes, and verify business assertions in CI. Python 3.10+, MIT, no runtime dependencies. Package version 0.4.0; the package has not been published to PyPI.
 
-## Hosted workspace: 中文 / English
+## Hosted workspace: Chinese / English
 
 [Overview](https://agent-replay-debugger.vercel.app/) · [Replay & regression](https://agent-replay-debugger.vercel.app/debugger.html) · [Benchmarks](https://agent-replay-debugger.vercel.app/benchmark.html) · [Refund evaluation](https://agent-replay-debugger.vercel.app/refund/evaluation.html)
 
 The four pages share grouped navigation and a persistent language preference. Overview, Replay and Benchmarks translate product copy, controls, dialogs and known validation messages. Refund offers Chinese and English aggregate reports. Switching language preserves the active Replay view, selected captures, imported snapshots/reports, and open dialog drafts. Language preference is browser-local; imported evidence is not uploaded by the static viewer.
-
-中文：四个页面共用分组导航和语言选择。首页、Replay、Benchmarks 的正文、按钮、弹窗和已知校验提示支持中英切换；Refund 提供双语汇总报告。切换语言不会清空当前视图、选中记录、导入数据或弹窗草稿。语言偏好保存在当前浏览器，静态查看器不会上传导入的执行证据。
 
 Raw JSON, code, trajectory names, identifiers, hardware/provider diagnostics and execution evidence remain literal. Unknown service errors have a translated explanation followed by unchanged diagnostic details. The legacy step debugger at `/legacy.html` retains its original interface and is outside the four-page bilingual workspace.
 
